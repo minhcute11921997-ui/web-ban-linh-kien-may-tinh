@@ -1,3 +1,14 @@
-node_modules/
-.env
+# Dependencies
+ecommerce-backend/node_modules/
+ecommerce-frontend/node_modules/
+
+# Environment variables
+ecommerce-backend/.env
+ecommerce-frontend/.env
+
+# Logs
 *.log
+
+# IDE
+.vscode/
+.idea/
