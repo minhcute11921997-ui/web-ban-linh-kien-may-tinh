@@ -9,6 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ IMPORT MIDDLEWARE
+const { verifyToken } = require('./src/middleware/auth');
+
 // Routes
 const authRoutes = require('./src/routes/auth');
 app.use('/api/auth', authRoutes);
@@ -34,6 +37,15 @@ app.get('/api/test-db', async (req, res) => {
             error: error.message 
         });
     }
+});
+
+// ✅ API TEST MIDDLEWARE - Cần token
+app.get('/api/test-protected', verifyToken, (req, res) => {
+    res.json({
+        success: true,
+        message: 'Bạn đã xác thực thành công!',
+        user: req.user  // Thông tin từ token
+    });
 });
 
 const PORT = process.env.PORT || 3000;
