@@ -16,6 +16,9 @@ const { verifyToken } = require('./src/middleware/auth');
 const authRoutes = require('./src/routes/auth');
 app.use('/api/auth', authRoutes);
 
+const productRoutes = require('./src/routes/product');
+app.use('/api/products', productRoutes);
+
 // Test route
 app.get('/', (req, res) => {
     res.json({ message: 'Backend API đang chạy!' });
