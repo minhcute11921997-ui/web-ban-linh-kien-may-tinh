@@ -19,6 +19,9 @@ app.use('/api/auth', authRoutes);
 const productRoutes = require('./src/routes/product');
 app.use('/api/products', productRoutes);
 
+const categoryRoutes = require('./src/routes/category');
+app.use('/api/categories', categoryRoutes);
+
 // Test route
 app.get('/', (req, res) => {
     res.json({ message: 'Backend API đang chạy!' });
