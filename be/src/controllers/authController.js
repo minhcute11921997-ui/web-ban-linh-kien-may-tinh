@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');         // Mã hoá / so sánh password
-const jwt = require('jsonwebtoken');         // Tạo và xác thực JWT token
-const User = require('../models/User');      // Import User model
+const bcrypt = require('bcryptjs');        
+const jwt = require('jsonwebtoken');        
+const db = require('../config/db');         
 
 // ĐĂNG KÝ tài khoản mới
 exports.register = async (req, res) => {
@@ -13,19 +13,24 @@ exports.register = async (req, res) => {
         }
 
         // Kiểm tra username hoặc email đã tồn tại chưa
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
+        const [existingUser] = await db.query(
+            'SELECT * FROM users WHERE username = ? OR email = ?',
+            [username, email]
+        );
+        if (existingUser.length > 0) {
             return res.status(400).json({ success: false, message: 'Username hoặc email đã tồn tại' });
         }
 
         // Mã hoá password trước khi lưu vào database
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Tạo user mới và lưu vào MongoDB
-        const newUser = new User({ username, email, password: hashedPassword, full_name, phone, address });
-        await newUser.save();
+        // Thêm user mới vào bảng users
+        const [result] = await db.query(
+            'INSERT INTO users (username, email, password, full_name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [username, email, hashedPassword, full_name, phone, address, 'customer']
+        );
 
-        res.status(201).json({ success: true, message: 'Đăng ký thành công!', userId: newUser._id });
+        res.status(201).json({ success: true, message: 'Đăng ký thành công!', userId: result.insertId });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
@@ -40,11 +45,16 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Vui lòng điền username và password' });
         }
 
-        // Tìm user theo username trong MongoDB
-        const user = await User.findOne({ username });
-        if (!user) {
+        // Tìm user theo username trong bảng users
+        const [users] = await db.query(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        );
+        if (users.length === 0) {
             return res.status(401).json({ success: false, message: 'Username hoặc password không đúng' });
         }
+
+        const user = users[0]; // Lấy user đầu tiên tìm được
 
         // So sánh password nhập vào với password đã mã hoá trong database
         const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -54,14 +64,14 @@ exports.login = async (req, res) => {
 
         // Tạo access token (hết hạn sau 1 ngày)
         const token = jwt.sign(
-            { userId: user._id, username: user.username, role: user.role },
+            { userId: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
         // Tạo refresh token (hết hạn sau 7 ngày)
         const refreshToken = jwt.sign(
-            { userId: user._id },
+            { userId: user.id },
             process.env.JWT_REFRESH_SECRET,
             { expiresIn: '7d' }
         );
@@ -71,7 +81,7 @@ exports.login = async (req, res) => {
             message: 'Đăng nhập thành công!',
             token,
             refreshToken,
-            user: { id: user._id, username: user.username, role: user.role } // Trả về thông tin user
+            user: { id: user.id, username: user.username, role: user.role }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
@@ -90,14 +100,16 @@ exports.refresh = async (req, res) => {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
         // Tìm user từ id trong token
-        const user = await User.findById(decoded.userId);
-        if (!user) {
+        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.userId]);
+        if (users.length === 0) {
             return res.status(401).json({ success: false, message: 'User không tồn tại' });
         }
 
+        const user = users[0];
+
         // Tạo access token mới
         const newToken = jwt.sign(
-            { userId: user._id, username: user.username, role: user.role },
+            { userId: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );

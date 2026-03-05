@@ -1,156 +1,130 @@
-const Order = require('../models/Order');   // Import Order model
-const Cart = require('../models/Cart');     // Import Cart model để lấy giỏ hàng khi đặt hàng
-const Product = require('../models/Product'); // Import Product model để trừ tồn kho
+const db = require('../config/db');
 
-// TẠO đơn hàng mới từ giỏ hàng
 exports.createOrder = async (req, res) => {
     try {
         const { shipping_address } = req.body;
-
         if (!shipping_address) {
             return res.status(400).json({ success: false, message: 'Vui lòng nhập địa chỉ giao hàng' });
         }
 
-        // Lấy giỏ hàng hiện tại của user
-        const cart = await Cart.findOne({ user: req.user.userId }).populate('items.product');
-        if (!cart || cart.items.length === 0) {
+        const [items] = await db.query(
+            'SELECT ci.*, p.price, p.stock, p.name FROM cart_items ci JOIN products p ON ci.product_id = p.id WHERE ci.user_id = ?',
+            [req.user.userId]
+        );
+
+        if (items.length === 0) {
             return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
         }
 
-        // Tính tổng tiền và tạo danh sách sản phẩm trong đơn hàng
-        let total_price = 0;
-        const orderItems = [];
-
-        for (const item of cart.items) {
-            // Kiểm tra tồn kho từng sản phẩm trước khi đặt
-            if (item.product.stock < item.quantity) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Sản phẩm "${item.product.name}" không đủ hàng trong kho`
-                });
+        for (const item of items) {
+            if (item.stock < item.quantity) {
+                return res.status(400).json({ success: false, message: `Sản phẩm "${item.name}" không đủ hàng trong kho` });
             }
-
-            orderItems.push({
-                product: item.product._id,  // ID sản phẩm
-                quantity: item.quantity,     // Số lượng
-                price: item.price,           // Giá tại thời điểm đặt hàng
-            });
-
-            total_price += item.price * item.quantity; // Cộng dồn tổng tiền
-
-            // Trừ tồn kho sản phẩm sau khi đặt hàng thành công
-            await Product.findByIdAndUpdate(item.product._id, {
-                $inc: { stock: -item.quantity } // $inc giảm stock đi số lượng đã đặt
-            });
         }
 
-        // Tạo đơn hàng mới và lưu vào MongoDB
-        const newOrder = new Order({
-            user: req.user.userId,
-            items: orderItems,
-            total_price,
-            shipping_address,
-            status: 'pending' // Trạng thái mặc định là chờ xử lý
-        });
-        await newOrder.save();
+        const total_price = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-        // Xoá giỏ hàng sau khi đặt hàng thành công
-        cart.items = [];
-        await cart.save();
+        const [order] = await db.query(
+            'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
+            [req.user.userId, total_price, shipping_address, 'pending']
+        );
 
-        res.status(201).json({ success: true, message: 'Đặt hàng thành công!', data: newOrder });
+        for (const item of items) {
+            await db.query(
+                'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
+                [order.insertId, item.product_id, item.quantity, item.price]
+            );
+            await db.query(
+                'UPDATE products SET stock = stock - ? WHERE id = ?',
+                [item.quantity, item.product_id]
+            );
+        }
+
+        await db.query('DELETE FROM cart_items WHERE user_id = ?', [req.user.userId]);
+
+        res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId: order.insertId });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// LẤY đơn hàng của user đang đăng nhập
 exports.getMyOrders = async (req, res) => {
     try {
-        // Tìm tất cả đơn hàng của user, populate để lấy tên sản phẩm kèm theo
-        const orders = await Order.find({ user: req.user.userId })
-            .populate('items.product', 'name image_url') // Lấy tên và ảnh sản phẩm
-            .sort({ createdAt: -1 }); // Sắp xếp mới nhất lên đầu
-
+        const [orders] = await db.query(
+            'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
+            [req.user.userId]
+        );
         res.json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// LẤY chi tiết 1 đơn hàng theo ID
 exports.getOrderById = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id)
-            .populate('items.product', 'name image_url price') // Lấy thông tin sản phẩm
-            .populate('user', 'username email full_name');     // Lấy thông tin user đặt hàng
-
-        if (!order) {
+        const [orders] = await db.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+        if (orders.length === 0) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
         }
 
-        // Chỉ cho phép xem đơn hàng của chính mình hoặc admin
-        if (order.user._id.toString() !== req.user.userId && req.user.role !== 'admin') {
+        const order = orders[0];
+        if (order.user_id !== req.user.userId && req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Bạn không có quyền xem đơn hàng này' });
         }
 
-        res.json({ success: true, data: order });
+        const [orderItems] = await db.query(
+            'SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?',
+            [req.params.id]
+        );
+
+        res.json({ success: true, data: { ...order, items: orderItems } });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// [ADMIN] LẤY TẤT CẢ đơn hàng
 exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find()
-            .populate('user', 'username email full_name') // Lấy thông tin user
-            .populate('items.product', 'name')            // Lấy tên sản phẩm
-            .sort({ createdAt: -1 });                     // Mới nhất lên đầu
-
+        const [orders] = await db.query(
+            `SELECT o.*, u.username, u.email, u.full_name 
+             FROM orders o JOIN users u ON o.user_id = u.id 
+             ORDER BY o.created_at DESC`
+        );
         res.json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// [ADMIN] CẬP NHẬT trạng thái đơn hàng
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
-
-        // Kiểm tra trạng thái hợp lệ
         const validStatus = ['pending', 'processing', 'shipping', 'delivered', 'cancelled'];
         if (!validStatus.includes(status)) {
             return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ' });
         }
 
-        // Tìm và cập nhật trạng thái đơn hàng
-        const updated = await Order.findByIdAndUpdate(
-            req.params.id,
-            { status },
-            { new: true } // Trả về document sau khi cập nhật
+        const [result] = await db.query(
+            'UPDATE orders SET status = ? WHERE id = ?',
+            [status, req.params.id]
         );
 
-        if (!updated) {
+        if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
         }
 
-        res.json({ success: true, message: 'Cập nhật trạng thái thành công!', data: updated });
+        res.json({ success: true, message: 'Cập nhật trạng thái thành công!' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// [ADMIN] XOÁ đơn hàng
 exports.deleteOrder = async (req, res) => {
     try {
-        const deleted = await Order.findByIdAndDelete(req.params.id);
-
-        if (!deleted) {
+        const [result] = await db.query('DELETE FROM orders WHERE id = ?', [req.params.id]);
+        if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
         }
-
         res.json({ success: true, message: 'Xoá đơn hàng thành công!' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });

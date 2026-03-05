@@ -1,12 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const connectDB = require('./src/config/db'); // Import hàm kết nối MongoDB
-
+const db = require('./src/config/db'); 
 const app = express();
-
-// ket noi
-connectDB();
 
 // Middleware
 app.use(cors());
