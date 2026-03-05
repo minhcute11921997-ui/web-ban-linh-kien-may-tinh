@@ -44,17 +44,17 @@ exports.login = async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({ success: false, message: 'Vui lòng điền username và password' });
         }
-
-        // Tìm user theo username trong bảng users
         const [users] = await db.query(
-            'SELECT * FROM users WHERE username = ?',
-            [username]
+            'SELECT * FROM users WHERE username = ? OR email = ?',
+            [username, username]  
         );
+
+
         if (users.length === 0) {
             return res.status(401).json({ success: false, message: 'Username hoặc password không đúng' });
         }
 
-        const user = users[0]; // Lấy user đầu tiên tìm được
+        const user = users[0]; 
 
         // So sánh password nhập vào với password đã mã hoá trong database
         const isPasswordValid = await bcrypt.compare(password, user.password);

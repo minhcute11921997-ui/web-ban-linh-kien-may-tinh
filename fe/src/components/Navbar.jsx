@@ -17,7 +17,7 @@ const Navbar = () => {
       <Link to="/" className="text-xl font-bold">🖥️ PC Shop</Link>
 
       <div className="flex items-center gap-5">
-        <Link to="/products" className="hover:underline">Sản phẩm</Link>
+        
 
         {user ? (
           <>
@@ -35,7 +35,12 @@ const Navbar = () => {
                 ⚙️ Admin
               </Link>
             )}
-            <span className="text-sm opacity-75">Xin chào, {user.name}</span>
+            <span
+            title={user.full_name || user.username}
+            className="text-sm opacity-90 max-w-[150px] truncate"
+            >
+              {user.full_name || user.username}
+            </span>
             <button
               onClick={handleLogout}
               className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100"
