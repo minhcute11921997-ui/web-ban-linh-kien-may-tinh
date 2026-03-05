@@ -1,29 +1,16 @@
-const mysql = require('mysql2');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
-// Tạo connection pool
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
-
-// Chuyển sang Promise để dùng async/await
-const promisePool = pool.promise();
-
-// Test kết nối
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error('❌ Lỗi kết nối database:', err.message);
-        return;
+const connectDB = async () => {
+    try {
+        console.log('🔄 Đang kết nối MongoDB...');
+        console.log('URI:', process.env.MONGODB_URI);
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('✅ Kết nối MongoDB thành công!');
+    } catch (error) {
+        console.error('❌ Lỗi kết nối MongoDB:', error.message);
+        process.exit(1);
     }
-    console.log('✅ Kết nối database thành công!');
-    connection.release();
-});
+};
 
-module.exports = promisePool;
+module.exports = connectDB;

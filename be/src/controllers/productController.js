@@ -1,276 +1,121 @@
-const db = require('../config/db');
-
-// Lấy tất cả sản phẩm (có phân trang + tìm kiếm nâng cao)
+const Product = require('../models/Product');  
+const Category = require('../models/Category'); 
+// LẤY TẤT CẢ sản phẩm 
 exports.getAllProducts = async (req, res) => {
     try {
-        const { 
-            page = 1, 
-            limit = 10, 
-            search = '', 
-            category_id = '',
-            min_price = '',
-            max_price = '',
-            brand = '',
-            sort_by = 'created_at',
-            order = 'DESC'
-        } = req.query;
-        
-        const offset = (page - 1) * limit;
-        
-        let query = 'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1';
-        let params = [];
-        
+        const { search, category, page = 1, limit = 10 } = req.query; // Lấy tham số từ URL
+
+        const filter = {}; // Bộ lọc, mặc định lấy tất cả
+
+        // Nếu có tham số search → tìm sản phẩm có tên chứa từ khoá (không phân biệt hoa thường)
         if (search) {
-            query += ' AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)';
-            params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+            filter.name = { $regex: search, $options: 'i' };
         }
-        
-        if (category_id) {
-            const categoryIds = category_id.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-            if (categoryIds.length > 0) {
-                query += ` AND p.category_id IN (${categoryIds.map(() => '?').join(',')})`;
-                params.push(...categoryIds);
-            }
+
+        // Nếu có tham số category → lọc theo danh mục
+        if (category) {
+            filter.category = category;
         }
-        
-        if (min_price) {
-            query += ' AND p.price >= ?';
-            params.push(parseFloat(min_price));
-        }
-        if (max_price) {
-            query += ' AND p.price <= ?';
-            params.push(parseFloat(max_price));
-        }
-        
-        if (brand) {
-            const brands = brand.split(',').map(b => b.trim());
-            if (brands.length > 0) {
-                query += ` AND p.brand IN (${brands.map(() => '?').join(',')})`;
-                params.push(...brands);
-            }
-        }
-        
-        const validSortBy = ['created_at', 'price', 'name', 'stock'];
-        const validOrder = ['ASC', 'DESC'];
-        
-        const sortColumn = validSortBy.includes(sort_by) ? sort_by : 'created_at';
-        const sortOrder = validOrder.includes(order.toUpperCase()) ? order.toUpperCase() : 'DESC';
-        
-        query += ` ORDER BY p.${sortColumn} ${sortOrder}`;
-        query += ' LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
-        
-        const [products] = await db.query(query, params);
-        
-        let countQuery = 'SELECT COUNT(*) as count FROM products p WHERE 1=1';
-        let countParams = [];
-        
-        if (search) {
-            countQuery += ' AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)';
-            countParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
-        }
-        
-        if (category_id) {
-            const categoryIds = category_id.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-            if (categoryIds.length > 0) {
-                countQuery += ` AND p.category_id IN (${categoryIds.map(() => '?').join(',')})`;
-                countParams.push(...categoryIds);
-            }
-        }
-        
-        if (min_price) {
-            countQuery += ' AND p.price >= ?';
-            countParams.push(parseFloat(min_price));
-        }
-        if (max_price) {
-            countQuery += ' AND p.price <= ?';
-            countParams.push(parseFloat(max_price));
-        }
-        
-        if (brand) {
-            const brands = brand.split(',').map(b => b.trim());
-            if (brands.length > 0) {
-                countQuery += ` AND p.brand IN (${brands.map(() => '?').join(',')})`;
-                countParams.push(...brands);
-            }
-        }
-        
-        const [total] = await db.query(countQuery, countParams);
-        
+
+        const skip = (page - 1) * limit; // Tính số document cần bỏ qua để phân trang
+
+        // Lấy sản phẩm theo bộ lọc, populate để lấy thông tin danh mục kèm theo
+        const products = await Product.find(filter)
+            .populate('category', 'name') // Thay category ID bằng tên danh mục
+            .skip(skip)                   // Bỏ qua các trang trước
+            .limit(Number(limit));        // Giới hạn số sản phẩm mỗi trang
+
+        const total = await Product.countDocuments(filter); // Đếm tổng số sản phẩm
+
         res.json({
             success: true,
             data: products,
             pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total: total[0].count,
-                totalPages: Math.ceil(total[0].count / limit)
-            },
-            filters: {
-                search,
-                category_id,
-                min_price,
-                max_price,
-                brand,
-                sort_by: sortColumn,
-                order: sortOrder
+                total,                          // Tổng số sản phẩm
+                page: Number(page),             // Trang hiện tại
+                totalPages: Math.ceil(total / limit) // Tổng số trang
             }
         });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Lỗi server', 
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Lấy chi tiết 1 sản phẩm
+// LẤY 1 sản phẩm theo ID
 exports.getProductById = async (req, res) => {
     try {
-        const { id } = req.params;
-        
-        const [products] = await db.query(
-            'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?',
-            [id]
-        );
-        
-        if (products.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Không tìm thấy sản phẩm' 
-            });
+        // populate để lấy đầy đủ thông tin danh mục kèm theo sản phẩm
+        const product = await Product.findById(req.params.id).populate('category', 'name');
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
         }
-        
-        const [specs] = await db.query(
-            'SELECT * FROM product_specifications WHERE product_id = ?',
-            [id]
-        );
-        
-        res.json({
-            success: true,
-            data: {
-                ...products[0],
-                specifications: specs
-            }
-        });
+
+        res.json({ success: true, data: product });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Lỗi server', 
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Thêm sản phẩm mới (Admin only)
+// TẠO sản phẩm mới (admin)
 exports.createProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category_id, brand, image_url, specifications } = req.body;
-        
-        if (!name || !price || !category_id) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Thiếu thông tin bắt buộc (name, price, category_id)' 
-            });
+        const { name, description, price, stock, image_url, category } = req.body;
+
+        // Kiểm tra các trường bắt buộc
+        if (!name || !price || !category) {
+            return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc (tên, giá, danh mục)' });
         }
-        
-        const [result] = await db.query(
-            'INSERT INTO products (name, description, price, stock, category_id, brand, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [name, description, price, stock || 0, category_id, brand, image_url]
-        );
-        
-        const productId = result.insertId;
-        
-        if (specifications && Array.isArray(specifications) && specifications.length > 0) {
-            for (const spec of specifications) {
-                await db.query(
-                    'INSERT INTO product_specifications (product_id, spec_name, spec_value) VALUES (?, ?, ?)',
-                    [productId, spec.spec_name, spec.spec_value]
-                );
-            }
+
+        // Kiểm tra danh mục có tồn tại không
+        const existingCategory = await Category.findById(category);
+        if (!existingCategory) {
+            return res.status(404).json({ success: false, message: 'Danh mục không tồn tại' });
         }
-        
-        res.status(201).json({
-            success: true,
-            message: 'Thêm sản phẩm thành công',
-            productId
-        });
+
+        // Tạo sản phẩm mới và lưu vào MongoDB
+        const newProduct = new Product({ name, description, price, stock, image_url, category });
+        await newProduct.save();
+
+        res.status(201).json({ success: true, message: 'Tạo sản phẩm thành công!', data: newProduct });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Lỗi server', 
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Cập nhật sản phẩm (Admin only)
+// CẬP NHẬT sản phẩm (admin)
 exports.updateProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { name, description, price, stock, category_id, brand, image_url, specifications } = req.body;
-        
-        const [existing] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Không tìm thấy sản phẩm' 
-            });
+        const { name, description, price, stock, image_url, category } = req.body;
+
+        // Tìm và cập nhật, { new: true } trả về document sau khi cập nhật
+        const updated = await Product.findByIdAndUpdate(
+            req.params.id,
+            { name, description, price, stock, image_url, category },
+            { new: true }
+        ).populate('category', 'name');
+
+        if (!updated) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
         }
-        
-        await db.query(
-            'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, brand = ?, image_url = ? WHERE id = ?',
-            [name, description, price, stock, category_id, brand, image_url, id]
-        );
-        
-        if (specifications && Array.isArray(specifications)) {
-            await db.query('DELETE FROM product_specifications WHERE product_id = ?', [id]);
-            
-            for (const spec of specifications) {
-                await db.query(
-                    'INSERT INTO product_specifications (product_id, spec_name, spec_value) VALUES (?, ?, ?)',
-                    [id, spec.spec_name, spec.spec_value]
-                );
-            }
-        }
-        
-        res.json({
-            success: true,
-            message: 'Cập nhật sản phẩm thành công'
-        });
+
+        res.json({ success: true, message: 'Cập nhật sản phẩm thành công!', data: updated });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Lỗi server', 
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Xóa sản phẩm (Admin only)
+// XOÁ sản phẩm (admin)
 exports.deleteProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        
-        const [result] = await db.query('DELETE FROM products WHERE id = ?', [id]);
-        
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Không tìm thấy sản phẩm' 
-            });
+        const deleted = await Product.findByIdAndDelete(req.params.id); // Tìm và xoá theo id
+
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
         }
-        
-        res.json({
-            success: true,
-            message: 'Xóa sản phẩm thành công'
-        });
+
+        res.json({ success: true, message: 'Xoá sản phẩm thành công!' });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Lỗi server', 
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
