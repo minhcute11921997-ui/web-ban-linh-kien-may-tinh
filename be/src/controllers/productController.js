@@ -2,8 +2,8 @@ const db = require('../config/db');
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const { search, category, page = 1, limit = 10 } = req.query;
-        const offset = (page - 1) * limit;
+        const { search, category } = req.query;
+
         let query = 'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1';
         const params = [];
 
@@ -16,22 +16,14 @@ exports.getAllProducts = async (req, res) => {
             params.push(category);
         }
 
-        query += ' LIMIT ? OFFSET ?';
-        params.push(Number(limit), Number(offset));
+        query += ' ORDER BY p.id DESC';
 
         const [products] = await db.query(query, params);
-
-        const [countResult] = await db.query('SELECT COUNT(*) as total FROM products WHERE 1=1');
-        const total = countResult[0].total;
 
         res.json({
             success: true,
             data: products,
-            pagination: {
-                total,
-                page: Number(page),
-                totalPages: Math.ceil(total / limit)
-            }
+            total: products.length
         });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });

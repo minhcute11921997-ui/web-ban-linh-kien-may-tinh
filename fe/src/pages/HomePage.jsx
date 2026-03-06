@@ -1,20 +1,130 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-const HomePage = () => {
+const ITEMS_PER_PAGE = 12;
+
+export default function HomePage() {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/categories')
+      .then(res => res.json())
+      .then(data => { if (data.success) setCategories(data.data); });
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setCurrentPage(1);
+    const url = activeCategory === 'all'
+      ? 'http://localhost:3000/api/products'
+      : `http://localhost:3000/api/products?category=${activeCategory}`; // ✅ sửa categoryid → category
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setProducts(data.data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [activeCategory]);
+
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentProducts = products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4">
-      <h1 className="text-5xl font-bold text-blue-600 mb-4">🖥️ PC Shop</h1>
-      <p className="text-gray-500 text-xl mb-10 text-center">
-        Mua sắm linh kiện máy tính chính hãng, giá tốt nhất
-      </p>
-      <Link
-        to="/products"
-        className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition"
-      >
-        Xem sản phẩm ngay →
-      </Link>
+    <div className="p-4">
+      {/* Tabs danh mục */}
+      <div className="flex gap-2 flex-wrap mb-6">
+        <button
+          onClick={() => setActiveCategory('all')}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            activeCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          Tất cả
+        </button>
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' // ✅ so sánh đúng vì cùng dùng cat.id (number)
+            }`}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400">Đang tải...</div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <div className="text-5xl mb-3">📦</div>
+          <p>Không có sản phẩm nào</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-4 gap-4">
+            {currentProducts.map(product => (
+              <div key={product.id} className="bg-white rounded-xl shadow-sm p-3 hover:shadow-md transition">
+                <img
+                  src={product.image_url || 'https://via.placeholder.com/200'} // ✅ sửa imageurl → image_url
+                  alt={product.name}
+                  className="w-full h-40 object-cover rounded-lg mb-2"
+                />
+                <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
+                <p className="text-blue-600 font-bold mt-1">
+                  {Number(product.price).toLocaleString('vi-VN')}₫
+                </p>
+                <button className="w-full mt-2 bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700">
+                  Thêm giỏ hàng
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <button
+                onClick={() => setCurrentPage(p => p - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Trước
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                    currentPage === page ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(p => p + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Sau →
+              </button>
+            </div>
+          )}
+
+          <p className="text-center text-xs text-gray-400 mt-2">
+            Trang {currentPage}/{totalPages} • {products.length} sản phẩm
+          </p>
+        </>
+      )}
     </div>
   );
-};
-
-export default HomePage;
+}
