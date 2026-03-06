@@ -81,8 +81,17 @@ exports.login = async (req, res) => {
             message: 'Đăng nhập thành công!',
             token,
             refreshToken,
-            user: { id: user.id, username: user.username, role: user.role }
+            user: {
+                id: user.id,
+                username: user.username,
+                full_name: user.full_name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                role: user.role,
+            }
         });
+
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
@@ -118,4 +127,19 @@ exports.refresh = async (req, res) => {
     } catch (error) {
         res.status(401).json({ success: false, message: 'Refresh token không hợp lệ hoặc đã hết hạn' });
     }
+};
+exports.updateProfile = async (req, res) => {
+  const { full_name, email, phone, address } = req.body;
+  const userId = req.user.userId; 
+
+  try {
+    await db.query(
+      'UPDATE users SET full_name=?, email=?, phone=?, address=? WHERE id=?',
+      [full_name, email, phone, address, userId]
+    );
+    res.json({ success: true, user: { full_name, email, phone, address } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
 };

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { verifyToken } = require('../middleware/auth'); 
 
 // POST /api/auth/register
 router.post('/register', authController.register);
@@ -10,5 +11,7 @@ router.post('/login', authController.login);
 
 // ✅ POST /api/auth/refresh - API MỚI
 router.post('/refresh', authController.refresh);
+
+router.put('/profile', verifyToken, authController.updateProfile);
 
 module.exports = router;

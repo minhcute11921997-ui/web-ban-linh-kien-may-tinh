@@ -16,6 +16,11 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, token: null });
   },
 
+  setUser: (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    set({ user: userData });
+  },
+
   isAdmin: () => get().user?.role === 'admin',
 }));
 
