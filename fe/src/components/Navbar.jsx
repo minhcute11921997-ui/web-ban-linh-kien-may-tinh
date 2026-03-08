@@ -83,7 +83,7 @@ const Navbar = () => {
                   <div className="px-4 py-4 bg-gradient-to-br from-blue-500 to-blue-700 text-white">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
-                        {(user.full_name || user.username)?.[0]?.toUpperCase()}
+                        {(user.full_name || user.username)?.slice(-1)?.toUpperCase()}
                       </div>
                       <div>
                         <p className="font-semibold text-sm leading-tight">{user.full_name || user.username}</p>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';956 
 
 const ITEMS_PER_PAGE = 12;
 
@@ -71,21 +72,33 @@ export default function HomePage() {
         <>
           <div className="grid grid-cols-4 gap-4">
             {currentProducts.map(product => (
-              <div key={product.id} className="bg-white rounded-xl shadow-sm p-3 hover:shadow-md transition">
-                <img
-                  src={product.image_url || 'https://via.placeholder.com/200'} // ✅ sửa imageurl → image_url
-                  alt={product.name}
-                  className="w-full h-40 object-cover rounded-lg mb-2"
-                />
-                <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
-                <p className="text-blue-600 font-bold mt-1">
-                  {Number(product.price).toLocaleString('vi-VN')}₫
-                </p>
-                <button className="w-full mt-2 bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700">
-                  Thêm giỏ hàng
-                </button>
+              <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                
+                {/* ✅ Bọc ảnh + tên + giá trong Link */}
+                <Link to={`/products/${product.id}`} className="block p-3">
+                  <img
+                    src={product.image_url || 'https://via.placeholder.com/200'}
+                    alt={product.name}
+                    className="w-full h-40 object-cover rounded-lg mb-2 hover:opacity-90 transition"
+                  />
+                  <h3 className="font-medium text-sm line-clamp-2 hover:text-blue-600 transition">
+                    {product.name}
+                  </h3>
+                  <p className="text-blue-600 font-bold mt-1">
+                    {Number(product.price).toLocaleString('vi-VN')}₫
+                  </p>
+                </Link>
+
+                {/* ✅ Nút nằm ngoài Link */}
+                <div className="px-3 pb-3">
+                  <button className="w-full bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700">
+                    Thêm giỏ hàng
+                  </button>
+                </div>
+
               </div>
             ))}
+
           </div>
 
           {totalPages > 1 && (

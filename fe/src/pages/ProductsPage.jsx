@@ -10,7 +10,7 @@ const ProductsPage = () => {
 
   useEffect(() => {
     getAllProducts()
-      .then(res => setProducts(res.data.products || res.data))
+      .then(res =>{ console.log('API response:', res.data);setProducts(res.data.data || [])})
       .catch(() => toast.error('Không thể tải sản phẩm!'))
       .finally(() => setLoading(false));
   }, []);

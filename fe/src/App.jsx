@@ -14,6 +14,7 @@ import OrdersPage from './pages/OrdersPage';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import ProfilePage from './pages/ProfilePage';
+import ProductDetail from './pages/ProductDetail';
 
 // Component banner placeholder tái sử dụng
 const BannerPlaceholder = ({ gradient, icon, title, discount, to }) => (
@@ -37,10 +38,10 @@ function App() {
       <Navbar />
 
       <div className="min-h-screen bg-gray-50">
-        <div className="flex gap-3 px-4 py-6 max-w-screen-xl mx-auto">
+        <div className="flex gap-3 px-4 py-6 max-w-screen-2xl mx-auto">
 
           {/* Banner trái */}
-          <div className="w-40 flex-shrink-0 hidden lg:block">
+          <div className="w-32 flex-shrink-0 hidden lg:block">
             <div className="sticky top-4 space-y-3">
               <BannerPlaceholder
                 gradient="bg-gradient-to-b from-blue-600 to-blue-900"
@@ -67,6 +68,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
 
               {/* Cần đăng nhập */}
               <Route path="/cart" element={
@@ -90,7 +92,7 @@ function App() {
           </main>
 
           {/* Banner phải */}
-          <div className="w-40 flex-shrink-0 hidden lg:block">
+          <div className="w-32 flex-shrink-0 hidden lg:block">
             <div className="sticky top-4 space-y-3">
               <BannerPlaceholder
                 gradient="bg-gradient-to-b from-red-500 to-orange-600"

@@ -5,7 +5,9 @@ const { verifyToken, verifyAdmin } = require('../middleware/auth');
 
 // Public routes
 router.get('/', productController.getAllProducts);
+router.get('/:id/specs', productController.getProductSpecs);
 router.get('/:id', productController.getProductById);
+
 
 // Admin routes
 router.post('/', verifyToken, verifyAdmin, productController.createProduct);
