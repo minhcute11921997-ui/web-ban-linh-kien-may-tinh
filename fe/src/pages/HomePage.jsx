@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';956 
+import { Link } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -21,7 +21,7 @@ export default function HomePage() {
     setCurrentPage(1);
     const url = activeCategory === 'all'
       ? 'http://localhost:3000/api/products'
-      : `http://localhost:3000/api/products?category=${activeCategory}`; // ✅ sửa categoryid → category
+      : `http://localhost:3000/api/products?category=${activeCategory}`;
 
     fetch(url)
       .then(res => res.json())
@@ -53,7 +53,7 @@ export default function HomePage() {
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' // ✅ so sánh đúng vì cùng dùng cat.id (number)
+              activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             {cat.name}

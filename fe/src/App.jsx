@@ -16,18 +16,13 @@ import AdminOrders from './pages/admin/AdminOrders';
 import ProfilePage from './pages/ProfilePage';
 import ProductDetail from './pages/ProductDetail';
 
-// Component banner placeholder tái sử dụng
-const BannerPlaceholder = ({ gradient, icon, title, discount, to }) => (
+// Component banner placeholder tái sử dụng - khung rỗng để chèn video khuyến mãi sau
+const BannerPlaceholder = ({ title, to }) => (
   <a href={to || '#'}
-    className="block w-full rounded-xl shadow overflow-hidden cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all duration-200">
-    <div className={`w-full h-80 ${gradient} flex flex-col items-center justify-center text-white text-center p-4`}>
-      <span className="text-4xl mb-3">{icon}</span>
-      <p className="font-bold text-sm leading-tight">{title}</p>
-      <p className="text-xs mt-2 opacity-80">Giảm đến</p>
-      <p className="text-2xl font-extrabold">{discount}</p>
-      <button className="mt-4 bg-white text-gray-800 text-xs font-bold px-4 py-1.5 rounded-full hover:bg-gray-100">
-        MUA NGAY
-      </button>
+    className="block w-full shadow overflow-hidden cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all duration-200">
+    <div className="w-full h-80 bg-gray-200 flex flex-col items-center justify-center text-gray-400 text-center p-4 border border-dashed border-gray-300">
+      <span className="text-3xl mb-2">🎬</span>
+      <p className="text-xs">{title || 'Video khuyến mãi'}</p>
     </div>
   </a>
 );
@@ -44,17 +39,11 @@ function App() {
           <div className="w-32 flex-shrink-0 hidden lg:block">
             <div className="sticky top-4 space-y-3">
               <BannerPlaceholder
-                gradient="bg-gradient-to-b from-blue-600 to-blue-900"
-                icon="🖥️"
-                title="PC Gaming Cao Cấp"
-                discount="30%"
+                title="Video khuyến mãi 1"
                 to="/products"
               />
               <BannerPlaceholder
-                gradient="bg-gradient-to-b from-purple-500 to-pink-600"
-                icon="⚡"
-                title="CPU Intel Core i9"
-                discount="20%"
+                title="Video khuyến mãi 2"
                 to="/products"
               />
             </div>
@@ -95,17 +84,11 @@ function App() {
           <div className="w-32 flex-shrink-0 hidden lg:block">
             <div className="sticky top-4 space-y-3">
               <BannerPlaceholder
-                gradient="bg-gradient-to-b from-red-500 to-orange-600"
-                icon="🎮"
-                title="VGA RTX 4090"
-                discount="15%"
+                title="Video khuyến mãi 3"
                 to="/products"
               />
               <BannerPlaceholder
-                gradient="bg-gradient-to-b from-green-500 to-teal-600"
-                icon="💾"
-                title="RAM DDR5 32GB"
-                discount="25%"
+                title="Video khuyến mãi 4"
                 to="/products"
               />
             </div>
