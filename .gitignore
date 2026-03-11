@@ -9,6 +9,9 @@ fe/.env
 # Logs
 *.log
 
+# Docker data
+mysql_data/
+
 # IDE
 .vscode/
 .idea/
