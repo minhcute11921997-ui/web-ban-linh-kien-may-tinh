@@ -10,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import OrdersPage from './pages/OrdersPage';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -62,6 +64,15 @@ function App() {
               {/* Cần đăng nhập */}
               <Route path="/cart" element={
                 <PrivateRoute><CartPage /></PrivateRoute>
+              } />
+              <Route path="/checkout" element={
+                <PrivateRoute><CheckoutPage /></PrivateRoute>
+              } />
+              <Route path="/payment-success" element={
+                <PrivateRoute><PaymentSuccessPage /></PrivateRoute>
+              } />
+              <Route path="/payment-callback" element={
+                <PrivateRoute><PaymentSuccessPage /></PrivateRoute>
               } />
               <Route path="/orders" element={
                 <PrivateRoute><OrdersPage /></PrivateRoute>

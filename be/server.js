@@ -27,6 +27,9 @@ app.use('/api/cart', cartRoutes);
 const orderRoutes = require('./src/routes/order');
 app.use('/api/orders', orderRoutes);
 
+const paymentRoutes = require('./src/routes/payment');
+app.use('/api/payments', paymentRoutes);
+
 // Route test server
 app.get('/', (req, res) => {
     res.json({ message: '🚀 Backend API đang chạy!' });
