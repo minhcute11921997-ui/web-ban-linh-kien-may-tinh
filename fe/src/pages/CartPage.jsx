@@ -80,19 +80,27 @@ const CartPage = () => {
             ))}
           </div>
 
-          <div className="border-t pt-4 flex justify-between items-center">
+          <div className="border-t pt-4 flex justify-between items-center gap-4">
             <p className="text-xl font-bold">
               Tổng cộng:{' '}
               <span className="text-blue-600">
                 {totalPrice.toLocaleString('vi-VN')}₫
               </span>
             </p>
-            <button
-              onClick={handleOrder}
-              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              Đặt hàng ngay
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate('/products')}
+                className="border border-blue-600 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
+              >
+                Tiếp tục mua sắm
+              </button>
+              <button
+                onClick={() => navigate('/checkout')}
+                className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+              >
+                Thanh toán
+              </button>
+            </div>
           </div>
         </>
       )}
