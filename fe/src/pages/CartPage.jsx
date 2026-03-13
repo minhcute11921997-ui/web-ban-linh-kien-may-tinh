@@ -1,18 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import { createOrder } from '../api/orderApi';
 import { toast } from 'react-toastify';
 
 const CartPage = () => {
-  const { items, loading, fetchCart, updateItem, removeItem, clearAll } = useCartStore();
+  const { items, loading, fetchCart, updateItem, removeItem, clearAll, selectedItems, toggleSelectedItem, toggleSelectAll } = useCartStore();
   const navigate = useNavigate();
 
-  useEffect(() => { fetchCart(); }, []);
+  useEffect(() => { 
+    fetchCart(); 
+  }, []);
 
-  const totalPrice = items.reduce((sum, item) => 
-    sum + Number(item.price) * item.quantity, 0
-  );
+  const totalPrice = items.reduce((sum, item) => {
+    if (selectedItems.includes(item.id)) {
+      return sum + Number(item.price) * item.quantity;
+    }
+    return sum;
+  }, 0);
 
   const handleOrder = async () => {
     if (items.length === 0) return;
@@ -32,6 +37,14 @@ const CartPage = () => {
       clearAll();
       toast.info('Đã xóa tất cả sản phẩm');
     }
+  };
+
+  const handleSelectItem = (itemId) => {
+    toggleSelectedItem(itemId);
+  };
+
+  const handleSelectAll = () => {
+    toggleSelectAll();
   };
 
   if (loading) return (
@@ -65,12 +78,32 @@ const CartPage = () => {
             {/* Cart Items */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-semibold text-lg text-gray-900">Chọn sản phẩm</h3>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.length === items.length && items.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Chọn tất cả</span>
+                  </label>
+                </div>
                 <div className="space-y-4">
                   {items.map(item => (
                     <div 
                       key={item.id} 
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:shadow-md transition bg-gray-50"
                     >
+                      {/* Checkbox */}
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                        className="w-5 h-5 rounded cursor-pointer"
+                      />
+
                       {/* Image */}
                       <div className="flex-shrink-0">
                         <img
@@ -108,7 +141,6 @@ const CartPage = () => {
                         <p className="font-bold text-gray-900 text-lg">
                           {(Number(item.price) * item.quantity).toLocaleString('vi-VN')}₫
                         </p>
-                        <p className="text-xs text-gray-500">x{item.quantity}</p>
                       </div>
 
                       {/* Delete Button */}
@@ -128,7 +160,7 @@ const CartPage = () => {
                     onClick={handleClearAll}
                     className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition font-semibold"
                   >
-                    🗑️ Xóa tất cả sản phẩm
+                    Xóa tất cả sản phẩm
                   </button>
                 </div>
               </div>
@@ -146,14 +178,6 @@ const CartPage = () => {
                       {totalPrice.toLocaleString('vi-VN')}₫
                     </span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Phí vận chuyển:</span>
-                    <span className="font-semibold text-green-600">Miễn phí</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Giảm giá:</span>
-                    <span className="font-semibold text-gray-900">0₫</span>
-                  </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-6 mb-6">
@@ -170,7 +194,7 @@ const CartPage = () => {
                     onClick={() => navigate('/checkout')}
                     className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
                   >
-                    💳 Tiến hành thanh toán
+                    Tiến hành thanh toán
                   </button>
                   <button
                     onClick={() => navigate('/products')}

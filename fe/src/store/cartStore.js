@@ -4,14 +4,18 @@ import { getCart, addToCart, updateCartItem, removeFromCart, clearCart } from '.
 const useCartStore = create((set, get) => ({
   items: [],
   loading: false,
+  selectedItems: [],
 
   fetchCart: async () => {
     set({ loading: true });
     try {
       const res = await getCart();
-      set({ items: res.data.data?.items || [] });
+      const items = res.data.data?.items || [];
+      set({ items });
+      // Auto-select all items when cart is fetched
+      set({ selectedItems: items.map(item => item.id) });
     } catch {
-      set({ items: [] });
+      set({ items: [], selectedItems: [] });
     } finally {
       set({ loading: false });
     }
@@ -51,7 +55,26 @@ const useCartStore = create((set, get) => ({
 
   clearAll: async () => {
     await clearCart();
-    set({ items: [] });
+    set({ items: [], selectedItems: [] });
+  },
+
+  toggleSelectedItem: (itemId) => {
+    const selectedItems = get().selectedItems;
+    if (selectedItems.includes(itemId)) {
+      set({ selectedItems: selectedItems.filter(id => id !== itemId) });
+    } else {
+      set({ selectedItems: [...selectedItems, itemId] });
+    }
+  },
+
+  toggleSelectAll: () => {
+    const items = get().items;
+    const selectedItems = get().selectedItems;
+    if (selectedItems.length === items.length) {
+      set({ selectedItems: [] });
+    } else {
+      set({ selectedItems: items.map(item => item.id) });
+    }
   },
 }));
 
