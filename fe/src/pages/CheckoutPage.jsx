@@ -58,7 +58,8 @@ const CheckoutPage = () => {
                 '/api/payments/create-order',
                 {
                     paymentMethod: paymentMethod,
-                    clientIp: '127.0.0.1'
+                    clientIp: '127.0.0.1',
+                    cartItemIds: cartItems.map(item => item.id)
                 },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -142,7 +143,7 @@ const CheckoutPage = () => {
                                             <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                                                 <img 
                                                     src={item.image_url || 'https://via.placeholder.com/100'} 
-                                                    alt={item.product_name}
+                                                    alt={item.product_name || item.name}
                                                     className="w-full h-full object-cover"
                                                 />
                                             </div>
@@ -150,7 +151,7 @@ const CheckoutPage = () => {
                                             {/* Product Info */}
                                             <div className="flex-1 flex justify-between">
                                                 <div>
-                                                    <h3 className="font-semibold text-gray-900">{item.product_name}</h3>
+                                                    <h3 className="font-semibold text-gray-900">{item.product_name || item.name}</h3>
                                                     <p className="text-gray-500 text-sm mt-1">SL: {item.quantity}</p>
                                                     <p className="text-blue-600 font-semibold mt-2">
                                                         {item.price.toLocaleString('vi-VN')} ₫/cái

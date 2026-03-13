@@ -7,7 +7,7 @@ const { createVNPayUrl, verifyVNPayResponse } = require('../config/payment');
  */
 exports.createOrder = async (req, res) => {
     try {
-        const { paymentMethod, clientIp } = req.body;
+        const { paymentMethod, clientIp, cartItemIds } = req.body;
         const userId = req.user.userId;
 
         // Validate payment method

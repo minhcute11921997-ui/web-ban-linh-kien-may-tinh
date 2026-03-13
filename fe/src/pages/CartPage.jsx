@@ -22,7 +22,8 @@ const CartPage = () => {
   const handleOrder = async () => {
     if (items.length === 0) return;
     try {
-      await createOrder({ items });
+      const selected = items.filter(i => selectedItems.includes(i.id));
+      await createOrder({ items: selected });
       await clearAll();
       toast.success('Đặt hàng thành công!');
       navigate('/orders');
