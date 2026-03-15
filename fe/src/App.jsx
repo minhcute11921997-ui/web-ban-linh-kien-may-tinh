@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
+import { useAuthInit } from "./hooks/useAuthInit";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -32,6 +33,8 @@ const BannerPlaceholder = ({ title, to }) => (
 );
 
 function App() {
+  useAuthInit();
+
   return (
     <BrowserRouter>
       <Navbar />
@@ -57,7 +60,10 @@ function App() {
               <Route path="/products/:id" element={<ProductDetail />} />
 
               {/* Cần đăng nhập */}
+<<<<<<< HEAD
 
+=======
+>>>>>>> ecdea6535cb3435dc74a3e58e84b2c3175fc6cb7
               <Route
                 path="/cart"
                 element={

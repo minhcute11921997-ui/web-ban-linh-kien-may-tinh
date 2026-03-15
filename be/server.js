@@ -24,11 +24,20 @@ app.use('/api/categories', categoryRoutes);
 const cartRoutes = require('./src/routes/cart');
 app.use('/api/cart', cartRoutes);
 
+const shippingRoutes = require('./src/routes/shipping');
+app.use('/api/shipping', shippingRoutes);
+
+const checkoutRoutes = require('./src/routes/checkout');
+app.use('/api/checkout', checkoutRoutes);
+
 const orderRoutes = require('./src/routes/order');
 app.use('/api/orders', orderRoutes);
 
 const paymentRoutes = require('./src/routes/payment');
 app.use('/api/payments', paymentRoutes);
+
+const discountRoutes = require('./src/routes/discount');
+app.use('/api/discounts', discountRoutes);
 
 // Route test server
 app.get('/', (req, res) => {

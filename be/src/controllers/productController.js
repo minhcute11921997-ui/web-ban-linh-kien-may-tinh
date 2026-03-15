@@ -152,10 +152,10 @@ const getFilterOptions = async (req, res) => {
         // Chỉ lấy các spec tiêu biểu cho từng danh mục (tham khảo GearVN, Phong Vũ, An Phát)
         const ALLOWED_SPECS = {
             'CPU':       ['Socket', 'Số nhân'],
-            'RAM':       ['Chuẩn', 'Dung lượng'],
-            'VGA':       ['VRAM'],
-            'SSD':       ['Chuẩn', 'Dung lượng'],
-            'Mainboard': ['Socket', 'Chipset', 'Form Factor'],
+            'RAM':       ['Chuẩn', 'Dung lượng', 'Tốc độ'],
+            'VGA':       ['VRAM', 'GPU', 'Loại VRAM'],
+            'SSD':       ['Dung lượng', 'Chuẩn', 'Loại'],
+            'Mainboard': ['Socket', 'Chipset', 'Form Factor', 'Chuẩn RAM'],
         };
 
         // Lấy tên danh mục
