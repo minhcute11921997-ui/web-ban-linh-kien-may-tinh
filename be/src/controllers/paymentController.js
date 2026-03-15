@@ -83,7 +83,7 @@ exports.createOrder = async (req, res) => {
         // Tạo order
         const [orderResult] = await db.query(
             `INSERT INTO orders
-             (user_id, total_price, payment_method, payment_status, order_status,
+             (user_id, total_price, payment_method, payment_status, status,
               customer_name, customer_phone, shipping_address, notes, shipping_fee, discount_amount)
              VALUES (?, ?, ?, 'pending', 'pending', ?, ?, ?, ?, ?, ?)`,
             [userId, totalPrice, paymentMethod, customerName, customerPhone, customerAddress, customerNotes || '', fee, discount]
@@ -117,7 +117,7 @@ exports.createOrder = async (req, res) => {
         if (paymentMethod === 'cod') {
             // COD: Xác nhận luôn
             await db.query(
-                `UPDATE orders SET payment_status = 'completed', order_status = 'processing' WHERE id = ?`,
+                `UPDATE orders SET payment_status = 'pending',status = 'processing' WHERE id = ?`,
                 [orderId]
             );
             return res.json({
@@ -172,7 +172,7 @@ exports.vnpayCallback = async (req, res) => {
         }
 
         await db.query(
-            `UPDATE orders SET payment_status = 'completed', order_status = 'processing', transaction_id = ? WHERE id = ?`,
+            `UPDATE orders SET payment_status = 'completed',status = 'processing', transaction_id = ? WHERE id = ?`,
             [verifyResult.transactionNo, verifyResult.orderId]
         );
 
@@ -228,7 +228,7 @@ exports.getPaymentStatus = async (req, res) => {
                 discountAmount: order.discount_amount,
                 paymentMethod: order.payment_method,
                 paymentStatus: order.payment_status,
-                orderStatus: order.order_status,
+                orderStatus: order.status,
                 transactionId: order.transaction_id,
                 customerName: order.customer_name,
                 customerPhone: order.customer_phone,

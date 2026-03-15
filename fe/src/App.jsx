@@ -18,6 +18,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
+import OrderDetailPage from './pages/OrderDetailPage';
 
 // Component banner placeholder tái sử dụng
 const BannerPlaceholder = ({ title, to }) => (
@@ -100,6 +101,14 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route
+    path="/orders/:id"
+    element={
+        <PrivateRoute>
+            <OrderDetailPage />
+        </PrivateRoute>
+    }
+/>
               <Route
                 path="/profile"
                 element={

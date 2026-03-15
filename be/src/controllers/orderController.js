@@ -157,3 +157,44 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
+exports.cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+
+        const [orders] = await db.query(
+            'SELECT * FROM orders WHERE id = ? AND user_id = ?',
+            [id, userId]
+        );
+
+        if (orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        const order = orders[0];
+        const orderStatus = order.status || order.order_status;
+
+        if (!['pending', 'processing'].includes(orderStatus)) {
+            return res.status(400).json({ success: false, message: 'Không thể hủy đơn hàng ở trạng thái này' });
+        }
+
+        // Hoàn lại tồn kho
+        const [items] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [id]);
+        for (const item of items) {
+            await db.query(
+                'UPDATE products SET stock = stock + ? WHERE id = ?',
+                [item.quantity, item.product_id]
+            );
+        }
+
+        await db.query(
+            'UPDATE orders SET status = "cancelled" WHERE id = ?',
+            [id]
+        );
+
+        res.json({ success: true, message: 'Hủy đơn hàng thành công' });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+};

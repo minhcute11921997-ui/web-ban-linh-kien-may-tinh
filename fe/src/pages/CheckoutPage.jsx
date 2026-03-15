@@ -77,6 +77,7 @@ const CheckoutPage = () => {
             );
 
             if (response.data.success) {
+                await fetchCart();
                 if (paymentMethod === 'cod') {
                     toast.success('Đặt hàng thành công!');
                     navigate(`/payment-success?orderId=${response.data.orderId}&method=cod`);
