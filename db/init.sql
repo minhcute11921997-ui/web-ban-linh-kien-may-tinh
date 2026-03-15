@@ -66,6 +66,11 @@ CREATE TABLE IF NOT EXISTS orders (
   order_status ENUM('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
   transaction_id VARCHAR(255),
   notes TEXT,
+  customer_name VARCHAR(255) DEFAULT NULL,
+  customer_phone VARCHAR(20) DEFAULT NULL,
+  shipping_address TEXT DEFAULT NULL,
+  shipping_fee DECIMAL(15,2) DEFAULT 0,
+  discount_amount DECIMAL(15,2) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id)
