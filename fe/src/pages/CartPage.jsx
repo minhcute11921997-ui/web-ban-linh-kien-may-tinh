@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 const CartPage = () => {
   const { items, loading, fetchCart, updateItem, removeItem, clearAll, selectedItems, toggleSelectedItem, toggleSelectAll } = useCartStore();
   const navigate = useNavigate();
+  const [inputValues, setInputValues] = useState({});
 
   useEffect(() => { 
     fetchCart(); 
@@ -124,7 +125,38 @@ const CartPage = () => {
                           disabled={item.quantity <= 1}
                           className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
                         >−</button>
-                        <span className="w-12 text-center font-semibold text-gray-900">{item.quantity}</span>
+                        <input
+                          type="number"
+                          min="1"
+                          value={inputValues[item.id] !== undefined ? inputValues[item.id] : item.quantity}
+                          onChange={(e) => {
+                            setInputValues({
+                              ...inputValues,
+                              [item.id]: e.target.value
+                            });
+                          }}
+                          onBlur={(e) => {
+                            let val = e.target.value;
+                            if (val === '' || parseInt(val) < 1) {
+                              updateItem(item.id, 1);
+                            } else {
+                              let numVal = parseInt(val);
+                              if (!isNaN(numVal)) {
+                                // Kiểm tra không vượt quá stock
+                                if (numVal > item.stock) {
+                                  numVal = item.stock;
+                                  toast.warning(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
+                                }
+                                updateItem(item.id, numVal);
+                              }
+                            }
+                            setInputValues({
+                              ...inputValues,
+                              [item.id]: undefined
+                            });
+                          }}
+                          className="w-12 text-center font-semibold text-gray-900 border-0 outline-none bg-transparent [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
+                        />
                         <button
                           onClick={() => updateItem(item.id, item.quantity + 1)}
                           className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"

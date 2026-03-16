@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import sanitizeHtml from 'sanitize-html';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 
@@ -14,9 +15,11 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         // Fetch sản phẩm
         const res = await fetch(`http://localhost:3000/api/products/${id}`);
@@ -45,6 +48,12 @@ const ProductDetail = () => {
       navigate('/login');
       return;
     }
+
+    // Kiểm tra số lượng không vượt quá kho
+    if (quantity > product.stock) {
+      toast.error(`Chỉ còn ${product.stock} sản phẩm trong kho!`);
+      return;
+    }
     
     setAddingToCart(true);
     try {
@@ -62,6 +71,12 @@ const ProductDetail = () => {
     if (!token) {
       toast.warning('Vui lòng đăng nhập để mua hàng!');
       navigate('/login');
+      return;
+    }
+
+    // Kiểm tra số lượng không vượt quá kho
+    if (quantity > product.stock) {
+      toast.error(`Chỉ còn ${product.stock} sản phẩm trong kho!`);
       return;
     }
 
@@ -86,9 +101,9 @@ const ProductDetail = () => {
 
       {/* Breadcrumb */}
       <div className="text-sm text-gray-500 mb-6 flex gap-1 items-center">
-        <span className="cursor-pointer hover:text-red-500" onClick={() => navigate('/')}>Trang chủ</span>
+        <span className="cursor-pointer hover:text-blue-500" onClick={() => navigate('/')}>Trang chủ</span>
         <span>/</span>
-        <span className="cursor-pointer hover:text-red-500" onClick={() => navigate(`/?category=${product.category_id}`)}>{product.category_name}</span>
+        <span className="cursor-pointer hover:text-blue-500" onClick={() => navigate(`/?category=${product.category_id}`)}>{product.category_name}</span>
         <span>/</span>
         <span className="text-gray-800 font-medium truncate">{product.name}</span>
       </div>
@@ -107,12 +122,12 @@ const ProductDetail = () => {
 
         {/* Thông tin */}
         <div className="flex flex-col gap-4">
-          <span className="text-xs font-bold text-red-500 uppercase tracking-widest">{product.brand}</span>
+          <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">{product.brand}</span>
           <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-          <div className="text-3xl font-bold text-red-500">{formatPrice(product.price)}</div>
+          <div className="text-3xl font-bold text-blue-500">{formatPrice(product.price)}</div>
 
           <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit
-            ${product.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            ${product.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
             {product.stock > 0 ? `Còn hàng (${product.stock})` : 'Hết hàng'}
           </span>
 
@@ -122,7 +137,35 @@ const ProductDetail = () => {
             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
               <button className="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-lg transition"
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}>−</button>
-              <span className="w-12 text-center font-semibold">{quantity}</span>
+              <input 
+                type="number" 
+                min="1" 
+                max={product.stock}
+                value={quantity}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (val === '') {
+                    setQuantity('');
+                  } else {
+                    val = parseInt(val);
+                    if (!isNaN(val)) {
+                      if (val > product.stock) {
+                        setQuantity(product.stock);
+                      } else if (val < 1) {
+                        setQuantity(1);
+                      } else {
+                        setQuantity(val);
+                      }
+                    }
+                  }
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                    setQuantity(1);
+                  }
+                }}
+                className="w-12 text-center font-semibold border-0 outline-none bg-transparent [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
+              />
               <button className="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-lg transition"
                 onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}>+</button>
             </div>
@@ -133,13 +176,13 @@ const ProductDetail = () => {
             <button 
               disabled={product.stock === 0 || addingToCart}
               onClick={handleAddToCart}
-              className="flex-1 py-3 rounded-xl border-2 border-orange-500 text-orange-500 font-semibold hover:bg-orange-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              className="flex-1 py-3 rounded-xl border-2 border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition disabled:opacity-40 disabled:cursor-not-allowed">
               🛒 {addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ'}
             </button>
             <button 
               disabled={product.stock === 0 || addingToCart}
               onClick={handleBuyNow}
-              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              className="flex-1 py-3 rounded-xl bg-blue-500 text-white font-semibold hover:bg-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed">
               {addingToCart ? 'Đang xử lý...' : 'Mua ngay'}
             </button>
           </div>
@@ -171,7 +214,31 @@ const ProductDetail = () => {
       {product.description && (
         <div className="bg-white rounded-2xl shadow-md p-8 mt-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Mô tả sản phẩm</h2>
-          <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+          <div 
+            className={`text-sm text-gray-600 leading-relaxed prose prose-sm max-w-none transition-all duration-300 ${
+              descriptionExpanded ? 'max-h-none' : 'max-h-96 overflow-hidden'
+            }`}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(product.description, {
+                allowedTags: ['p', 'br', 'img', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot'],
+                allowedAttributes: {
+                  'img': ['src', 'alt', 'width', 'height'],
+                  'a': ['href'],
+                  'table': ['border'],
+                  'td': ['colspan', 'rowspan'],
+                  'th': ['colspan', 'rowspan'],
+                }
+              })
+            }}
+          />
+          {product.description.length > 200 && (
+            <button
+              onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+              className="mt-4 w-full py-2 text-blue-600 font-semibold hover:text-teal-700 transition flex items-center justify-center gap-2"
+            >
+              {descriptionExpanded ? '▲ Thu gọn' : '▼ Xem tất cả'}
+            </button>
+          )}
         </div>
       )}
 
