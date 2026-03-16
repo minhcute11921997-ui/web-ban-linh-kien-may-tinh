@@ -67,12 +67,6 @@ const CartPage = () => {
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
             <div className="text-6xl mb-4">🛒</div>
             <p className="text-gray-500 text-lg mb-6">Giỏ hàng đang trống</p>
-            <button 
-              onClick={() => navigate('/products')}
-              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              ← Tiếp tục mua sắm
-            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -196,12 +190,6 @@ const CartPage = () => {
                     className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
                   >
                     Tiến hành thanh toán
-                  </button>
-                  <button
-                    onClick={() => navigate('/products')}
-                    className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
-                  >
-                    ← Tiếp tục mua sắm
                   </button>
                 </div>
               </div>

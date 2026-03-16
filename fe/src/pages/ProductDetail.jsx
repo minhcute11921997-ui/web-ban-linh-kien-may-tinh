@@ -109,7 +109,6 @@ const ProductDetail = () => {
         <div className="flex flex-col gap-4">
           <span className="text-xs font-bold text-red-500 uppercase tracking-widest">{product.brand}</span>
           <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-          <p className="text-sm text-gray-500 leading-relaxed">{product.description}</p>
           <div className="text-3xl font-bold text-red-500">{formatPrice(product.price)}</div>
 
           <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit
@@ -165,6 +164,14 @@ const ProductDetail = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Mô tả chi tiết */}
+      {product.description && (
+        <div className="bg-white rounded-2xl shadow-md p-8 mt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Mô tả sản phẩm</h2>
+          <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
       )}
 

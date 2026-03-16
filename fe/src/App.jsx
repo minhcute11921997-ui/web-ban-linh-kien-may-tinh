@@ -9,7 +9,6 @@ import { useAuthInit } from "./hooks/useAuthInit";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import ProductsPage from "./pages/ProductsPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
@@ -57,7 +56,6 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:id" element={<ProductDetail />} />
 
               {/* Cần đăng nhập */}

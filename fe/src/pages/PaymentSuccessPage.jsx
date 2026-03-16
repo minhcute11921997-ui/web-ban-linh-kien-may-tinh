@@ -223,9 +223,6 @@ const PaymentSuccessPage = () => {
                         <Link to="/orders" className="block bg-blue-600 text-white py-3 rounded-xl font-bold text-center hover:bg-blue-700 transition">
                             Xem Lịch Sử Đơn Hàng
                         </Link>
-                        <Link to="/" className="block border border-gray-200 text-gray-600 py-3 rounded-xl font-bold text-center hover:bg-gray-50 transition">
-                            Tiếp Tục Mua Sắm
-                        </Link>
                     </div>
 
                 </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getAllCategories } from '../api/categoryApi';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
@@ -72,9 +72,12 @@ export default function HomePage() {
   const [sortOption, setSortOption] = useState('id-DESC');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const addItem = useCartStore(state => state.addItem);
   const token = useAuthStore(state => state.token);
   const navigate = useNavigate();
+  const location = useLocation();
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [categoryBrandsMap, setCategoryBrandsMap] = useState({});
   const [hoverTimeout, setHoverTimeout] = useState(null);
@@ -82,6 +85,36 @@ export default function HomePage() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [slidePaused, setSlidePaused] = useState(false);
   const slideInterval = useRef(null);
+
+  // Reset state về ban đầu khi quay lại HomePage
+  useEffect(() => {
+    setActiveCategory('all');
+    setActiveBrand('all');
+    setPriceMin(MIN_PRICE);
+    setPriceMax(MAX_PRICE);
+    setSortOption('id-DESC');
+    setCurrentPage(1);
+    setActiveSubFilters({});
+    setSearchInput('');
+    setSearchQuery('');
+  }, [location.pathname]);
+
+  // Listen event reset từ Navbar (click logo)
+  useEffect(() => {
+    const handleResetFilters = () => {
+      setActiveCategory('all');
+      setActiveBrand('all');
+      setPriceMin(MIN_PRICE);
+      setPriceMax(MAX_PRICE);
+      setSortOption('id-DESC');
+      setCurrentPage(1);
+      setActiveSubFilters({});
+      setSearchInput('');
+      setSearchQuery('');
+    };
+    window.addEventListener('resetHomeFilters', handleResetFilters);
+    return () => window.removeEventListener('resetHomeFilters', handleResetFilters);
+  }, []);
 
   // Auto-slide banner
   useEffect(() => {
@@ -193,6 +226,7 @@ export default function HomePage() {
     if (activeBrand !== 'all') params.append('brand', activeBrand);
     if (debouncedMin > MIN_PRICE) params.append('minPrice', debouncedMin);
     if (debouncedMax < MAX_PRICE) params.append('maxPrice', debouncedMax);
+    if (searchQuery.trim()) params.append('search', searchQuery.trim());
 
     // Gửi specs filter lên server
     if (Object.keys(activeSubFilters).length > 0) {
@@ -210,7 +244,7 @@ export default function HomePage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters]);
+  }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery]);
 
   const handleAddToCart = async (product) => {
     if (!token) {
@@ -234,139 +268,126 @@ export default function HomePage() {
 
   return (
     <div className="p-4">
-      {/* Tabs danh mục với dropdown hãng */}
-      <div className="flex gap-2 flex-wrap mb-4 relative sticky top-0 z-40 bg-white py-3 -mx-4 px-4 shadow-sm">
-        {/* Nút Tất cả */}
-        <div
-          className="relative"
-          onMouseEnter={() => handleCategoryMouseEnter('all')}
-          onMouseLeave={handleCategoryMouseLeave}
-        >
+      {/* Tabs danh mục với thanh tìm kiếm */}
+      <div className="flex gap-2 flex-wrap mb-4 items-center justify-between relative sticky top-0 z-40 bg-white py-3 -mx-4 px-4 shadow-sm">
+        <div className="flex gap-2 flex-wrap items-center">
+          {/* Nút Tất cả */}
           <button
             onClick={() => handleSelectCategory('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
               activeCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Tất cả ▾
+            Tất cả
           </button>
-          {hoveredCategory === 'all' && (
+
+          {/* Các nút danh mục */}
+          {categories.map(cat => (
             <div
-              onMouseEnter={handleDropdownMouseEnter}
-              onMouseLeave={handleDropdownMouseLeave}
-              className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 min-w-[200px] max-h-[400px] overflow-y-auto animate-fadeIn"
+              key={cat.id}
+              className="relative"
+              onMouseEnter={() => handleCategoryMouseEnter(cat.id)}
+              onMouseLeave={handleCategoryMouseLeave}
             >
-              <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Hãng sản xuất</div>
               <button
-                onClick={() => handleSelectBrand('all', 'all')}
-                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                  activeCategory === 'all' && activeBrand === 'all'
-                    ? 'bg-blue-50 text-blue-600 font-medium'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                onClick={() => handleSelectCategory(cat.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                Tất cả hãng
+                {cat.name} ▾
               </button>
-              {(categoryBrandsMap['all'] || []).map(brand => (
-                <button
-                  key={brand}
-                  onClick={() => handleSelectBrand('all', brand)}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                    activeCategory === 'all' && activeBrand === brand
-                      ? 'bg-blue-50 text-blue-600 font-medium'
-                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                  }`}
+              {hoveredCategory === cat.id && (
+                <div
+                  onMouseEnter={handleDropdownMouseEnter}
+                  onMouseLeave={handleDropdownMouseLeave}
+                  className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 min-w-[220px] max-h-[450px] overflow-y-auto animate-fadeIn"
                 >
-                  {brand}
-                </button>
-              ))}
-              {!categoryBrandsMap['all'] && (
-                <div className="px-4 py-2 text-xs text-gray-400">Đang tải...</div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Các nút danh mục */}
-        {categories.map(cat => (
-          <div
-            key={cat.id}
-            className="relative"
-            onMouseEnter={() => handleCategoryMouseEnter(cat.id)}
-            onMouseLeave={handleCategoryMouseLeave}
-          >
-            <button
-              onClick={() => handleSelectCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {cat.name} ▾
-            </button>
-            {hoveredCategory === cat.id && (
-              <div
-                onMouseEnter={handleDropdownMouseEnter}
-                onMouseLeave={handleDropdownMouseLeave}
-                className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 min-w-[220px] max-h-[450px] overflow-y-auto animate-fadeIn"
-              >
-                {/* Hãng sản xuất */}
-                <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Hãng sản xuất</div>
-                <button
-                  onClick={() => handleSelectBrand(cat.id, 'all')}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                    activeCategory === cat.id && activeBrand === 'all'
-                      ? 'bg-blue-50 text-blue-600 font-medium'
-                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                  }`}
-                >
-                  Tất cả {cat.name}
-                </button>
-                {(categoryBrandsMap[cat.id] || []).map(brand => (
+                  {/* Hãng sản xuất */}
+                  <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Hãng sản xuất</div>
                   <button
-                    key={brand}
-                    onClick={() => handleSelectBrand(cat.id, brand)}
+                    onClick={() => handleSelectBrand(cat.id, 'all')}
                     className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                      activeCategory === cat.id && activeBrand === brand
+                      activeCategory === cat.id && activeBrand === 'all'
                         ? 'bg-blue-50 text-blue-600 font-medium'
                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                     }`}
                   >
-                    {brand}
+                    Tất cả {cat.name}
                   </button>
-                ))}
+                  {(categoryBrandsMap[cat.id] || []).map(brand => (
+                    <button
+                      key={brand}
+                      onClick={() => handleSelectBrand(cat.id, brand)}
+                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                        activeCategory === cat.id && activeBrand === brand
+                          ? 'bg-blue-50 text-blue-600 font-medium'
+                          : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand}
+                    </button>
+                  ))}
 
-                {/* Sub-filters từ DB (dynamic) */}
-                {(() => {
-                  const specs = categoryFiltersMap[cat.id];
-                  if (!specs) return null;
-                  return Object.entries(specs).map(([specName, values]) => (
-                    <div key={specName}>
-                      <div className="border-t border-gray-100 my-1" />
-                      <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{specName}</div>
-                      {values.map(v => (
-                        <button
-                          key={v.value}
-                          onClick={() => toggleSubFilter(cat.id, specName, v.value)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                            activeCategory === cat.id && activeSubFilters[specName] === v.value
-                              ? 'bg-blue-50 text-blue-600 font-medium'
-                              : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                          }`}
-                        >
-                          {v.value} <span className="text-gray-400 text-xs">({v.count})</span>
-                        </button>
-                      ))}
-                    </div>
-                  ));
-                })()}
+                  {/* Sub-filters từ DB (dynamic) */}
+                  {(() => {
+                    const specs = categoryFiltersMap[cat.id];
+                    if (!specs) return null;
+                    return Object.entries(specs).map(([specName, values]) => (
+                      <div key={specName}>
+                        <div className="border-t border-gray-100 my-1" />
+                        <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{specName}</div>
+                        {values.map(v => (
+                          <button
+                            key={v.value}
+                            onClick={() => toggleSubFilter(cat.id, specName, v.value)}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                              activeCategory === cat.id && activeSubFilters[specName] === v.value
+                                ? 'bg-blue-50 text-blue-600 font-medium'
+                                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                            }`}
+                          >
+                            {v.value} <span className="text-gray-400 text-xs">({v.count})</span>
+                          </button>
+                        ))}
+                      </div>
+                    ));
+                  })()}
 
-                {!categoryBrandsMap[cat.id] && (
-                  <div className="px-4 py-2 text-xs text-gray-400">Đang tải...</div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+                  {!categoryBrandsMap[cat.id] && (
+                    <div className="px-4 py-2 text-xs text-gray-400">Đang tải...</div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Thanh tìm kiếm (nằm bên phải) */}
+        <div className="flex gap-2 items-center flex-1 max-w-sm">
+          <input
+            type="text"
+            placeholder="Tìm kiếm..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setSearchQuery(searchInput);
+                setCurrentPage(1);
+              }
+            }}
+            className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={() => {
+              setSearchQuery(searchInput);
+              setCurrentPage(1);
+            }}
+            className="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            🔍
+          </button>
+        </div>
       </div>
 
       {/* Banner Slider */}
@@ -435,9 +456,30 @@ export default function HomePage() {
               {formatPrice(priceMin)} — {formatPrice(priceMax)}
             </span>
           </div>
-          <div className="relative h-6 flex items-center">
+          <div className="relative h-6 flex items-center" onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            const clickedValue = Math.round((percent * (MAX_PRICE - MIN_PRICE) + MIN_PRICE) / PRICE_STEP) * PRICE_STEP;
+            
+            // Clamp value to valid range
+            const clampedValue = Math.max(MIN_PRICE, Math.min(MAX_PRICE, clickedValue));
+            
+            // Determine nó gần với min hay max hơn
+            const distToMin = Math.abs(clampedValue - priceMin);
+            const distToMax = Math.abs(clampedValue - priceMax);
+            
+            if (distToMin < distToMax) {
+              // Adjust min
+              const newMin = Math.max(MIN_PRICE, Math.min(clampedValue, priceMax - PRICE_STEP));
+              setPriceMin(newMin);
+            } else {
+              // Adjust max
+              const newMax = Math.min(MAX_PRICE, Math.max(clampedValue, priceMin + PRICE_STEP));
+              setPriceMax(newMax);
+            }
+          }}>
             {/* Track background */}
-            <div className="absolute w-full h-1.5 bg-gray-200 rounded-full" />
+            <div className="absolute w-full h-1.5 bg-gray-200 rounded-full cursor-pointer" />
             {/* Active range */}
             <div
               className="absolute h-1.5 bg-blue-500 rounded-full"
@@ -454,8 +496,8 @@ export default function HomePage() {
               step={PRICE_STEP}
               value={priceMin}
               onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val <= priceMax - PRICE_STEP) setPriceMin(val);
+                const val = Math.max(MIN_PRICE, Math.min(Number(e.target.value), priceMax - PRICE_STEP));
+                setPriceMin(val);
               }}
               className="absolute w-full h-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white"
             />
@@ -467,8 +509,8 @@ export default function HomePage() {
               step={PRICE_STEP}
               value={priceMax}
               onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val >= priceMin + PRICE_STEP) setPriceMax(val);
+                const val = Math.min(MAX_PRICE, Math.max(Number(e.target.value), priceMin + PRICE_STEP));
+                setPriceMax(val);
               }}
               className="absolute w-full h-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white"
             />

@@ -224,9 +224,6 @@ const OrderDetailPage = () => {
 
                     {/* Nút hành động */}
                     <div className="space-y-3">
-                        <Link to="/" className="block bg-blue-600 text-white py-3 rounded-xl font-bold text-center hover:bg-blue-700 transition">
-                            Tiếp Tục Mua Sắm
-                        </Link>
                         {['pending', 'processing'].includes(orderStatus) && (
                             <button
                                 onClick={() => setShowConfirm(true)}

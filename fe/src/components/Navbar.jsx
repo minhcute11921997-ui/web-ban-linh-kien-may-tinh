@@ -45,13 +45,19 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const handleLogoClick = () => {
+    // Dispatch event để HomePage reset state
+    window.dispatchEvent(new Event('resetHomeFilters'));
+    navigate('/');
+  };
+
   return (
     <nav className="bg-blue-600 text-white shadow">
       <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-between">
 
-        <Link to="/">
+        <button onClick={handleLogoClick} className="cursor-pointer">
           <img src={logo2} alt="PC Shop" className="h-14 w-auto object-contain" />
-        </Link>
+        </button>
 
         <div className="flex items-center gap-2">
           {user ? (
