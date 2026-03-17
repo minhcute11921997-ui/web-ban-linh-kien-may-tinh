@@ -3,12 +3,12 @@ const db = require('../config/db');
 const STATUS_LABEL = {
   pending:    'Chờ xử lý',
   processing: 'Đang xử lý',
-  shipped:    'Đang giao',    
+  shipped:    'Đang giao',
   delivered:  'Đã giao',
   cancelled:  'Đã hủy',
+  rejected:   'Đã hủy',
 };
 
-// Helper — thêm status_label vào mỗi order
 const formatOrder = (order) => ({
   ...order,
   status_label: STATUS_LABEL[order.status] || order.status,
@@ -21,7 +21,6 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập địa chỉ giao hàng' });
     }
 
-    // Lấy cart_id của user
     const [carts] = await db.query('SELECT id FROM cart WHERE user_id = ?', [req.user.userId]);
     if (carts.length === 0) {
       return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
@@ -78,7 +77,6 @@ exports.getMyOrders = async (req, res) => {
       'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
       [req.user.userId]
     );
-    // ✅ map formatOrder vào từng order
     res.json({ success: true, data: orders.map(formatOrder) });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
@@ -102,7 +100,6 @@ exports.getOrderById = async (req, res) => {
       [req.params.id]
     );
 
-    // ✅ map formatOrder vào order
     res.json({ success: true, data: { ...formatOrder(order), items: orderItems } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
@@ -111,12 +108,14 @@ exports.getOrderById = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
+    // Tự động chuyển tất cả đơn pending → processing khi admin xem
+    await db.query(`UPDATE orders SET status = 'processing' WHERE status = 'pending'`);
+
     const [orders] = await db.query(
       `SELECT o.*, u.username, u.email, u.full_name 
        FROM orders o JOIN users u ON o.user_id = u.id 
        ORDER BY o.created_at DESC`
     );
-    // ✅ map formatOrder vào từng order
     res.json({ success: true, data: orders.map(formatOrder) });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
@@ -126,7 +125,7 @@ exports.getAllOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const validStatus = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']; // ✅ fix 'shipping' → 'shipped'
+    const validStatus = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'rejected'];
     if (!validStatus.includes(status)) {
       return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ' });
     }
@@ -157,44 +156,40 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
+
 exports.cancelOrder = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const userId = req.user.userId;
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
 
-        const [orders] = await db.query(
-            'SELECT * FROM orders WHERE id = ? AND user_id = ?',
-            [id, userId]
-        );
+    const [orders] = await db.query(
+      'SELECT * FROM orders WHERE id = ? AND user_id = ?',
+      [id, userId]
+    );
 
-        if (orders.length === 0) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
-        }
-
-        const order = orders[0];
-        const orderStatus = order.status || order.order_status;
-
-        if (!['pending', 'processing'].includes(orderStatus)) {
-            return res.status(400).json({ success: false, message: 'Không thể hủy đơn hàng ở trạng thái này' });
-        }
-
-        // Hoàn lại tồn kho
-        const [items] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [id]);
-        for (const item of items) {
-            await db.query(
-                'UPDATE products SET stock = stock + ? WHERE id = ?',
-                [item.quantity, item.product_id]
-            );
-        }
-
-        await db.query(
-            'UPDATE orders SET status = "cancelled" WHERE id = ?',
-            [id]
-        );
-
-        res.json({ success: true, message: 'Hủy đơn hàng thành công' });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    if (orders.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
     }
+
+    const order = orders[0];
+    const orderStatus = order.status || order.order_status;
+
+    if (!['pending', 'processing'].includes(orderStatus)) {
+      return res.status(400).json({ success: false, message: 'Không thể hủy đơn hàng ở trạng thái này' });
+    }
+
+    const [items] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [id]);
+    for (const item of items) {
+      await db.query(
+        'UPDATE products SET stock = stock + ? WHERE id = ?',
+        [item.quantity, item.product_id]
+      );
+    }
+
+    await db.query('UPDATE orders SET status = "cancelled" WHERE id = ?', [id]);
+
+    res.json({ success: true, message: 'Hủy đơn hàng thành công' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
 };
