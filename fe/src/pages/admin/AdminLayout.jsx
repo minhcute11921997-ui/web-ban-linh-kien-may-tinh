@@ -2,9 +2,9 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
 const menuItems = [
-  { to: '/admin', icon: '📊', label: 'Dashboard', end: true },
-  { to: '/admin/products', icon: '📦', label: 'Sản phẩm' },
-  { to: '/admin/orders', icon: '🛍️', label: 'Đơn hàng' },
+  { to: '/admin', icon: '', label: 'Dashboard', end: true },
+  { to: '/admin/products', icon: '', label: 'Sản phẩm' },
+  { to: '/admin/orders', icon: '', label: 'Đơn hàng' },
 ];
 
 const AdminLayout = () => {
@@ -27,7 +27,6 @@ const AdminLayout = () => {
           <button onClick={() => navigate('/admin')} className="flex items-center gap-3 cursor-pointer">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              ⚙
             </div>
             <div>
               <h1 className="text-white text-lg font-bold leading-tight">Admin Panel</h1>
@@ -47,7 +46,6 @@ const AdminLayout = () => {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`
               }>
-              <span className="text-lg">{item.icon}</span>
               {item.label}
             </NavLink>
           ))}
@@ -57,7 +55,6 @@ const AdminLayout = () => {
         <div className="px-3 py-4 border-t border-white/10">
           <button onClick={() => navigate('/')}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all w-full cursor-pointer">
-            <span className="text-lg">🏠</span>
             Về trang chủ
           </button>
         </div>
@@ -68,7 +65,7 @@ const AdminLayout = () => {
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Xin chào, {user?.full_name || user?.username} 👋</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Xin chào, {user?.full_name || user?.username}</h2>
             <p className="text-xs text-gray-400">Quản trị viên</p>
           </div>
           <div className="flex items-center gap-4">

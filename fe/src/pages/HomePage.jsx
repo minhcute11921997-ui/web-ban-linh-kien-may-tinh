@@ -49,10 +49,10 @@ const SLIDES = [
   },
   {
     id: 5,
-    title: '🛒 Miễn phí vận chuyển',
+    title: 'Miễn phí vận chuyển',
     subtitle: 'Cho đơn hàng từ 500K toàn quốc',
     bg: 'from-pink-500 to-rose-700',
-    accent: '🚚',
+    accent: '',
   },
 ];
 
@@ -559,7 +559,6 @@ export default function HomePage() {
         <div className="text-center py-16 text-gray-400">Đang tải...</div>
       ) : products.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <div className="text-5xl mb-3">📦</div>
           <p>Không có sản phẩm nào</p>
         </div>
       ) : (
@@ -568,7 +567,7 @@ export default function HomePage() {
             {currentProducts.map(product => (
               <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition">
                 
-                {/* ✅ Bọc ảnh + tên + giá trong Link */}
+                {/* Bọc ảnh + tên + giá trong Link */}
                 <Link to={`/products/${product.id}`} className="block p-3">
                   <div className="w-full aspect-square bg-gray-50 rounded-lg mb-2 overflow-hidden">
                     <img
@@ -585,7 +584,7 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* ✅ Nút nằm ngoài Link */}
+                {/* Nút nằm ngoài Link */}
                 <div className="px-3 pb-3">
                   <button
                     onClick={() => handleAddToCart(product)}

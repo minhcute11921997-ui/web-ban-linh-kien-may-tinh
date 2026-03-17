@@ -44,10 +44,10 @@ const AdminDashboard = () => {
   );
 
   const cards = [
-    { label: 'Sản phẩm',   value: stats?.totalProducts || 0,  icon: '🛍️', color: 'from-blue-500 to-blue-600',   link: '/admin/products' },
-    { label: 'Đơn hàng',   value: stats?.totalOrders || 0,    icon: '📦', color: 'from-purple-500 to-purple-600', link: '/admin/orders' },
-    { label: 'Doanh thu',  value: `${Number(stats?.totalRevenue || 0).toLocaleString('vi-VN')}₫`, icon: '💰', color: 'from-green-500 to-green-600', link: null },
-    { label: 'Người dùng', value: stats?.totalUsers || 0,     icon: '👥', color: 'from-orange-500 to-orange-600', link: '/admin/users' },
+    { label: 'Sản phẩm',   value: stats?.totalProducts || 0,  icon: '', color: 'from-blue-500 to-blue-600',   link: '/admin/products' },
+    { label: 'Đơn hàng',   value: stats?.totalOrders || 0,    icon: '', color: 'from-purple-500 to-purple-600', link: '/admin/orders' },
+    { label: 'Doanh thu',  value: `${Number(stats?.totalRevenue || 0).toLocaleString('vi-VN')}₫`, icon: '', color: 'from-green-500 to-green-600', link: null },
+    { label: 'Người dùng', value: stats?.totalUsers || 0,     icon: '', color: 'from-orange-500 to-orange-600', link: '/admin/users' },
   ];
 
   return (
@@ -60,7 +60,6 @@ const AdminDashboard = () => {
           <div key={i} onClick={() => card.link && navigate(card.link)}
             className={`bg-gradient-to-br ${card.color} rounded-2xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${card.link ? 'cursor-pointer hover:scale-[1.02]' : ''}`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-3xl">{card.icon}</span>
               {stats?.pendingOrders > 0 && card.label === 'Đơn hàng' && (
                 <span className="bg-white/20 text-xs px-2 py-1 rounded-full">{stats.pendingOrders} chờ xử lý</span>
               )}

@@ -66,7 +66,6 @@ const CartPage = () => {
 
         {items.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-            <div className="text-6xl mb-4">🛒</div>
             <p className="text-gray-500 text-lg mb-6">Giỏ hàng đang trống</p>
           </div>
         ) : (

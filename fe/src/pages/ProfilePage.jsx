@@ -55,7 +55,6 @@ const ProfilePage = () => {
         <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-lg text-white text-sm font-medium
           ${toast === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
         >
-          <span className="text-lg">{toast === 'success' ? '✅' : '❌'}</span>
           {toast === 'success' ? 'Cập nhật thông tin thành công!' : 'Cập nhật thất bại, thử lại!'}
         </div>
       )}
@@ -72,7 +71,7 @@ const ProfilePage = () => {
             <div>
               <p className="text-xl font-semibold">{user?.full_name || user?.username}</p>
               <span className="text-sm bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-                {user?.role === 'admin' ? '⚙️ Quản trị viên' : '👤 Khách hàng'}
+                {user?.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
               </span>
             </div>
           </div>
@@ -82,7 +81,7 @@ const ProfilePage = () => {
               onClick={() => setEditing(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-medium transition-colors"
             >
-              ✏️ Chỉnh sửa
+              Chỉnh sửa
             </button>
           ) : (
             <div className="flex gap-2">
@@ -97,7 +96,7 @@ const ProfilePage = () => {
                 disabled={loading}
                 className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {loading ? 'Đang lưu...' : '💾 Lưu'}
+                {loading ? 'Đang lưu...' : 'Lưu'}
               </button>
             </div>
           )}

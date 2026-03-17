@@ -177,7 +177,7 @@ const ProductDetail = () => {
               disabled={product.stock === 0 || addingToCart}
               onClick={handleAddToCart}
               className="flex-1 py-3 rounded-xl border-2 border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition disabled:opacity-40 disabled:cursor-not-allowed">
-              🛒 {addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ'}
+              {addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ'}
             </button>
             <button 
               disabled={product.stock === 0 || addingToCart}
@@ -189,7 +189,7 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* ✅ BẢNG THÔNG SỐ KỸ THUẬT */}
+      {/* BẢNG THÔNG SỐ KỸ THUẬT */}
       {specs.length > 0 && (
         <div className="bg-white rounded-2xl shadow-md p-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Thông số kỹ thuật</h2>

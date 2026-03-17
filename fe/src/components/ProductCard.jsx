@@ -27,7 +27,7 @@ const ProductCard = ({ product }) => {
   return (
     <div className="border rounded-xl shadow hover:shadow-md transition bg-white overflow-hidden">
 
-      {/* ✅ Toàn bộ phần trên là link */}
+      {/* Toàn bộ phần trên là link */}
       <Link to={`/products/${product.id}`} className="block p-4 cursor-pointer">
         <div className="w-full aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
           <img
@@ -46,7 +46,7 @@ const ProductCard = ({ product }) => {
         <p className="text-gray-400 text-xs mb-3">Còn {product.stock} sản phẩm</p>
       </Link>
 
-      {/* ✅ Nút nằm ngoài Link */}
+      {/* Nút nằm ngoài Link */}
       <div className="px-4 pb-4">
         <button
           onClick={handleAddToCart}
