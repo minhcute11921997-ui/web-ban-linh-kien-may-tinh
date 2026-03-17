@@ -88,7 +88,7 @@ const Navbar = () => {
 
               {/* Admin */}
               {user.role === 'admin' && (
-                <Link to="/admin/products"
+                <Link to="/admin"
                   className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl hover:bg-white/20 transition-colors min-w-[70px]">
                   <span className="text-xl">⚙️</span>
                   <span className="text-xs font-medium text-yellow-300">Admin</span>

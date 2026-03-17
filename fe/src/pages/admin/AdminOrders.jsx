@@ -27,7 +27,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       const res = await getAllOrders();
-      setOrders(res.data.data); 
+      setOrders(res.data.data);
     } catch {
       toast.error('Không thể tải đơn hàng!');
     } finally {
@@ -57,66 +57,73 @@ const AdminOrders = () => {
   };
 
   if (loading) return (
-    <p className="text-center py-20 text-gray-400">Đang tải...</p>
+    <div className="flex items-center justify-center h-64">
+      <div className="text-gray-400 text-lg">Đang tải...</div>
+    </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Quản lý đơn hàng</h1>
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Quản lý đơn hàng</h1>
+        <span className="text-sm text-gray-400">{orders.length} đơn hàng</span>
+      </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="text-left p-3 border">Đơn #</th>
-              <th className="text-left p-3 border">Khách hàng</th>
-              <th className="text-left p-3 border">Tổng tiền</th>
-              <th className="text-left p-3 border">Ngày đặt</th>
-              <th className="text-left p-3 border">Trạng thái</th>
-              <th className="text-left p-3 border">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map(order => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="p-3 border font-medium">#{order.id}</td>
-                <td className="p-3 border">
-                  <p className="font-medium">{order.full_name}</p>
-                  <p className="text-gray-400 text-xs">{order.email}</p>
-                </td>
-                <td className="p-3 border text-blue-600 font-semibold">
-                  {Number(order.total_price).toLocaleString('vi-VN')}₫
-                </td>
-                <td className="p-3 border text-gray-500">
-                  {new Date(order.created_at).toLocaleDateString('vi-VN')}
-                </td>
-                <td className="p-3 border">
-                  
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium mb-2 inline-block ${STATUS_COLOR[order.status]}`}>
-                    {order.status_label}
-                  </span>
-                  <select
-                    value={order.status}
-                    onChange={e => handleStatus(order.id, e.target.value)}
-                    className="block border px-2 py-1 rounded text-sm focus:outline-none w-full"
-                  >
-                    {STATUSES.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="p-3 border">
-                  <button
-                    onClick={() => handleDelete(order.id)}
-                    className="text-red-500 hover:underline"
-                  >
-                    Xóa
-                  </button>
-                </td>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="text-left px-6 py-3 font-medium">Đơn #</th>
+                <th className="text-left px-6 py-3 font-medium">Khách hàng</th>
+                <th className="text-left px-6 py-3 font-medium">Tổng tiền</th>
+                <th className="text-left px-6 py-3 font-medium">Ngày đặt</th>
+                <th className="text-left px-6 py-3 font-medium">Trạng thái</th>
+                <th className="text-left px-6 py-3 font-medium">Thao tác</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-3 font-medium text-gray-800">#{order.id}</td>
+                  <td className="px-6 py-3">
+                    <p className="font-medium text-gray-700">{order.full_name}</p>
+                    <p className="text-gray-400 text-xs">{order.email}</p>
+                  </td>
+                  <td className="px-6 py-3 text-blue-600 font-semibold">
+                    {Number(order.total_price).toLocaleString('vi-VN')}₫
+                  </td>
+                  <td className="px-6 py-3 text-gray-500">
+                    {new Date(order.created_at).toLocaleDateString('vi-VN')}
+                  </td>
+                  <td className="px-6 py-3">
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium mb-2 inline-block ${STATUS_COLOR[order.status]}`}>
+                      {order.status_label}
+                    </span>
+                    <select
+                      value={order.status}
+                      onChange={e => handleStatus(order.id, e.target.value)}
+                      className="block border border-gray-200 px-2 py-1.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                      {STATUSES.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-6 py-3">
+                    <button
+                      onClick={() => handleDelete(order.id)}
+                      className="text-red-500 hover:text-red-700 font-medium cursor-pointer">
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {orders.length === 0 && (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-400">Chưa có đơn hàng nào</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

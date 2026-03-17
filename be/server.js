@@ -39,6 +39,12 @@ app.use('/api/payments', paymentRoutes);
 const discountRoutes = require('./src/routes/discount');
 app.use('/api/discounts', discountRoutes);
 
+const userRoutes = require('./src/routes/user');
+app.use('/api/users', userRoutes);
+
+const dashboardRoutes = require('./src/routes/dashboard');
+app.use('/api/dashboard', dashboardRoutes);
+
 // Route test server
 app.get('/', (req, res) => {
     res.json({ message: ' Backend API đang chạy!' });
