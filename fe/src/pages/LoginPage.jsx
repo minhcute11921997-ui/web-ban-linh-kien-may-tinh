@@ -33,7 +33,7 @@ const LoginPage = () => {
       const res = await login(payload);
       setAuth(res.data.user, res.data.token);
       toast.success('Đăng nhập thành công!');
-      navigate('/');
+      navigate(res.data.user.role === 'admin' ? '/admin' : '/');
     } catch (err) {
       const msg = err.response?.data?.message || 'Đăng nhập thất bại!';
       if (msg.toLowerCase().includes('password')) setErrors({ password: msg });
