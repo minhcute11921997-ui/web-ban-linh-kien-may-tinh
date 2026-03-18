@@ -15,7 +15,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import OrdersPage from "./pages/OrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
-import OrderDetailPage from './pages/OrderDetailPage';
+import OrderDetailPage from "./pages/OrderDetailPage";
 
 // Admin
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -56,7 +56,7 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
         </Route>
 
-        {/* ===== Customer routes + admin CRUD — có Navbar + banner ===== */}
+        {/* ===== Customer routes — có Navbar + banner ===== */}
         <Route
           path="*"
           element={
@@ -67,8 +67,14 @@ function App() {
                   {/* Banner trái */}
                   <div className="w-32 flex-shrink-0 hidden lg:block">
                     <div className="sticky top-4 space-y-3">
-                      <BannerPlaceholder title="Video khuyến mãi 1" to="/products" />
-                      <BannerPlaceholder title="Video khuyến mãi 2" to="/products" />
+                      <BannerPlaceholder
+                        title="Video khuyến mãi 1"
+                        to="/products"
+                      />
+                      <BannerPlaceholder
+                        title="Video khuyến mãi 2"
+                        to="/products"
+                      />
                     </div>
                   </div>
 
@@ -82,21 +88,76 @@ function App() {
                       <Route path="/products/:id" element={<ProductDetail />} />
 
                       {/* Cần đăng nhập */}
-                      <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
-                      <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
-                      <Route path="/payment-success" element={<PrivateRoute><PaymentSuccessPage /></PrivateRoute>} />
-                      <Route path="/payment-callback" element={<PrivateRoute><PaymentSuccessPage /></PrivateRoute>} />
-                      <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
-                      <Route path="/orders/:id" element={<PrivateRoute><OrderDetailPage /></PrivateRoute>} />
-                      <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+                      <Route
+                        path="/cart"
+                        element={
+                          <PrivateRoute>
+                            <CartPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/checkout"
+                        element={
+                          <PrivateRoute>
+                            <CheckoutPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/payment-success"
+                        element={
+                          <PrivateRoute>
+                            <PaymentSuccessPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/payment-callback"
+                        element={
+                          <PrivateRoute>
+                            <PaymentSuccessPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/orders"
+                        element={
+                          <PrivateRoute>
+                            <OrdersPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/orders/:id"
+                        element={
+                          <PrivateRoute>
+                            <OrderDetailPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/profile"
+                        element={
+                          <PrivateRoute>
+                            <ProfilePage />
+                          </PrivateRoute>
+                        }
+                      />
                     </Routes>
                   </main>
 
                   {/* Banner phải */}
                   <div className="w-32 flex-shrink-0 hidden lg:block">
                     <div className="sticky top-4 space-y-3">
-                      <BannerPlaceholder title="Video khuyến mãi 3" to="/products" />
-                      <BannerPlaceholder title="Video khuyến mãi 4" to="/products" />
+                      <BannerPlaceholder
+                        title="Video khuyến mãi 3"
+                        to="/products"
+                      />
+                      <BannerPlaceholder
+                        title="Video khuyến mãi 4"
+                        to="/products"
+                      />
                     </div>
                   </div>
                 </div>
