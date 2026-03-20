@@ -90,6 +90,10 @@ export default function HomePage() {
   const [categoryFiltersMap, setCategoryFiltersMap] = useState({});
   const [debouncedMin, setDebouncedMin] = useState(MIN_PRICE);
   const [debouncedMax, setDebouncedMax] = useState(MAX_PRICE);
+  const [flashSaleProducts, setFlashSaleProducts] = useState([]);
+const [flashSaleTimeLeft, setFlashSaleTimeLeft] = useState({ h: 2, m: 7, s: 2 });
+const flashSaleRef = useRef(null);
+const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 + 2 * 1000);
 
   // Reset state khi quay lại HomePage
   useEffect(() => {
@@ -155,7 +159,38 @@ export default function HomePage() {
     }, 400);
     return () => clearTimeout(timer);
   }, [priceMin, priceMax]);
+  
+  useEffect(() => {
+  fetch('http://localhost:3000/api/products?sortBy=price&sortOrder=DESC&limit=10')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // Giả lập % giảm giá ngẫu nhiên cho mỗi sản phẩm
+        const discounts = [7, 10, 12, 15, 20];
+        const withDiscount = data.data.slice(0, 6).map((p, i) => ({
+          ...p,
+          discountPercent: discounts[i % discounts.length],
+          originalPrice: Math.round(Number(p.price) / (1 - discounts[i % discounts.length] / 100) / 1000) * 1000,
+          stockLeft: Math.floor(Math.random() * 4) + 1,
+          stockTotal: 5,
+        }));
+        setFlashSaleProducts(withDiscount);
+      }
+    })
+    .catch(() => {});
+}, []);
 
+// Đồng hồ đếm ngược flash sale
+useEffect(() => {
+  const timer = setInterval(() => {
+    const remaining = Math.max(0, flashSaleEndTime.current - Date.now());
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    setFlashSaleTimeLeft({ h, m, s });
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
   // Fetch filter data cho 1 category
   const fetchCategoryData = (catId) => {
     const key = catId || 'all';
