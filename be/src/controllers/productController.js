@@ -47,13 +47,29 @@ const getAllProducts = async (req, res) => {
         const order = allowedOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
         query += ` ORDER BY p.${sort} ${order}`;
 
-        const [products] = await db.query(query, params);
+        // Đếm tổng số sản phẩm (không limit)
+const countQuery = query.replace(
+    /^SELECT DISTINCT p\.\*, c\.name as category_name/,
+    'SELECT COUNT(DISTINCT p.id) as total'
+).replace(/ ORDER BY p\.\w+ (ASC|DESC)$/, '');
+const [[{ total }]] = await db.query(countQuery, params);
 
-        res.json({
-            success: true,
-            data: products,
-            total: products.length
-        });
+// Thêm pagination
+const limit = Math.min(parseInt(req.query.limit) || 12, 100);
+const page  = Math.max(parseInt(req.query.page) || 1, 1);
+const offset = (page - 1) * limit;
+query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+const [products] = await db.query(query, params);
+
+res.json({
+    success: true,
+    data: products,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+});
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
@@ -144,7 +160,7 @@ const getProductSpecs = async (req, res) => {
   }
 };
 
-// GET /api/products/filters/:categoryId - Lấy các filter options theo danh mục
+// - Lấy các filter options theo danh mục
 const getFilterOptions = async (req, res) => {
     try {
         const { categoryId } = req.params;

@@ -5,10 +5,12 @@ import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 
+
 const ITEMS_PER_PAGE = 12;
 const MIN_PRICE = 0;
 const MAX_PRICE = 50000000;
 const PRICE_STEP = 500000;
+
 
 const SORT_OPTIONS = [
   { label: 'Mới nhất', value: 'id-DESC' },
@@ -17,6 +19,7 @@ const SORT_OPTIONS = [
   { label: 'Tên A → Z', value: 'name-ASC' },
   { label: 'Tên Z → A', value: 'name-DESC' },
 ];
+
 
 const SLIDES = [
   {
@@ -56,14 +59,18 @@ const SLIDES = [
   },
 ];
 
+
 const formatPrice = (v) => {
   if (v >= 1000000) return (v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1) + ' tr';
   if (v >= 1000) return (v / 1000).toFixed(0) + 'k';
   return v.toString();
 };
 
+
 export default function HomePage() {
   const [products, setProducts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeBrand, setActiveBrand] = useState('all');
@@ -91,9 +98,10 @@ export default function HomePage() {
   const [debouncedMin, setDebouncedMin] = useState(MIN_PRICE);
   const [debouncedMax, setDebouncedMax] = useState(MAX_PRICE);
   const [flashSaleProducts, setFlashSaleProducts] = useState([]);
-const [flashSaleTimeLeft, setFlashSaleTimeLeft] = useState({ h: 2, m: 7, s: 2 });
-const flashSaleRef = useRef(null);
-const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 + 2 * 1000);
+  const [flashSaleTimeLeft, setFlashSaleTimeLeft] = useState({ h: 2, m: 7, s: 2 });
+  const flashSaleRef = useRef(null);
+  const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 + 2 * 1000);
+
 
   // Reset state khi quay lại HomePage
   useEffect(() => {
@@ -107,6 +115,7 @@ const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 
     setSearchInput('');
     setSearchQuery('');
   }, [location.pathname]);
+
 
   // Listen event reset từ Navbar
   useEffect(() => {
@@ -125,6 +134,7 @@ const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 
     return () => window.removeEventListener('resetHomeFilters', handleResetFilters);
   }, []);
 
+
   // Auto-slide banner
   useEffect(() => {
     if (slidePaused) return;
@@ -134,6 +144,7 @@ const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 
     return () => clearInterval(slideInterval.current);
   }, [slidePaused]);
 
+
   // Lấy danh mục
   useEffect(() => {
     getAllCategories()
@@ -141,15 +152,9 @@ const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 
       .catch(() => {});
   }, []);
 
-  // Fetch sản phẩm nổi bật (lấy tất cả, không giới hạn)
-  useEffect(() => {
-    fetch('http://localhost:3000/api/products?sortBy=id&sortOrder=DESC')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setFeaturedProducts(data.data);
-      })
-      .catch(() => {});
-  }, []);
+
+
+
 
   // Debounce giá
   useEffect(() => {
@@ -159,44 +164,47 @@ const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 
     }, 400);
     return () => clearTimeout(timer);
   }, [priceMin, priceMax]);
-  
-  useEffect(() => {
-  fetch('http://localhost:3000/api/products?sortBy=price&sortOrder=DESC&limit=10')
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        // Giả lập % giảm giá ngẫu nhiên cho mỗi sản phẩm
-        const discounts = [7, 10, 12, 15, 20];
-        const withDiscount = data.data.slice(0, 6).map((p, i) => ({
-          ...p,
-          discountPercent: discounts[i % discounts.length],
-          originalPrice: Math.round(Number(p.price) / (1 - discounts[i % discounts.length] / 100) / 1000) * 1000,
-          stockLeft: Math.floor(Math.random() * 4) + 1,
-          stockTotal: 5,
-        }));
-        setFlashSaleProducts(withDiscount);
-      }
-    })
-    .catch(() => {});
-}, []);
 
-// Đồng hồ đếm ngược flash sale
-useEffect(() => {
-  const timer = setInterval(() => {
-    const remaining = Math.max(0, flashSaleEndTime.current - Date.now());
-    const h = Math.floor(remaining / 3600000);
-    const m = Math.floor((remaining % 3600000) / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
-    setFlashSaleTimeLeft({ h, m, s });
-  }, 1000);
-  return () => clearInterval(timer);
-}, []);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/products?sortBy=price&sortOrder=DESC&limit=10`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const discounts = [7, 10, 12, 15, 20];
+          const withDiscount = data.data.slice(0, 6).map((p, i) => ({
+            ...p,
+            discountPercent: discounts[i % discounts.length],
+            originalPrice: Math.round(Number(p.price) / (1 - discounts[i % discounts.length] / 100) / 1000) * 1000,
+            stockLeft: Math.floor(Math.random() * 4) + 1,
+            stockTotal: 5,
+          }));
+          setFlashSaleProducts(withDiscount);
+        }
+      })
+      .catch(() => {});
+  }, []);
+  
+
+
+  // Đồng hồ đếm ngược flash sale
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const remaining = Math.max(0, flashSaleEndTime.current - Date.now());
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      setFlashSaleTimeLeft({ h, m, s });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Fetch filter data cho 1 category
   const fetchCategoryData = (catId) => {
     const key = catId || 'all';
     if (categoryBrandsMap[key]) return;
     if (key === 'all') {
-      fetch('http://localhost:3000/api/products?sortBy=id&sortOrder=DESC')
+      fetch(`${import.meta.env.VITE_API_URL}/api/products?sortBy=id&sortOrder=DESC`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -205,7 +213,7 @@ useEffect(() => {
           }
         });
     } else {
-      fetch(`http://localhost:3000/api/products/filters/${catId}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/products/filters/${catId}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -215,6 +223,7 @@ useEffect(() => {
         });
     }
   };
+
 
   // Hover handlers
   const handleCategoryMouseEnter = (catId) => {
@@ -233,6 +242,7 @@ useEffect(() => {
     setHoveredCategory(null);
   };
 
+
   const handleSelectBrand = (catId, brand) => {
     setActiveCategory(catId);
     setActiveBrand(brand);
@@ -245,6 +255,7 @@ useEffect(() => {
     setActiveSubFilters({});
     setHoveredCategory(null);
   };
+
 
   const toggleSubFilter = (catId, key, value) => {
     setActiveCategory(catId);
@@ -260,10 +271,16 @@ useEffect(() => {
     setHoveredCategory(null);
   };
 
-  // Fetch sản phẩm chính
+
+  
+  // useEffect 1: Reset page khi filter thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery]);
+
+  // useEffect 2: Fetch sản phẩm chính theo page
   useEffect(() => {
     setLoading(true);
-    setCurrentPage(1);
     const params = new URLSearchParams();
     if (activeCategory !== 'all') params.append('category', activeCategory);
     if (activeBrand !== 'all') params.append('brand', activeBrand);
@@ -276,15 +293,26 @@ useEffect(() => {
     const [sortBy, sortOrder] = sortOption.split('-');
     params.append('sortBy', sortBy);
     params.append('sortOrder', sortOrder);
+    params.append('limit', ITEMS_PER_PAGE);
+    params.append('page', currentPage);
 
-    fetch(`http://localhost:3000/api/products?${params.toString()}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/products?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success) setProducts(data.data);
+        if (data.success) {
+          setProducts(data.data);
+          setTotalPages(data.totalPages || 1);
+          setTotalProducts(data.total || 0);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery]);
+  }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery, currentPage]);
+useEffect(() => {
+  if (currentPage === 1 && activeCategory === 'all' && activeBrand === 'all' && products.length > 0) {
+    setFeaturedProducts(products);
+  }
+}, [products, currentPage, activeCategory, activeBrand]);
 
   const handleAddToCart = async (product) => {
     if (!token) {
@@ -301,12 +329,10 @@ useEffect(() => {
     }
   };
 
-  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentProducts = products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="p-4">
+
 
       {/* ===== Banner Slider ===== */}
       <div
@@ -352,6 +378,7 @@ useEffect(() => {
         </div>
       </div>
 
+
       {/* ===== Section: Sản phẩm nổi bật ===== */}
       {featuredProducts.length > 0 && (
         <div className="mb-8">
@@ -363,11 +390,13 @@ useEffect(() => {
             </div>
           </div>
 
+
           <div className="relative group">
             <button
               onClick={() => featuredRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
             >‹</button>
+
 
             <div
               ref={featuredRef}
@@ -408,6 +437,7 @@ useEffect(() => {
               ))}
             </div>
 
+
             <button
               onClick={() => featuredRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
@@ -416,10 +446,12 @@ useEffect(() => {
         </div>
       )}
 
+
       {/* ===== Tiêu đề Danh sách sản phẩm ===== */}
       <div className="flex items-center gap-2 mb-3">
         <h2 className="text-lg font-bold text-gray-800">Danh sách sản phẩm</h2>
       </div>
+
 
       {/* ===== Tab danh mục + Tìm kiếm ===== */}
       <div className="flex gap-2 flex-wrap mb-4 items-center justify-between bg-white py-3 -mx-4 px-4 shadow-sm">
@@ -432,6 +464,7 @@ useEffect(() => {
           >
             Tất cả
           </button>
+
 
           {categories.map(cat => (
             <div
@@ -448,6 +481,7 @@ useEffect(() => {
               >
                 {cat.name} ▾
               </button>
+
 
               {hoveredCategory === cat.id && (
                 <div
@@ -480,6 +514,7 @@ useEffect(() => {
                     </button>
                   ))}
 
+
                   {(() => {
                     const specs = categoryFiltersMap[cat.id];
                     if (!specs) return null;
@@ -504,6 +539,7 @@ useEffect(() => {
                     ));
                   })()}
 
+
                   {!categoryBrandsMap[cat.id] && (
                     <div className="px-4 py-2 text-xs text-gray-400">Đang tải...</div>
                   )}
@@ -512,6 +548,7 @@ useEffect(() => {
             </div>
           ))}
         </div>
+
 
         {/* Thanh tìm kiếm */}
         <div className="flex gap-2 items-center flex-1 max-w-sm">
@@ -536,6 +573,7 @@ useEffect(() => {
           </button>
         </div>
       </div>
+
 
       {/* ===== Bộ lọc giá + Sắp xếp ===== */}
       <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
@@ -602,6 +640,7 @@ useEffect(() => {
           </div>
         </div>
 
+
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-500">🔽 Sắp xếp:</span>
           <select
@@ -616,6 +655,7 @@ useEffect(() => {
         </div>
       </div>
 
+
       {/* ===== Grid sản phẩm ===== */}
       {loading ? (
         <div className="text-center py-16 text-gray-400">Đang tải...</div>
@@ -626,7 +666,8 @@ useEffect(() => {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-4">
-            {currentProducts.map(product => (
+            
+            {products.map(product => (
               <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition">
                 <Link to={`/products/${product.id}`} className="block p-3">
                   <div className="w-full aspect-square bg-gray-50 rounded-lg mb-2 overflow-hidden">
@@ -655,6 +696,7 @@ useEffect(() => {
             ))}
           </div>
 
+
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               <button
@@ -662,6 +704,7 @@ useEffect(() => {
                 disabled={currentPage === 1}
                 className="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
               >← Trước</button>
+
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
@@ -673,6 +716,7 @@ useEffect(() => {
                 >{page}</button>
               ))}
 
+
               <button
                 onClick={() => setCurrentPage(p => p + 1)}
                 disabled={currentPage === totalPages}
@@ -682,7 +726,7 @@ useEffect(() => {
           )}
 
           <p className="text-center text-xs text-gray-400 mt-2">
-            Trang {currentPage}/{totalPages} • {products.length} sản phẩm
+            Trang {currentPage}/{totalPages} • {totalProducts} sản phẩm
           </p>
         </>
       )}

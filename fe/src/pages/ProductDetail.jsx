@@ -22,12 +22,12 @@ const ProductDetail = () => {
       setLoading(true);
       try {
         // Fetch sản phẩm
-        const res = await fetch(`http://localhost:3000/api/products/${id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`);
         const data = await res.json();
         if (data.success) setProduct(data.data);
 
         // Fetch thông số kỹ thuật
-        const specRes = await fetch(`http://localhost:3000/api/products/${id}/specs`);
+        const specRes = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}/specs`);
         const specData = await specRes.json();
         if (specData.success) setSpecs(specData.data);
       } catch (error) {

@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { incrementUsedCount } = require('./discountController');
 
 const STATUS_LABEL = {
   pending:    'Chờ xử lý',
@@ -16,8 +17,8 @@ const formatOrder = (order) => ({
 
 exports.createOrder = async (req, res) => {
   try {
-    const { shipping_address } = req.body;
-    if (!shipping_address) {
+    const { shipping_address, discount_code, discount_amount } = req.body;
+if (!shipping_address)  {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập địa chỉ giao hàng' });
     }
 
@@ -45,13 +46,13 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    const total_price = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+const total_price = Math.max(0, subtotal - (Number(discount_amount) || 0));
 
-    const [order] = await db.query(
-      'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
-      [req.user.userId, total_price, shipping_address, 'pending']
-    );
-
+const [order] = await db.query(
+  'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
+  [req.user.userId, total_price, shipping_address, 'pending']
+);
     for (const item of items) {
       await db.query(
         'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
@@ -63,9 +64,14 @@ exports.createOrder = async (req, res) => {
       );
     }
 
-    await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
+await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
 
-    res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId: order.insertId });
+// Tăng used_count nếu có dùng mã giảm giá
+if (discount_code) {
+  await incrementUsedCount(discount_code);
+}
+
+res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId: order.insertId });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
