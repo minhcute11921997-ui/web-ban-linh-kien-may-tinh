@@ -257,5 +257,41 @@ const getFilterOptions = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
+// POST /api/products/flash-sale  — set giảm giá theo giờ cho nhiều sản phẩm
+const setFlashSale = async (req, res) => {
+  try {
+    const { items, discountPercent, durationHours } = req.body;
+    // items = [{ productId, saleQty }]
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts };
+    if (!items?.length || !discountPercent || !durationHours) {
+      return res.status(400).json({ success: false, message: 'Thiếu dữ liệu' });
+    }
+    if (discountPercent < 1 || discountPercent > 99) {
+      return res.status(400).json({ success: false, message: 'Phần trăm giảm phải từ 1–99' });
+    }
+
+    const expiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000);
+
+    for (const { productId, saleQty } of items) {
+      // Kiểm tra số lượng không vượt tồn kho
+      const [[product]] = await db.query('SELECT stock FROM products WHERE id = ?', [productId]);
+      if (!product) continue;
+      if (saleQty > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Sản phẩm ID ${productId}: số lượng flash sale (${saleQty}) vượt tồn kho (${product.stock})`
+        });
+      }
+      await db.query(
+        'UPDATE products SET discount_percent = ?, discount_expires_at = ? WHERE id = ?',
+        [discountPercent, expiresAt, productId]
+      );
+    }
+
+    res.json({ success: true, message: `Đã set flash sale ${discountPercent}% trong ${durationHours} giờ cho ${items.length} sản phẩm!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts, setFlashSale };

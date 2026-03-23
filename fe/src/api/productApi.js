@@ -19,3 +19,5 @@ export const updateProduct = (id, data) => {
 export const deleteProduct = (id) => {
   return axiosInstance.delete(`/products/${id}`);
 };
+export const setFlashSaleApi = (data) =>
+  axiosInstance.post('/products/flash-sale', data);

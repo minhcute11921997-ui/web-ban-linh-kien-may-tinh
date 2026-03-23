@@ -7,7 +7,7 @@ const { verifyToken, verifyAdmin } = require('../middleware/auth');
 router.get('/', productController.getAllProducts);
 router.get('/filters/:categoryId', productController.getFilterOptions);
 router.get('/featured', productController.getFeaturedProducts); 
-router.get('/on-sale', productController.getOnSaleProducts); 
+router.get('/on-sale', productController.getOnSaleProducts);
 router.get('/:id/specs', productController.getProductSpecs);
 router.get('/:id', productController.getProductById);
 
