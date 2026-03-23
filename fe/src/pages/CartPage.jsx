@@ -34,11 +34,11 @@ const CartPage = () => {
   };
 
   const handleClearAll = () => {
-    if (items.length === 0) return;
-    if (window.confirm('Bạn chắc chắn muốn xóa tất cả sản phẩm trong giỏ hàng?')) {
-      clearAll();
-      toast.info('Đã xóa tất cả sản phẩm');
+    if (selectedItems.length === 0) {
+      toast.warning('Vui lòng chọn sản phẩm để xóa!');
+      return;
     }
+      selectedItems.forEach(itemId => removeItem(itemId));
   };
 
   const handleSelectItem = (itemId) => {
@@ -69,12 +69,19 @@ const CartPage = () => {
             <p className="text-gray-500 text-lg mb-6">Giỏ hàng đang trống</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="max-w-4xl mx-auto">
             {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-lg text-gray-900">Chọn sản phẩm</h3>
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-semibold text-lg text-gray-900">Chọn sản phẩm</h3>
+                <div className="flex items-center gap-6">
+                  <button
+                    onClick={handleClearAll}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-lg transition font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={selectedItems.length === 0}
+                  >
+                    Xóa 
+                  </button>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -85,6 +92,7 @@ const CartPage = () => {
                     <span className="text-sm font-semibold text-gray-700">Chọn tất cả</span>
                   </label>
                 </div>
+              </div>
                 <div className="space-y-4">
                   {items.map(item => (
                     <div 
@@ -100,18 +108,18 @@ const CartPage = () => {
                       />
 
                       {/* Image */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate(`/products/${item.id}`)}>
                         <img
                           src={item.image_url || 'https://placehold.co/100x100?text=No+Image'}
                           alt={item.name}
-                          className="w-24 h-24 object-cover rounded-lg bg-white"
+                          className="w-24 h-24 object-cover rounded-lg bg-white hover:opacity-80 transition"
                           onError={(e) => (e.target.src = 'https://placehold.co/100x100?text=No+Image')}
                         />
                       </div>
 
                       {/* Product Info */}
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-lg mb-1">{item.name}</h3>
+                      <div className="flex-1 cursor-pointer" onClick={() => navigate(`/products/${item.id}`)}>
+                        <h3 className="font-semibold text-gray-900 text-lg mb-1 hover:text-blue-600 transition">{item.name}</h3>
                         <p className="text-blue-600 font-bold text-lg">
                           {Number(item.price).toLocaleString('vi-VN')}₫
                         </p>
@@ -172,7 +180,7 @@ const CartPage = () => {
                       {/* Delete Button */}
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white bg-blue-500 hover:bg-red-600 rounded-lg transition font-bold text-lg shadow-md hover:shadow-lg"
                       >
                         ✕
                       </button>
@@ -180,34 +188,13 @@ const CartPage = () => {
                   ))}
                 </div>
 
-                {/* Clear All Button */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <button
-                    onClick={handleClearAll}
-                    className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition font-semibold"
-                  >
-                    Xóa tất cả sản phẩm
-                  </button>
-                </div>
+                {/* Clear All Button - MOVED UP */}
               </div>
-            </div>
 
-            {/* Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-4 h-fit">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Tóm tắt đơn hàng</h2>
-
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tạm tính:</span>
-                    <span className="font-semibold text-gray-900">
-                      {totalPrice.toLocaleString('vi-VN')}₫
-                    </span>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-200 pt-6 mb-6">
-                  <div className="flex justify-between items-center">
+              {/* Total Price Section */}
+              <div className="mt-6 bg-white rounded-2xl shadow-sm p-6">
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center mb-6">
                     <span className="text-gray-600 font-semibold">Tổng cộng:</span>
                     <span className="text-2xl font-bold text-blue-600">
                       {totalPrice.toLocaleString('vi-VN')}₫
@@ -225,7 +212,6 @@ const CartPage = () => {
                 </div>
               </div>
             </div>
-          </div>
         )}
       </div>
     </div>

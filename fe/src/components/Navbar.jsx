@@ -25,19 +25,49 @@ const Navbar = () => {
 
   useEffect(() => {
     if (!user || !token) { setActiveOrderCount(0); return; }
-    axios.get('/api/orders/my-orders', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        const orders = res.data.data || [];
-        const count = orders.filter(o => {
-          const s = o.status || o.order_status;
-          return ['pending', 'processing', 'shipped'].includes(s);
-        }).length;
-        setActiveOrderCount(count);
+    
+    const fetchOrderCount = () => {
+      axios.get('/api/orders/my-orders', {
+        headers: { Authorization: `Bearer ${token}` }
       })
-      .catch(() => {});
+        .then(res => {
+          const orders = res.data.data || [];
+          const count = orders.filter(o => {
+            const s = o.status || o.order_status;
+            return ['pending', 'processing', 'shipped'].includes(s);
+          }).length;
+          setActiveOrderCount(count);
+        })
+        .catch(() => {});
+    };
+    
+    // Fetch ngay lập tức
+    fetchOrderCount();
+    
+    // Fetch lại mỗi 5 giây để cập nhật tự động
+    const interval = setInterval(fetchOrderCount, 5000);
+    
+    // Cũng fetch khi user/token thay đổi
+    return () => clearInterval(interval);
   }, [user, token]);
+
+  // Fetch lại đơn hàng khi giỏ hàng thay đổi (mỗi khi thêm sản phẩm)
+  useEffect(() => {
+    if (items.length > 0 && user && token) {
+      axios.get('/api/orders/my-orders', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          const orders = res.data.data || [];
+          const count = orders.filter(o => {
+            const s = o.status || o.order_status;
+            return ['pending', 'processing', 'shipped'].includes(s);
+          }).length;
+          setActiveOrderCount(count);
+        })
+        .catch(() => {});
+    }
+  }, [items, user, token]);
 
   const handleLogout = () => {
     logout();

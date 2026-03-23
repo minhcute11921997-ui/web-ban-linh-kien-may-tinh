@@ -234,7 +234,7 @@ const ProductDetail = () => {
           {product.description.length > 200 && (
             <button
               onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-              className="mt-4 w-full py-2 text-blue-600 font-semibold hover:text-teal-700 transition flex items-center justify-center gap-2"
+              className="mt-4 w-full py-2 text-blue-600 font-semibold transition flex items-center justify-center gap-2"
             >
               {descriptionExpanded ? '▲ Thu gọn' : '▼ Xem tất cả'}
             </button>

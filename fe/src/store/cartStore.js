@@ -33,11 +33,8 @@ const useCartStore = create((set, get) => ({
       const res = await addToCart({ productId, quantity });
       console.log('addToCart response:', res.data);
       if (res.data.success) {
-        try {
-          await get().fetchCart();
-        } catch (fetchError) {
-          console.warn('fetchCart failed after addToCart:', fetchError);
-        }
+        // Fetch lại giỏ hàng để cập nhật chính xác
+        await get().fetchCart();
       } else {
         throw new Error(res.data.message || 'Thêm giỏ hàng thất bại');
       }
@@ -51,12 +48,12 @@ const useCartStore = create((set, get) => ({
   updateItem: async (id, quantity) => {
     if (quantity < 1) return;
     await updateCartItem(id, { quantity });
-    get().fetchCart();
+    await get().fetchCart();
   },
 
   removeItem: async (id) => {
     await removeFromCart(id);
-    get().fetchCart();
+    await get().fetchCart();
   },
 
   clearAll: async () => {
