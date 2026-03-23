@@ -4,6 +4,8 @@ import { getAllCategories } from '../api/categoryApi';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
+import ProductCard from '../components/ProductCard';
+import FeaturedProductCard from '../components/FeaturedProductCard';
 
 
 const ITEMS_PER_PAGE = 12;
@@ -278,7 +280,7 @@ export default function HomePage() {
     setCurrentPage(1);
   }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery]);
 
-  // useEffect 2: Fetch sản phẩm chính theo page
+  //  Fetch sản phẩm chính theo page
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
@@ -334,7 +336,7 @@ useEffect(() => {
     <div className="p-4">
 
 
-      {/* ===== Banner Slider ===== */}
+      {/*Banner Slider  */}
       <div
         className="relative mb-5 rounded-2xl overflow-hidden select-none"
         onMouseEnter={() => setSlidePaused(true)}
@@ -379,81 +381,22 @@ useEffect(() => {
       </div>
 
 
-      {/* ===== Section: Sản phẩm nổi bật ===== */}
-      {featuredProducts.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              
-              <h2 className="text-lg font-bold text-gray-800">Sản phẩm nổi bật</h2>
-              
-            </div>
-          </div>
+      {/*Section: Sản phẩm nổi bật*/}
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-lg font-bold text-gray-800">Sản phẩm nổi bật</h2>
+      </div>
+ {featuredProducts.map((product) => (
+  <FeaturedProductCard key={product.id} product={product} />
+))}
 
 
-          <div className="relative group">
-            <button
-              onClick={() => featuredRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
-            >‹</button>
-
-
-            <div
-              ref={featuredRef}
-              className="flex gap-3 overflow-x-auto scroll-smooth pb-2"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {featuredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 w-44 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-200 hover:-translate-y-0.5"
-                >
-                  <Link to={`/products/${product.id}`}>
-                    <div className="w-full aspect-square bg-gray-50 rounded-t-xl overflow-hidden">
-                      <img
-                        src={product.image_url || 'https://via.placeholder.com/200'}
-                        alt={product.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  </Link>
-                  <div className="p-2.5">
-                    <Link to={`/products/${product.id}`}>
-                      <h3 className="text-xs font-medium text-gray-700 line-clamp-2 hover:text-blue-600 transition mb-1">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    <p className="text-blue-600 font-bold text-sm">
-                      {Number(product.price).toLocaleString('vi-VN')}₫
-                    </p>
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full mt-2 bg-blue-600 text-white text-xs py-1.5 rounded-lg hover:bg-blue-700 transition"
-                    >
-                      + Giỏ hàng
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-
-            <button
-              onClick={() => featuredRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
-            >›</button>
-          </div>
-        </div>
-      )}
-
-
-      {/* ===== Tiêu đề Danh sách sản phẩm ===== */}
+      {/*  Tiêu đề Danh sách sản phẩm  */}
       <div className="flex items-center gap-2 mb-3">
         <h2 className="text-lg font-bold text-gray-800">Danh sách sản phẩm</h2>
       </div>
 
 
-      {/* ===== Tab danh mục + Tìm kiếm ===== */}
+      {/*  Tab danh mục + Tìm kiếm  */}
       <div className="flex gap-2 flex-wrap mb-4 items-center justify-between bg-white py-3 -mx-4 px-4 shadow-sm">
         <div className="flex gap-2 flex-wrap items-center">
           <button
@@ -656,7 +599,7 @@ useEffect(() => {
       </div>
 
 
-      {/* ===== Grid sản phẩm ===== */}
+      {/*Grid sản phẩm */}
       {loading ? (
         <div className="text-center py-16 text-gray-400">Đang tải...</div>
       ) : products.length === 0 ? (
@@ -665,36 +608,11 @@ useEffect(() => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-4 gap-4">
-            
-            {products.map(product => (
-              <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition">
-                <Link to={`/products/${product.id}`} className="block p-3">
-                  <div className="w-full aspect-square bg-gray-50 rounded-lg mb-2 overflow-hidden">
-                    <img
-                      src={product.image_url || 'https://via.placeholder.com/200'}
-                      alt={product.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-medium text-sm line-clamp-2 hover:text-blue-600 transition">
-                    {product.name}
-                  </h3>
-                  <p className="text-blue-600 font-bold mt-1">
-                    {Number(product.price).toLocaleString('vi-VN')}₫
-                  </p>
-                </Link>
-                <div className="px-3 pb-3">
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-blue-600 text-white text-sm py-1.5 rounded-lg hover:bg-blue-700"
-                  >
-                    Thêm giỏ hàng
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  {products.map(product => (
+    <ProductCard key={product.id} product={product} />
+  ))}
+</div>
 
 
           {totalPages > 1 && (

@@ -3,13 +3,19 @@ import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 
+// Hàm strip HTML tags khỏi description
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+};
+
 const ProductCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
   const handleAddToCart = async (e) => {
-    e.preventDefault(); // ← ngăn Link bị trigger khi click nút
+    e.preventDefault();
     if (!user) {
       navigate('/login');
       return;
@@ -19,39 +25,45 @@ const ProductCard = ({ product }) => {
       toast.success('Đã thêm vào giỏ hàng!');
     } catch (error) {
       console.error('Add to cart error:', error);
-      const errorMsg = error?.message || 'Có lỗi xảy ra!';
-      toast.error(errorMsg);
+      toast.error(error?.message || 'Có lỗi xảy ra!');
     }
   };
 
-  return (
-    <div className="border rounded-xl shadow hover:shadow-md transition bg-white overflow-hidden">
+  const cleanDescription = stripHtml(product.description);
 
-      {/* Toàn bộ phần trên là link */}
-      <Link to={`/products/${product.id}`} className="block p-4 cursor-pointer">
-        <div className="w-full aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
+  return (
+    <div className="border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 bg-white flex flex-col h-full group">
+
+      {/* Ảnh sản phẩm */}
+      <Link to={`/products/${product.id}`} className="block p-4 flex-1">
+        <div className="w-full aspect-square bg-gray-50 rounded-xl mb-3 overflow-hidden">
           <img
-            src={product.image_url || 'https://placehold.co/300x200?text=No+Image'}
+            src={product.image_url || 'https://placehold.co/300x300?text=No+Image'}
             alt={product.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
           />
         </div>
-        <h3 className="font-semibold text-base mb-1 line-clamp-2 text-gray-900 hover:text-blue-600 transition">
+
+        {/* Tên sản phẩm */}
+        <h3 className="font-semibold text-sm leading-snug mb-1 line-clamp-2 text-gray-800 group-hover:text-blue-600 transition-colors">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-sm mb-2 line-clamp-2">{product.description}</p>
-        <p className="text-blue-600 font-bold text-lg">
+
+        {/* Description đã strip HTML */}
+
+        {/* Giá */}
+        <p className="text-blue-600 font-bold text-base mt-1">
           {Number(product.price).toLocaleString('vi-VN')}₫
         </p>
-        <p className="text-gray-400 text-xs mb-3">Còn {product.stock} sản phẩm</p>
+
       </Link>
 
-      {/* Nút nằm ngoài Link */}
+      {/* Nút thêm giỏ hàng - luôn ở đáy */}
       <div className="px-4 pb-4">
         <button
           onClick={handleAddToCart}
           disabled={product.stock === 0}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 text-white text-sm py-2 rounded-xl hover:bg-blue-700 active:scale-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed font-medium"
         >
           {product.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ'}
         </button>
