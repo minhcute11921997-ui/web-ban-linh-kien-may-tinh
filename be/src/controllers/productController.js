@@ -260,38 +260,51 @@ const getFilterOptions = async (req, res) => {
 // POST /api/products/flash-sale  — set giảm giá theo giờ cho nhiều sản phẩm
 const setFlashSale = async (req, res) => {
   try {
-    const { items, discountPercent, durationHours } = req.body;
-    // items = [{ productId, saleQty }]
+    const { items, durationHours } = req.body;
 
-    if (!items?.length || !discountPercent || !durationHours) {
-      return res.status(400).json({ success: false, message: 'Thiếu dữ liệu' });
-    }
-    if (discountPercent < 1 || discountPercent > 99) {
-      return res.status(400).json({ success: false, message: 'Phần trăm giảm phải từ 1–99' });
-    }
+    if (!items || !Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ success: false, message: 'Thiếu danh sách sản phẩm' });
+    if (!durationHours || durationHours < 1)
+      return res.status(400).json({ success: false, message: 'Thời gian ít nhất 1 giờ' });
 
     const expiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000);
 
-    for (const { productId, saleQty } of items) {
-      // Kiểm tra số lượng không vượt tồn kho
-      const [[product]] = await db.query('SELECT stock FROM products WHERE id = ?', [productId]);
-      if (!product) continue;
-      if (saleQty > product.stock) {
+    // Bước 1: Tắt toàn bộ sale cũ
+    await db.query(
+      `UPDATE products SET discount_percent = 0, discount_expires_at = NULL WHERE discount_percent > 0`
+    );
+
+    // Bước 2: Validate rồi set sale mới
+    for (const { productId, saleQty, discountPercent } of items) {
+      if (!discountPercent || discountPercent < 1 || discountPercent > 99)
         return res.status(400).json({
           success: false,
-          message: `Sản phẩm ID ${productId}: số lượng flash sale (${saleQty}) vượt tồn kho (${product.stock})`
+          message: `Sản phẩm ID ${productId}: % giảm (${discountPercent}) không hợp lệ (1-99)`
         });
-      }
+
+      const [[product]] = await db.query('SELECT stock FROM products WHERE id = ?', [productId]);
+      if (!product) continue;
+
+      if (saleQty > product.stock)
+        return res.status(400).json({
+          success: false,
+          message: `Sản phẩm ID ${productId}: số lượng sale (${saleQty}) vượt tồn kho (${product.stock})`
+        });
+
       await db.query(
         'UPDATE products SET discount_percent = ?, discount_expires_at = ? WHERE id = ?',
         [discountPercent, expiresAt, productId]
       );
     }
 
-    res.json({ success: true, message: `Đã set flash sale ${discountPercent}% trong ${durationHours} giờ cho ${items.length} sản phẩm!` });
+    res.json({
+      success: true,
+      message: `Flash sale đã bắt đầu trong ${durationHours} giờ cho ${items.length} sản phẩm!`
+    });
+
   } catch (error) {
+    console.error('Flash sale error:', error);
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
-
 module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts, setFlashSale };

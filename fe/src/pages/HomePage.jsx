@@ -103,7 +103,7 @@ export default function HomePage() {
   const [flashSaleProducts, setFlashSaleProducts] = useState([]);
   const [flashSaleTimeLeft, setFlashSaleTimeLeft] = useState({ h: 2, m: 7, s: 2 });
   const flashSaleRef = useRef(null);
-  const flashSaleEndTime = useRef(Date.now() + 2 * 60 * 60 * 1000 + 7 * 60 * 1000 + 2 * 1000);
+ const flashSaleEndTime = useRef(null);
 
 
   // Reset state khi quay lại HomePage
@@ -179,16 +179,21 @@ useEffect(() => {
 
 
   // Đồng hồ đếm ngược flash sale
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const remaining = Math.max(0, flashSaleEndTime.current - Date.now());
-      const h = Math.floor(remaining / 3600000);
-      const m = Math.floor((remaining % 3600000) / 60000);
-      const s = Math.floor((remaining % 60000) / 1000);
-      setFlashSaleTimeLeft({ h, m, s });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+useEffect(() => {
+  const timer = setInterval(() => {
+    if (!flashSaleEndTime.current) return;
+    const remaining = Math.max(0, flashSaleEndTime.current - Date.now());
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    setFlashSaleTimeLeft({ h, m, s });
+    if (remaining === 0) {
+      setFlashSaleProducts([]);
+      clearInterval(timer);
+    }
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
 
   // Fetch filter data cho 1 category
   const fetchCategoryData = (catId) => {
@@ -299,12 +304,21 @@ useEffect(() => {
       })
       .catch(() => setLoading(false));
   }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery, currentPage]);
+
 useEffect(() => {
   fetch(`${import.meta.env.VITE_API_URL}/api/products/on-sale`)
     .then(res => res.json())
-    .then(data => { if (data.success) setFlashSaleProducts(data.data); })
+    .then(data => {
+      if (data.success && data.data.length > 0) {
+        setFlashSaleProducts(data.data);
+        if (data.data[0].discount_expires_at) {
+          flashSaleEndTime.current = new Date(data.data[0].discount_expires_at).getTime();
+        }
+      }
+    })
     .catch(() => {});
 }, []);
+
   const handleAddToCart = async (product) => {
     if (!token) {
       toast.warning('Vui lòng đăng nhập để thêm giỏ hàng!');
