@@ -9,7 +9,7 @@ router.post('/register', authController.register);
 // POST /api/auth/login
 router.post('/login', authController.login);
 
-// ✅ POST /api/auth/refresh 
+// POST /api/auth/refresh 
 router.post('/refresh', authController.refresh);
 
 router.put('/profile', verifyToken, authController.updateProfile);

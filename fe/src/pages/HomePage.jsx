@@ -6,6 +6,7 @@ import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 import FeaturedProductCard from '../components/FeaturedProductCard';
+import FlashSaleCard from '../components/FlashSaleCard';
 
 
 const ITEMS_PER_PAGE = 12;
@@ -168,24 +169,12 @@ export default function HomePage() {
   }, [priceMin, priceMax]);
 
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products?sortBy=price&sortOrder=DESC&limit=10`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const discounts = [7, 10, 12, 15, 20];
-          const withDiscount = data.data.slice(0, 6).map((p, i) => ({
-            ...p,
-            discountPercent: discounts[i % discounts.length],
-            originalPrice: Math.round(Number(p.price) / (1 - discounts[i % discounts.length] / 100) / 1000) * 1000,
-            stockLeft: Math.floor(Math.random() * 4) + 1,
-            stockTotal: 5,
-          }));
-          setFlashSaleProducts(withDiscount);
-        }
-      })
-      .catch(() => {});
-  }, []);
+useEffect(() => {
+  fetch(`${import.meta.env.VITE_API_URL}/api/products/featured`)
+    .then(res => res.json())
+    .then(data => { if (data.success) setFeaturedProducts(data.data); })
+    .catch(() => {});
+}, []);
   
 
 
@@ -275,7 +264,7 @@ export default function HomePage() {
 
 
   
-  // useEffect 1: Reset page khi filter thay đổi
+  //  Reset page khi filter thay đổi
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery]);
@@ -311,11 +300,11 @@ export default function HomePage() {
       .catch(() => setLoading(false));
   }, [activeCategory, activeBrand, debouncedMin, debouncedMax, sortOption, activeSubFilters, searchQuery, currentPage]);
 useEffect(() => {
-  if (currentPage === 1 && activeCategory === 'all' && activeBrand === 'all' && products.length > 0) {
-    setFeaturedProducts(products);
-  }
-}, [products, currentPage, activeCategory, activeBrand]);
-
+  fetch(`${import.meta.env.VITE_API_URL}/api/products/on-sale`)
+    .then(res => res.json())
+    .then(data => { if (data.success) setFlashSaleProducts(data.data); })
+    .catch(() => {});
+}, []);
   const handleAddToCart = async (product) => {
     if (!token) {
       toast.warning('Vui lòng đăng nhập để thêm giỏ hàng!');
@@ -382,12 +371,70 @@ useEffect(() => {
 
 
       {/*Section: Sản phẩm nổi bật*/}
-      <div className="flex items-center gap-2 mb-3">
-        <h2 className="text-lg font-bold text-gray-800">Sản phẩm nổi bật</h2>
+      {featuredProducts.length > 0 && (
+  <div className="mb-8">
+    <div className="flex items-center gap-2 mb-3">
+      <h2 className="text-lg font-bold text-gray-800">Sản phẩm nổi bật</h2>
+    </div>
+
+    <div className="relative group">
+     
+      <button
+        onClick={() => featuredRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+      >‹</button>
+
+      <div
+        ref={featuredRef}
+        className="flex flex-row gap-3 overflow-x-auto scroll-smooth pb-2"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {featuredProducts.map((product) => (
+          <FeaturedProductCard key={product.id} product={product} />
+        ))}
       </div>
- {featuredProducts.map((product) => (
-  <FeaturedProductCard key={product.id} product={product} />
-))}
+
+      <button
+        onClick={() => featuredRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+      >›</button>
+    </div>
+  </div>
+)}
+
+
+
+{flashSaleProducts.length > 0 && (
+  <div className="mb-8">
+    <div className="flex items-center gap-3 mb-3">
+      <h2 className="text-lg font-bold text-gray-800"> Flash Sale</h2>
+      <div className="flex items-center gap-1 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded-lg">
+        <span>{String(flashSaleTimeLeft.h).padStart(2, '0')}</span>
+        <span className="animate-pulse">:</span>
+        <span>{String(flashSaleTimeLeft.m).padStart(2, '0')}</span>
+        <span className="animate-pulse">:</span>
+        <span>{String(flashSaleTimeLeft.s).padStart(2, '0')}</span>
+      </div>
+    </div>
+    <div className="relative group ">
+      <button
+        onClick={() => flashSaleRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+      >‹</button>
+    <div ref={flashSaleRef} className="flex flex-row gap-3 overflow-x-auto scroll-smooth pb-2"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
+      {flashSaleProducts.map((product) => (
+        <FlashSaleCard key={product.id} product={product} />
+      ))}
+    </div>
+    <button
+        onClick={() => flashSaleRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+      >›</button>
+    </div>
+  </div>
+)}
 
 
       {/*  Tiêu đề Danh sách sản phẩm  */}
@@ -518,7 +565,7 @@ useEffect(() => {
       </div>
 
 
-      {/* ===== Bộ lọc giá + Sắp xếp ===== */}
+      {/* Bộ lọc giá + Sắp xếp*/}
       <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
         <div className="flex-1 min-w-[280px]">
           <div className="flex items-center justify-between mb-2">

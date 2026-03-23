@@ -101,6 +101,33 @@ const getProductById = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
+// GET /api/products/featured
+const getFeaturedProducts = async (req, res) => {
+    try {
+        const [rows] = await db.query(
+            'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.is_featured = 1 AND p.stock > 0 ORDER BY p.id DESC LIMIT 20'
+        );
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// GET /api/products/on-sale
+const getOnSaleProducts = async (req, res) => {
+    try {
+        const [rows] = await db.query(
+            'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.discount_percent > 0 AND p.stock > 0 ORDER BY p.discount_percent DESC LIMIT 20'
+        );
+        const data = rows.map(p => ({
+            ...p,
+            originalPrice: Math.round(Number(p.price) / (1 - p.discount_percent / 100) / 1000) * 1000
+        }));
+        res.json({ success: true, data });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 // POST /api/products
 const createProduct = async (req, res) => {
@@ -122,14 +149,13 @@ const createProduct = async (req, res) => {
 // PUT /api/products/:id
 const updateProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, image_url, category_id, brand } = req.body;
+        const { name, description, price, stock, image_url, category_id, brand, discount_percent, is_featured } = req.body;
         const [result] = await db.query(
-            'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, image_url = ?, category_id = ?, brand = ? WHERE id = ?',
-            [name, description, price, stock, image_url, category_id, brand, req.params.id]
+            'UPDATE products SET name=?, description=?, price=?, stock=?, image_url=?, category_id=?, brand=?, discount_percent=?, is_featured=? WHERE id=?',
+            [name, description, price, stock, image_url, category_id, brand, discount_percent || 0, is_featured || 0, req.params.id]
         );
-        if (result.affectedRows === 0) {
+        if (result.affectedRows === 0)
             return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
-        }
         res.json({ success: true, message: 'Cập nhật sản phẩm thành công!' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
@@ -224,4 +250,4 @@ const getFilterOptions = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions };
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts };

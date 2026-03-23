@@ -51,7 +51,7 @@ const FeaturedProductCard = ({ product }) => {
           disabled={product.stock === 0}
           className="w-full mt-auto bg-blue-600 text-white text-xs py-1.5 rounded-lg hover:bg-blue-700 transition disabled:opacity-40"
         >
-          {product.stock === 0 ? 'Hết hàng' : '+ Giỏ hàng'}
+          {product.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ '}
         </button>
       </div>
 
