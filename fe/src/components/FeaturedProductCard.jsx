@@ -34,7 +34,6 @@ const FeaturedProductCard = ({ product }) => {
         </div>
       </Link>
 
-      {/* Nội dung - flex-1 để đẩy nút xuống đáy */}
       <div className="p-2.5 flex flex-col flex-1">
         <Link to={`/products/${product.id}`}>
           <h3 className="text-xs font-medium text-gray-700 line-clamp-2 hover:text-blue-600 transition mb-1">

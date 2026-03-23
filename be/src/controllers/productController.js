@@ -104,9 +104,17 @@ const getProductById = async (req, res) => {
 // GET /api/products/featured
 const getFeaturedProducts = async (req, res) => {
     try {
-        const [rows] = await db.query(
-            'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.is_featured = 1 AND p.stock > 0 ORDER BY p.id DESC LIMIT 20'
-        );
+        const [rows] = await db.query(`
+            SELECT p.*, c.name as category_name,
+                   COALESCE(SUM(oi.quantity), 0) as total_sold
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN order_items oi ON oi.product_id = p.id
+            WHERE p.stock > 0
+            GROUP BY p.id
+            ORDER BY total_sold DESC, p.id DESC
+            LIMIT 8
+        `);
         res.json({ success: true, data: rows });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -191,7 +199,7 @@ const getFilterOptions = async (req, res) => {
     try {
         const { categoryId } = req.params;
 
-        // Chỉ lấy các spec tiêu biểu cho từng danh mục (tham khảo GearVN, Phong Vũ, An Phát)
+        
         const ALLOWED_SPECS = {
             'CPU':       ['Socket', 'Số nhân'],
             'RAM':       ['Chuẩn', 'Dung lượng', 'Tốc độ'],

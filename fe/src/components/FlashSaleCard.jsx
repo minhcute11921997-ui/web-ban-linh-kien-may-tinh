@@ -7,7 +7,11 @@ const FlashSaleCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
-
+ const discountPercent = product.discount_percent || product.discountPercent || 0;
+  const originalPrice = product.originalPrice ||
+    Math.round(Number(product.price) / (1 - discountPercent / 100) / 1000) * 1000;
+ const stockTotal = product.stockTotal || product.stock || 10;
+  const stockLeft = product.stockLeft ?? product.stock ?? 0;
   const handleAddToCart = async (e) => {
     e.preventDefault();
     if (!user) { navigate('/login'); return; }
@@ -34,7 +38,7 @@ const FlashSaleCard = ({ product }) => {
           </div>
         </Link>
         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-md">
-          -{product.discountPercent}%
+          -{product.discount_percent}%
         </span>
       </div>
 
@@ -73,7 +77,7 @@ const FlashSaleCard = ({ product }) => {
           disabled={product.stock === 0}
           className="w-full mt-auto bg-red-500 text-white text-xs py-1.5 rounded-lg hover:bg-red-600 transition disabled:opacity-40"
         >
-          {product.stock === 0 ? 'Hết hàng' : '🔥 Mua ngay'}
+          {product.stock === 0 ? 'Hết hàng' : ' Mua ngay'}
         </button>
       </div>
     </div>

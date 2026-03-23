@@ -128,7 +128,7 @@ const ProductDetail = () => {
 
           <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit
             ${product.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-            {product.stock > 0 ? `Còn hàng (${product.stock})` : 'Hết hàng'}
+            {product.stock > 0 ? `Còn hàng` : 'Hết hàng'}
           </span>
 
           {/* Số lượng */}
