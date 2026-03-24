@@ -1,28 +1,33 @@
 import { create } from 'zustand';
+import { refresh } from '../../../be/src/controllers/authController';
 
 const useAuthStore = create((set, get) => ({
   user: null,
   token: null,
+  refreshToken: null,
   initialized: false,
 
   initAuth: () => {
     const user = JSON.parse(localStorage.getItem('user')) || null;
     const token = localStorage.getItem('token') || null;
-    set({ user, token, initialized: true });
+    const refreshToken = localStorage.getItem('refreshToken') || null;
+    set({ user, token, refreshToken, initialized: true });
     console.log('Auth initialized:', { user: user?.username, token: token ? 'present' : 'null' });
   },
 
-  setAuth: (user, token) => {
+  setAuth: (user, token, refreshToken) => {
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', token);
-    set({ user, token });
+    localStorage.setItem('refreshToken', refreshToken);
+    set({ user, token, refreshToken });
     console.log('Auth updated:', { user: user?.username, token: token ? 'present' : 'null' });
   },
 
   logout: () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    set({ user: null, token: null });
+    localStorage.removeItem('refreshToken');
+    set({ user: null, token: null, refreshToken: null });
   },
 
   setUser: (userData) => {

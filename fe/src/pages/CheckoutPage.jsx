@@ -56,7 +56,6 @@ const CheckoutPage = () => {
         if (!customerName.trim()) { toast.error('Vui lòng nhập tên người nhận!'); return; }
         if (!customerPhone.trim()) { toast.error('Vui lòng nhập số điện thoại!'); return; }
         if (!customerAddress.trim()) { toast.error('Vui lòng nhập địa chỉ giao hàng!'); return; }
-        if (shippingFee === 0) { toast.error('Vui lòng nhập địa chỉ để tính phí vận chuyển!'); return; }
 
         setLoading(true);
         try {
@@ -71,7 +70,8 @@ const CheckoutPage = () => {
                     customerAddress,
                     customerNotes,
                     shippingFee,
-                    discountAmount
+                    discountAmount,
+                    discount_code: discountCode || null 
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -17,18 +17,42 @@ import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
 import OrderDetailPage from "./pages/OrderDetailPage";
 
-// Admin
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 
-// Component banner placeholder tái sử dụng
+// Layout chung cho customer (có Navbar + banner)
+const CustomerLayout = ({ children }) => (
+  <>
+    <Navbar />
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex gap-3 px-4 py-6 max-w-screen-2xl mx-auto">
+        {/* Banner trái */}
+        <div className="w-32 flex-shrink-0 hidden lg:block">
+          <div className="sticky top-4 space-y-3">
+            <BannerPlaceholder title="Video khuyến mãi 1" to="/products" />
+            <BannerPlaceholder title="Video khuyến mãi 2" to="/products" />
+          </div>
+        </div>
+
+        {/* Nội dung chính */}
+        <main className="flex-1 min-w-0">{children}</main>
+
+        {/* Banner phải */}
+        <div className="w-32 flex-shrink-0 hidden lg:block">
+          <div className="sticky top-4 space-y-3">
+            <BannerPlaceholder title="Video khuyến mãi 3" to="/products" />
+            <BannerPlaceholder title="Video khuyến mãi 4" to="/products" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
+);
+
 const BannerPlaceholder = ({ title, to }) => (
-  <a
-    href={to || "#"}
-    className="block w-full shadow overflow-hidden cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all duration-200"
-  >
+  <a href={to || "#"} className="block w-full shadow overflow-hidden cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all duration-200">
     <div className="w-full h-80 bg-gray-200 flex flex-col items-center justify-center text-gray-400 text-center p-4 border border-dashed border-gray-300">
       <span className="text-3xl mb-2">🎬</span>
       <p className="text-xs">{title || "Video khuyến mãi"}</p>
@@ -42,129 +66,25 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ===== Admin Dashboard — layout riêng ===== */}
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute adminOnly={true}>
-              <AdminLayout />
-            </PrivateRoute>
-          }
-        >
+        {/* Admin routes */}
+        <Route path="/admin" element={<PrivateRoute adminOnly={true}><AdminLayout /></PrivateRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
         </Route>
 
-        {/* ===== Customer routes — có Navbar + banner ===== */}
-        <Route
-          path="*"
-          element={
-            <>
-              <Navbar />
-              <div className="min-h-screen bg-gray-50">
-                <div className="flex gap-3 px-4 py-6 max-w-screen-2xl mx-auto">
-                  {/* Banner trái */}
-                  <div className="w-32 flex-shrink-0 hidden lg:block">
-                    <div className="sticky top-4 space-y-3">
-                      <BannerPlaceholder
-                        title="Video khuyến mãi 1"
-                        to="/products"
-                      />
-                      <BannerPlaceholder
-                        title="Video khuyến mãi 2"
-                        to="/products"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Nội dung chính */}
-                  <main className="flex-1 min-w-0">
-                    <Routes>
-                      {/* Public */}
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/login" element={<LoginPage />} />
-                      <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/products/:id" element={<ProductDetail />} />
-
-                      {/* Cần đăng nhập */}
-                      <Route
-                        path="/cart"
-                        element={
-                          <PrivateRoute>
-                            <CartPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/checkout"
-                        element={
-                          <PrivateRoute>
-                            <CheckoutPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/payment-success"
-                        element={
-                          <PrivateRoute>
-                            <PaymentSuccessPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/payment-callback"
-                        element={
-                          <PrivateRoute>
-                            <PaymentSuccessPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/orders"
-                        element={
-                          <PrivateRoute>
-                            <OrdersPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/orders/:id"
-                        element={
-                          <PrivateRoute>
-                            <OrderDetailPage />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <PrivateRoute>
-                            <ProfilePage />
-                          </PrivateRoute>
-                        }
-                      />
-                    </Routes>
-                  </main>
-
-                  {/* Banner phải */}
-                  <div className="w-32 flex-shrink-0 hidden lg:block">
-                    <div className="sticky top-4 space-y-3">
-                      <BannerPlaceholder
-                        title="Video khuyến mãi 3"
-                        to="/products"
-                      />
-                      <BannerPlaceholder
-                        title="Video khuyến mãi 4"
-                        to="/products"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          }
-        />
+        {/* Customer routes */}
+        <Route path="/" element={<CustomerLayout><HomePage /></CustomerLayout>} />
+        <Route path="/login" element={<CustomerLayout><LoginPage /></CustomerLayout>} />
+        <Route path="/register" element={<CustomerLayout><RegisterPage /></CustomerLayout>} />
+        <Route path="/products/:id" element={<CustomerLayout><ProductDetail /></CustomerLayout>} />
+        <Route path="/cart" element={<CustomerLayout><PrivateRoute><CartPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/checkout" element={<CustomerLayout><PrivateRoute><CheckoutPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/payment-success" element={<CustomerLayout><PrivateRoute><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/payment-callback" element={<CustomerLayout><PrivateRoute><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/orders" element={<CustomerLayout><PrivateRoute><OrdersPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/profile" element={<CustomerLayout><PrivateRoute><ProfilePage /></PrivateRoute></CustomerLayout>} />
       </Routes>
 
       <ToastContainer position="top-right" autoClose={3000} />
