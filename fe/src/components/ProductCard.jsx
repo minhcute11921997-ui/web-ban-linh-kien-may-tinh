@@ -52,9 +52,23 @@ const ProductCard = ({ product }) => {
         {/* Description đã strip HTML */}
 
         {/* Giá */}
-        <p className="text-blue-600 font-bold text-base mt-1">
-          {Number(product.price).toLocaleString('vi-VN')}₫
-        </p>
+        {product.discount_percent > 0 ? (
+  <div className="mt-1">
+    <span className="text-gray-400 line-through text-xs mr-1">
+      {Number(product.price).toLocaleString('vi-VN')}₫
+    </span>
+    <span className="text-orange-500 font-bold text-base">
+      {Math.round(product.price * (1 - product.discount_percent / 100)).toLocaleString('vi-VN')}₫
+    </span>
+    <span className="ml-1 text-xs bg-orange-100 text-orange-500 px-1.5 py-0.5 rounded-full">
+      -{product.discount_percent}%
+    </span>
+  </div>
+) : (
+  <p className="text-blue-600 font-bold text-base mt-1">
+    {Number(product.price).toLocaleString('vi-VN')}₫
+  </p>
+)}
 
       </Link>
 

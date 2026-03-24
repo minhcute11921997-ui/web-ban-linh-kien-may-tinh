@@ -134,11 +134,12 @@ const getOnSaleProducts = async (req, res) => {
        ORDER BY p.discount_percent DESC LIMIT 20`
     );
     const data = rows.map(p => ({
-      ...p,
-      originalPrice: Math.round(Number(p.price) / (1 - p.discount_percent / 100) / 1000) * 1000,
-      stockLeft: p.flash_sale_qty ?? p.stock,                            
-      stockTotal: p.flash_sale_qty || p.stock          
-    }));
+  ...p,
+  originalPrice: Number(p.price), 
+  salePrice: Math.round(Number(p.price) * (1 - p.discount_percent / 100)),
+  stockLeft: p.flash_sale_qty ?? p.stock,
+  stockTotal: p.flash_sale_qty || p.stock
+}));
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

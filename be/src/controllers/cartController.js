@@ -17,12 +17,21 @@ exports.getCart = async (req, res) => {
         }
 
         const [items] = await db.query(
-            `SELECT ci.id, ci.quantity, p.price, p.name, p.image_url, p.stock
-             FROM cart_items ci
-             JOIN products p ON ci.product_id = p.id
-             WHERE ci.cart_id = ?`,
-            [cartId]
-        );
+    `SELECT ci.id, ci.quantity,
+        p.name, p.image_url, p.stock,
+        p.price AS original_price,
+        p.discount_percent,
+        CASE
+            WHEN p.discount_percent > 0 
+              AND (p.discount_expires_at IS NULL OR p.discount_expires_at > NOW())
+            THEN ROUND(p.price * (1 - p.discount_percent / 100))
+            ELSE p.price
+        END AS price
+     FROM cart_items ci
+     JOIN products p ON ci.product_id = p.id
+     WHERE ci.cart_id = ?`,
+    [cartId]
+);
 
         console.log('items found:', items.length);
         const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

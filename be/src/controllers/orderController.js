@@ -29,10 +29,20 @@ if (!shipping_address)  {
     const cartId = carts[0].id;
 
     const [items] = await db.query(
-      'SELECT ci.*, p.price, p.stock, p.name FROM cart_items ci JOIN products p ON ci.product_id = p.id WHERE ci.cart_id = ?',
-      [cartId]
-    );
-
+  `SELECT ci.*, p.stock, p.name,
+      p.price AS original_price,
+      p.discount_percent,
+      CASE
+          WHEN p.discount_percent > 0
+            AND (p.discount_expires_at IS NULL OR p.discount_expires_at > NOW())
+          THEN ROUND(p.price * (1 - p.discount_percent / 100))
+          ELSE p.price
+      END AS price
+   FROM cart_items ci
+   JOIN products p ON ci.product_id = p.id
+   WHERE ci.cart_id = ?`,
+  [cartId]
+);
     if (items.length === 0) {
       return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
     }
