@@ -5,6 +5,7 @@ import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import useCartStore from '../store/cartStore';
 import { discountApi } from '../api/discountApi';
+import AddressSelector from '../components/AddressSelector';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -172,18 +173,17 @@ const CheckoutPage = () => {
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                                             Địa chỉ giao hàng <span className="text-red-500">*</span>
                                         </label>
-                                        <textarea value={customerAddress}
-                                            onChange={e => { setCustomerAddress(e.target.value); calculateShippingFee(e.target.value); }}
-                                            placeholder="Nhập địa chỉ giao hàng (VD: 123 Lê Lợi, Hà Nội)"
-                                            rows="3"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                                        <AddressSelector onChange={(addr) => {
+                                            setCustomerAddress(addr);
+                                            calculateShippingFee(addr);
+                                        }} />
                                         {shippingFee > 0 && (
-                                            <p className="text-sm text-blue-700 mt-1">
-                                                 Phí vận chuyển: <strong>{shippingFee.toLocaleString('vi-VN')} ₫</strong>
-                                                {shippingFee === 50000 ? ' (Nội thành Hà Nội)' : ' (Tỉnh thành khác)'}
+                                            <p className="text-sm text-blue-700 mt-2">
+                                            🚚 Phí vận chuyển: <strong>{shippingFee.toLocaleString('vi-VN')} ₫</strong>
+                                            {shippingFee === 50000 ? ' (Nội thành Hà Nội)' : ' (Tỉnh thành khác)'}
                                             </p>
                                         )}
-                                    </div>
+                                        </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Ghi chú đơn hàng</label>
                                         <textarea value={customerNotes}
