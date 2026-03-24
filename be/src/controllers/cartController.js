@@ -17,7 +17,7 @@ exports.getCart = async (req, res) => {
         }
 
         const [items] = await db.query(
-    `SELECT ci.id, ci.quantity,
+    `SELECT ci.id,ci.product_id, ci.quantity,
         p.name, p.image_url, p.stock,
         p.price AS original_price,
         p.discount_percent,

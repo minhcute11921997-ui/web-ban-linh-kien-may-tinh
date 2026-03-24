@@ -124,7 +124,23 @@ const ProductDetail = () => {
         <div className="flex flex-col gap-4">
           <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">{product.brand}</span>
           <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-          <div className="text-3xl font-bold text-blue-500">{formatPrice(product.price)}</div>
+          {product.discount_percent > 0 ? (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl font-bold text-blue-500">
+                  {formatPrice(Math.round(product.price * (1 - product.discount_percent / 100)))}
+                </span>
+                <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg">
+                  -{product.discount_percent}%
+                </span>
+              </div>
+              <span className="text-gray-400 line-through text-base">
+                {formatPrice(product.price)}
+              </span>
+            </div>
+          ) : (
+            <div className="text-3xl font-bold text-blue-500">{formatPrice(product.price)}</div>
+          )}
 
           <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit
             ${product.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>

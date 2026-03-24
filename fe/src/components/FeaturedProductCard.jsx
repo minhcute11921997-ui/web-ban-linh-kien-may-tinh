@@ -40,10 +40,25 @@ const FeaturedProductCard = ({ product }) => {
             {product.name}
           </h3>
         </Link>
+        {product.discount_percent > 0 ? (
+        <div className="mb-2">
+          <div className="flex items-center gap-1 flex-wrap">
+            <p className="text-blue-600 font-bold text-sm">
+              {Math.round(product.price * (1 - product.discount_percent / 100)).toLocaleString('vi-VN')}₫
+            </p>
+            <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full font-medium">
+              -{product.discount_percent}%
+            </span>
+          </div>
+          <p className="text-gray-400 line-through text-xs">
+            {Number(product.price).toLocaleString('vi-VN')}₫
+          </p>
+        </div>
+      ) : (
         <p className="text-blue-600 font-bold text-sm mb-2">
           {Number(product.price).toLocaleString('vi-VN')}₫
         </p>
-
+      )}
         {/* Nút ghim đáy */}
         <button
           onClick={handleAddToCart}

@@ -108,7 +108,7 @@ const CartPage = () => {
                       />
 
                       {/* Image */}
-                      <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate(`/products/${item.id}`)}>
+                      <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate(`/products/${item.product_id}`)}>
                         <img
                           src={item.image_url || 'https://placehold.co/100x100?text=No+Image'}
                           alt={item.name}
@@ -118,13 +118,28 @@ const CartPage = () => {
                       </div>
 
                       {/* Product Info */}
-                      <div className="flex-1 cursor-pointer" onClick={() => navigate(`/products/${item.id}`)}>
+                      <div className="flex-1 cursor-pointer" onClick={() => navigate(`/products/${item.product_id}`)}>
                         <h3 className="font-semibold text-gray-900 text-lg mb-1 hover:text-blue-600 transition">{item.name}</h3>
+                        {item.discount_percent > 0 ? (
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-blue-600 font-bold text-lg">
+                              {Number(item.price).toLocaleString('vi-VN')}₫
+                            </p>
+                            <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full font-medium">
+                              -{item.discount_percent}%
+                            </span>
+                          </div>
+                          <p className="text-gray-400 line-through text-sm">
+                            {Number(item.original_price).toLocaleString('vi-VN')}₫
+                          </p>
+                        </div>
+                      ) : (
                         <p className="text-blue-600 font-bold text-lg">
                           {Number(item.price).toLocaleString('vi-VN')}₫
                         </p>
-                      </div>
-
+                      )}
+                      </div>  
                       {/* Quantity Controls */}
                       <div className="flex items-center border border-gray-300 rounded-lg bg-white">
                         <button
