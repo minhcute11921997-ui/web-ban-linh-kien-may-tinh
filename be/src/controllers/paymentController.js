@@ -92,16 +92,17 @@ exports.createOrder = async (req, res) => {
 
         // Thêm order items và trừ tồn kho
         for (const item of cartItems) {
-            await db.query(
-                `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)`,
-                [orderId, item.product_id, item.quantity, item.price]
-            );
-            await db.query(
-                `UPDATE products SET stock = stock - ? WHERE id = ?`,
-                [item.quantity, item.product_id]
-            );
-        }
-
+  await db.query(
+    `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)`,
+    [orderId, item.product_id, item.quantity, item.price]
+  );
+  if (paymentMethod === 'vnpay') {
+    await db.query(
+      `UPDATE products SET stock = stock - ? WHERE id = ?`,
+      [item.quantity, item.product_id]
+    );
+  }
+}
         // Xóa các cart_items đã thanh toán
         if (cartItemIds && cartItemIds.length > 0) {
             const placeholders = cartItemIds.map(() => '?').join(',');
@@ -172,7 +173,7 @@ exports.vnpayCallback = async (req, res) => {
         }
 
         await db.query(
-            `UPDATE orders SET payment_status = 'completed',status = 'processing', transaction_id = ? WHERE id = ?`,
+            `UPDATE orders SET payment_status = 'completed',status = 'shipped', transaction_id = ? WHERE id = ?`,
             [verifyResult.transactionNo, verifyResult.orderId]
         );
 

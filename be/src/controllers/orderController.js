@@ -62,6 +62,10 @@ const [order] = await db.query(
         'UPDATE products SET stock = stock - ? WHERE id = ?',
         [item.quantity, item.product_id]
       );
+      await db.query(
+  'UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0',
+  [item.quantity, item.product_id]
+);
     }
 
 await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
@@ -153,6 +157,19 @@ exports.updateOrderStatus = async (req, res) => {
       [status, req.params.id]
     );
 
+    if (status === 'shipped') {
+  const [orderDetail] = await db.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+  if (orderDetail[0].payment_method === 'cod') {
+    const [orderItems] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [req.params.id]);
+    for (const item of orderItems) {
+      await db.query(
+        'UPDATE products SET stock = stock - ? WHERE id = ?',
+        [item.quantity, item.product_id]
+      );
+    }
+  }
+}
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
     }
@@ -197,11 +214,20 @@ exports.cancelOrder = async (req, res) => {
     }
 
     const [items] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [id]);
-    for (const item of items) {
-      await db.query(
-        'UPDATE products SET stock = stock + ? WHERE id = ?',
-        [item.quantity, item.product_id]
-      );
+
+    const shouldRestoreStock = order.payment_method === 'vnpay';
+
+    if (shouldRestoreStock) {
+      for (const item of items) {
+        await db.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ?',
+          [item.quantity, item.product_id]
+        );
+        await db.query(
+          'UPDATE products SET flash_sale_qty = flash_sale_qty + ? WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0',
+          [item.quantity, item.product_id]
+        );
+      }
     }
 
     await db.query('UPDATE orders SET status = "cancelled" WHERE id = ?', [id]);

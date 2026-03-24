@@ -128,13 +128,15 @@ const getOnSaleProducts = async (req, res) => {
       `SELECT p.*, c.name as category_name 
        FROM products p 
        LEFT JOIN categories c ON p.category_id = c.id 
-       WHERE p.discount_percent > 0 AND p.stock > 0 
+       WHERE p.discount_percent > 0 
+  AND p.stock > 0 
+  AND (p.flash_sale_qty IS NULL OR p.flash_sale_qty > 0)
        ORDER BY p.discount_percent DESC LIMIT 20`
     );
     const data = rows.map(p => ({
       ...p,
       originalPrice: Math.round(Number(p.price) / (1 - p.discount_percent / 100) / 1000) * 1000,
-      stockLeft: p.stock,                              
+      stockLeft: p.flash_sale_qty ?? p.stock,                            
       stockTotal: p.flash_sale_qty || p.stock          
     }));
     res.json({ success: true, data });
