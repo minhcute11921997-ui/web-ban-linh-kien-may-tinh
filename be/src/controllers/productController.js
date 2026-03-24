@@ -240,13 +240,11 @@ const getFilterOptions = async (req, res) => {
             ORDER BY ps.spec_name, count DESC, ps.spec_value
         `, [categoryId, ...allowedSpecs]);
 
-        // Nhóm theo spec_name, giữ đúng thứ tự trong ALLOWED_SPECS
         const filters = {};
         allowedSpecs.forEach(name => { filters[name] = []; });
         rows.forEach(row => {
             filters[row.spec_name].push({ value: row.spec_value, count: row.count });
         });
-        // Xóa spec nào không có giá trị
         Object.keys(filters).forEach(k => { if (filters[k].length === 0) delete filters[k]; });
 
         // Lấy brands
@@ -266,7 +264,7 @@ const getFilterOptions = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
-// POST /api/products/flash-sale  — set giảm giá theo giờ cho nhiều sản phẩm
+// POST /api/products/flash-sale 
 const setFlashSale = async (req, res) => {
   try {
     const { items, durationHours } = req.body;

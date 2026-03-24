@@ -8,8 +8,7 @@ const FlashSaleCard = ({ product }) => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
  const discountPercent = product.discount_percent || product.discountPercent || 0;
-  const originalPrice = product.originalPrice ||
-    Math.round(Number(product.price) / (1 - discountPercent / 100) / 1000) * 1000;
+  
  const stockTotal = product.stockTotal || product.stock || 10;
   const stockLeft = product.stockLeft ?? product.stock ?? 0;
   const handleAddToCart = async (e) => {
@@ -52,21 +51,21 @@ const FlashSaleCard = ({ product }) => {
 
         {/* Giá */}
         <div className="mb-2">
-          <p className="text-red-500 font-bold text-sm">
-            {Number(product.price).toLocaleString('vi-VN')}₫
-          </p>
-          <p className="text-gray-400 text-xs line-through">
-            {Number(product.originalPrice).toLocaleString('vi-VN')}₫
-          </p>
-        </div>
+  <p className="text-red-500 font-bold text-sm">
+    {Number(product.salePrice).toLocaleString('vi-VN')}₫
+  </p>
+  <p className="text-gray-400 text-xs line-through">
+    {Number(product.originalPrice).toLocaleString('vi-VN')}₫
+  </p>
+</div>
 
-        {/* Thanh tiến độ còn hàng */}
-        <div className="mb-2">
-    <div
-      className="h-full bg-red-400 rounded-full transition-all"
-      style={{ width: stockTotal > 0 ? `${Math.min(100, (stockLeft / stockTotal) * 100)}%` : '0%' }}
-    />
-  </div>  {/* ← đóng div thanh tiến độ ở đây */}
+{/* Thanh tiến độ còn hàng */}
+<div className="w-full h-1.5 bg-gray-100 rounded-full mb-1">
+  <div
+    className="h-full bg-red-400 rounded-full transition-all"
+    style={{ width: stockTotal > 0 ? `${Math.min(100, (stockLeft / stockTotal) * 100)}%` : '0%' }}
+  />
+</div> 
   <p className="text-xs text-gray-400 mt-0.5">Còn {stockLeft} suất</p>
 </div>
 
