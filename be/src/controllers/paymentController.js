@@ -102,7 +102,14 @@ exports.createOrder = async (req, res) => {
       [item.quantity, item.product_id]
     );
   }
+   await db.query(
+    `UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) 
+     WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0`,
+    [item.quantity, item.product_id]
+  );
 }
+
+
         // Xóa các cart_items đã thanh toán
         if (cartItemIds && cartItemIds.length > 0) {
             const placeholders = cartItemIds.map(() => '?').join(',');

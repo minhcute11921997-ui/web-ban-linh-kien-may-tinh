@@ -62,7 +62,6 @@ const FlashSaleCard = ({ product }) => {
 
         {/* Thanh tiến độ còn hàng */}
         <div className="mb-2">
-  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
     <div
       className="h-full bg-red-400 rounded-full transition-all"
       style={{ width: stockTotal > 0 ? `${Math.min(100, (stockLeft / stockTotal) * 100)}%` : '0%' }}
@@ -80,7 +79,6 @@ const FlashSaleCard = ({ product }) => {
           {product.stock === 0 ? 'Hết hàng' : ' Mua ngay'}
         </button>
       </div>
-    </div>
   );
 };
 
