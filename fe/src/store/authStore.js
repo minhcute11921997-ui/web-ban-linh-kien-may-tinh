@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { refresh } from '../../../be/src/controllers/authController';
 
 const useAuthStore = create((set, get) => ({
   user: null,
