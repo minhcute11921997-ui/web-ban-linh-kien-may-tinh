@@ -44,8 +44,21 @@ app.use('/api/users', userRoutes);
 
 const dashboardRoutes = require('./src/routes/dashboard');
 app.use('/api/dashboard', dashboardRoutes);
-
-// Route test server
+const cleanExpiredSales = async () => {
+  try {
+    await db.query(
+      `UPDATE products 
+       SET discount_percent = 0, discount_expires_at = NULL 
+       WHERE discount_percent > 0 
+       AND discount_expires_at IS NOT NULL 
+       AND discount_expires_at < NOW()`
+    );
+  } catch (err) {
+    console.error('Clean expired sales error:', err);
+  }
+};
+cleanExpiredSales();
+setInterval(cleanExpiredSales, 60 * 1000);
 app.get('/', (req, res) => {
     res.json({ message: ' Backend API đang chạy!' });
 });

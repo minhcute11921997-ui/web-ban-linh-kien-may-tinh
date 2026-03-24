@@ -298,7 +298,7 @@ const handleFlashSaleSubmit = async () => {
                     </span>
                   </td>
                   <td className="px-6 py-3">
-                    {p.discount_percent > 0 ? (
+                    {p.discount_percent > 0 && (!p.discount_expires_at || new Date(p.discount_expires_at) > new Date()) ? (
                       <div className="flex items-center gap-2">
                         <span className="text-xs px-2 py-1 rounded-full font-medium bg-orange-100 text-orange-600">
                           -{p.discount_percent}%

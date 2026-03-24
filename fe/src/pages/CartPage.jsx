@@ -165,9 +165,16 @@ const CartPage = () => {
                           className="w-12 text-center font-semibold text-gray-900 border-0 outline-none bg-transparent [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
                         />
                         <button
-                          onClick={() => updateItem(item.id, item.quantity + 1)}
-                          className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"
-                        >+</button>
+  onClick={() => {
+    if (item.quantity >= item.stock) {
+      toast.warning(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
+      return;
+    }
+    updateItem(item.id, item.quantity + 1);
+  }}
+  disabled={item.quantity >= item.stock}
+  className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+>+</button>
                       </div>
 
                       {/* Total Price */}

@@ -136,8 +136,20 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ' });
     }
 
+    const [orders] = await db.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+    if (orders.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+    }
+
+    const order = orders[0];
+
+    let paymentStatusUpdate = '';
+    if (status === 'delivered' && order.payment_method === 'cod') {
+      paymentStatusUpdate = ", payment_status = 'completed'";
+    }
+
     const [result] = await db.query(
-      'UPDATE orders SET status = ? WHERE id = ?',
+      `UPDATE orders SET status = ?${paymentStatusUpdate} WHERE id = ?`,
       [status, req.params.id]
     );
 

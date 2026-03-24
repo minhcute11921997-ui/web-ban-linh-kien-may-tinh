@@ -123,18 +123,24 @@ const getFeaturedProducts = async (req, res) => {
 
 // GET /api/products/on-sale
 const getOnSaleProducts = async (req, res) => {
-    try {
-        const [rows] = await db.query(
-            'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.discount_percent > 0 AND p.stock > 0 ORDER BY p.discount_percent DESC LIMIT 20'
-        );
-        const data = rows.map(p => ({
-            ...p,
-            originalPrice: Math.round(Number(p.price) / (1 - p.discount_percent / 100) / 1000) * 1000
-        }));
-        res.json({ success: true, data });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+  try {
+    const [rows] = await db.query(
+      `SELECT p.*, c.name as category_name 
+       FROM products p 
+       LEFT JOIN categories c ON p.category_id = c.id 
+       WHERE p.discount_percent > 0 AND p.stock > 0 
+       ORDER BY p.discount_percent DESC LIMIT 20`
+    );
+    const data = rows.map(p => ({
+      ...p,
+      originalPrice: Math.round(Number(p.price) / (1 - p.discount_percent / 100) / 1000) * 1000,
+      stockLeft: p.stock,                              
+      stockTotal: p.flash_sale_qty || p.stock          
+    }));
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // POST /api/products
@@ -273,6 +279,10 @@ const setFlashSale = async (req, res) => {
     await db.query(
       `UPDATE products SET discount_percent = 0, discount_expires_at = NULL WHERE discount_percent > 0`
     );
+    await db.query(
+  'UPDATE products SET discount_percent = ?, discount_expires_at = ?, flash_sale_qty = ? WHERE id = ?',
+  [discountPercent, expiresAt, saleQty, productId]
+);
 
     // Bước 2: Validate rồi set sale mới
     for (const { productId, saleQty, discountPercent } of items) {
