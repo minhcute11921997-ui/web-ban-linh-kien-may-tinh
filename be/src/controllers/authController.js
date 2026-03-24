@@ -128,11 +128,22 @@ exports.refresh = async (req, res) => {
         res.status(401).json({ success: false, message: 'Refresh token không hợp lệ hoặc đã hết hạn' });
     }
 };
+
 exports.updateProfile = async (req, res) => {
   const { full_name, email, phone, address } = req.body;
-  const userId = req.user.userId; 
+  const userId = req.user.userId;
 
   try {
+    if (email) {
+      const [existing] = await db.query(
+        'SELECT id FROM users WHERE email = ? AND id != ?',
+        [email, userId]
+      );
+      if (existing.length > 0) {
+        return res.status(400).json({ success: false, message: 'Email đã được sử dụng bởi tài khoản khác' });
+      }
+    }
+
     await db.query(
       'UPDATE users SET full_name=?, email=?, phone=?, address=? WHERE id=?',
       [full_name, email, phone, address, userId]

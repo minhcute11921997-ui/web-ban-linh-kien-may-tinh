@@ -118,8 +118,6 @@ exports.getOrderById = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    // Tự động chuyển tất cả đơn pending → processing khi admin xem
-    await db.query(`UPDATE orders SET status = 'processing' WHERE status = 'pending'`);
 
     const [orders] = await db.query(
       `SELECT o.*, u.username, u.email, u.full_name 
@@ -156,19 +154,6 @@ exports.updateOrderStatus = async (req, res) => {
       `UPDATE orders SET status = ?${paymentStatusUpdate} WHERE id = ?`,
       [status, req.params.id]
     );
-
-    if (status === 'shipped') {
-  const [orderDetail] = await db.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
-  if (orderDetail[0].payment_method === 'cod') {
-    const [orderItems] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [req.params.id]);
-    for (const item of orderItems) {
-      await db.query(
-        'UPDATE products SET stock = stock - ? WHERE id = ?',
-        [item.quantity, item.product_id]
-      );
-    }
-  }
-}
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
@@ -215,7 +200,7 @@ exports.cancelOrder = async (req, res) => {
 
     const [items] = await db.query('SELECT * FROM order_items WHERE order_id = ?', [id]);
 
-    const shouldRestoreStock = order.payment_method === 'vnpay';
+    const shouldRestoreStock = true;
 
     if (shouldRestoreStock) {
       for (const item of items) {

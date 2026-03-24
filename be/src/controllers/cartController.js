@@ -134,6 +134,11 @@ exports.updateCartItem = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Số lượng phải lớn hơn 0' });
         }
 
+        const [carts] = await db.query('SELECT id FROM cart WHERE user_id = ?', [req.user.userId]);
+        if (carts.length === 0) {
+            return res.status(403).json({ success: false, message: 'Không có quyền thực hiện' });
+        }
+        
         const [result] = await db.query(
             'UPDATE cart_items SET quantity = ? WHERE id = ?',
             [quantity, req.params.id]
@@ -151,9 +156,14 @@ exports.updateCartItem = async (req, res) => {
 
 exports.removeFromCart = async (req, res) => {
     try {
+        const [carts] = await db.query('SELECT id FROM cart WHERE user_id = ?', [req.user.userId]);
+        if (carts.length === 0) {
+            return res.status(403).json({ success: false, message: 'Không có quyền thực hiện' });
+        }
+
         const [result] = await db.query(
-            'DELETE FROM cart_items WHERE id = ?',
-            [req.params.id]
+            'DELETE FROM cart_items WHERE id = ? AND cart_id = ?',
+            [req.params.id, carts[0].id]
         );
 
         if (result.affectedRows === 0) {

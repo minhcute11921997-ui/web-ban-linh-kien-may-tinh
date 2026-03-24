@@ -1,5 +1,7 @@
 const db = require('../config/db');
 const { createVNPayUrl, verifyVNPayResponse } = require('../config/payment');
+const db = require('../config/db');
+const { createVNPayUrl, verifyVNPayResponse } = require('../config/payment');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -112,6 +114,10 @@ exports.createOrder = async (req, res) => {
 
         // Xóa các cart_items đã thanh toán
         if (cartItemIds && cartItemIds.length > 0) {
+            const { discount_code } = req.body;
+            if (discount_code) {
+                await incrementUsedCount(discount_code);
+            }
             const placeholders = cartItemIds.map(() => '?').join(',');
             await db.query(
                 `DELETE FROM cart_items WHERE cart_id = ? AND id IN (${placeholders})`,
@@ -180,7 +186,7 @@ exports.vnpayCallback = async (req, res) => {
         }
 
         await db.query(
-            `UPDATE orders SET payment_status = 'completed',status = 'shipped', transaction_id = ? WHERE id = ?`,
+            `UPDATE orders SET payment_status = 'completed',status = 'processing', transaction_id = ? WHERE id = ?`,
             [verifyResult.transactionNo, verifyResult.orderId]
         );
 
