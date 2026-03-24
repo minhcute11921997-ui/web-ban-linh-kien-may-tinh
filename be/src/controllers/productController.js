@@ -279,10 +279,6 @@ const setFlashSale = async (req, res) => {
     await db.query(
       `UPDATE products SET discount_percent = 0, discount_expires_at = NULL WHERE discount_percent > 0`
     );
-    await db.query(
-  'UPDATE products SET discount_percent = ?, discount_expires_at = ?, flash_sale_qty = ? WHERE id = ?',
-  [discountPercent, expiresAt, saleQty, productId]
-);
 
     // Bước 2: Validate rồi set sale mới
     for (const { productId, saleQty, discountPercent } of items) {
@@ -302,9 +298,9 @@ const setFlashSale = async (req, res) => {
         });
 
       await db.query(
-        'UPDATE products SET discount_percent = ?, discount_expires_at = ? WHERE id = ?',
-        [discountPercent, expiresAt, productId]
-      );
+  'UPDATE products SET discount_percent = ?, discount_expires_at = ?, flash_sale_qty = ? WHERE id = ?',
+  [discountPercent, expiresAt, saleQty, productId]
+);
     }
 
     res.json({
