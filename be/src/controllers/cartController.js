@@ -140,8 +140,8 @@ exports.updateCartItem = async (req, res) => {
         }
         
         const [result] = await db.query(
-            'UPDATE cart_items SET quantity = ? WHERE id = ?',
-            [quantity, req.params.id]
+            'UPDATE cart_items SET quantity = ? WHERE id = ? AND cart_id = ?',
+            [quantity, req.params.id, carts[0].id]
         );
 
         if (result.affectedRows === 0) {
