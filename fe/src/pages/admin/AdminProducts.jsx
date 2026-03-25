@@ -8,9 +8,6 @@ import {
 } from "../../api/productApi";
 import { getAllCategories } from "../../api/categoryApi";
 import { toast } from "react-toastify";
-import { lazy, Suspense } from "react";
-const ReactQuill = lazy(() => import("react-quill"));
-import "react-quill/dist/quill.snow.css";
 
 const emptyForm = {
   name: "",
@@ -27,7 +24,8 @@ const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false); // form thêm mới (inline)
+  const [showEditModal, setShowEditModal] = useState(false); // popup sửa
 
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState({});
@@ -45,8 +43,7 @@ const AdminProducts = () => {
       const res = await getAllProducts({ limit: 100 });
       const data = res.data?.data;
       setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Lỗi load sản phẩm:", err);
+    } catch {
       setProducts([]);
     }
   };
@@ -55,8 +52,7 @@ const AdminProducts = () => {
     try {
       const res = await getAllCategories();
       setCategories(res.data.data || []);
-    } catch (err) {
-      console.error("Lỗi load danh mục:", err);
+    } catch {
       setCategories([]);
     }
   };
@@ -67,19 +63,21 @@ const AdminProducts = () => {
       if (editId) {
         await updateProduct(editId, form);
         toast.success("Cập nhật thành công!");
+        setShowEditModal(false);
       } else {
         await createProduct(form);
         toast.success("Thêm sản phẩm thành công!");
+        setShowForm(false);
       }
       setForm(emptyForm);
       setEditId(null);
-      setShowForm(false);
       fetchProducts();
     } catch {
       toast.error("Có lỗi xảy ra!");
     }
   };
 
+  // Bấm Sửa → mở popup
   const handleEdit = (product) => {
     setForm({
       name: product.name,
@@ -91,7 +89,7 @@ const AdminProducts = () => {
       brand: product.brand || "",
     });
     setEditId(product.id);
-    setShowForm(true);
+    setShowEditModal(true);
   };
 
   const handleDelete = async (id) => {
@@ -133,7 +131,7 @@ const AdminProducts = () => {
 
   const openSaleModal = () => {
     const init = {};
-    (products || []).forEach((p) => {
+    products.forEach((p) => {
       init[p.id] = { checked: false, qty: 1, discount: 10 };
     });
     setSelectedItems(init);
@@ -142,9 +140,8 @@ const AdminProducts = () => {
     setShowSaleModal(true);
   };
 
-  const toggleCheck = (id, checked) => {
+  const toggleCheck = (id, checked) =>
     setSelectedItems((prev) => ({ ...prev, [id]: { ...prev[id], checked } }));
-  };
 
   const changeQty = (id, val, maxStock) => {
     const qty = Math.min(Math.max(1, Number(val)), maxStock);
@@ -177,22 +174,15 @@ const AdminProducts = () => {
         saleQty: v.qty,
         discountPercent: v.discount || discountPercent,
       }));
-
     if (!items.length) return toast.warning("Chưa chọn sản phẩm nào!");
     if (!durationHours || durationHours < 1)
       return toast.warning("Thời gian ít nhất 1 giờ!");
-
-    // Cảnh báo đơn giản nếu đang có sale cũ
     const hasActiveSale = products.some((p) => p.discount_percent > 0);
-    if (hasActiveSale) {
-      if (
-        !window.confirm(
-          " Đợt Flash Sale hiện tại sẽ bị tắt và thay bằng đợt mới.\nBạn có chắc không?"
-        )
-      )
-        return;
-    }
-
+    if (
+      hasActiveSale &&
+      !window.confirm("Đợt Flash Sale hiện tại sẽ bị tắt. Bạn có chắc không?")
+    )
+      return;
     setSubmittingSale(true);
     try {
       await setFlashSaleApi({ items, durationHours });
@@ -214,6 +204,120 @@ const AdminProducts = () => {
   const expiresAt = new Date(
     Date.now() + (durationHours || 0) * 3600000
   ).toLocaleString("vi-VN");
+
+  // Component form dùng chung cho cả thêm và sửa
+  const ProductForm = ({ onCancel }) => (
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Tên sản phẩm *
+          </label>
+          <input
+            placeholder="Nhập tên sản phẩm"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Giá (VNĐ) *
+          </label>
+          <input
+            placeholder="0"
+            type="number"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Tồn kho *
+          </label>
+          <input
+            placeholder="0"
+            type="number"
+            value={form.stock}
+            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Danh mục
+          </label>
+          <select
+            value={form.category_id}
+            onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">-- Chọn danh mục --</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Thương hiệu
+          </label>
+          <input
+            placeholder="Nhập thương hiệu"
+            value={form.brand}
+            onChange={(e) => setForm({ ...form, brand: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Mô tả sản phẩm
+          </label>
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            dangerouslySetInnerHTML={{ __html: form.description }}
+            onBlur={(e) =>
+              setForm({ ...form, description: e.currentTarget.innerHTML })
+            }
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none"
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            URL hình ảnh
+          </label>
+          <input
+            placeholder="https://..."
+            value={form.image_url}
+            onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+            className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div className="flex gap-3 mt-5">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 font-medium text-sm cursor-pointer"
+        >
+          {editId ? "Cập nhật" : "Thêm mới"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-xl hover:bg-gray-50 font-medium text-sm cursor-pointer"
+        >
+          Hủy
+        </button>
+      </div>
+    </form>
+  );
 
   return (
     <div>
@@ -240,128 +344,14 @@ const AdminProducts = () => {
         </div>
       </div>
 
-      {/* Form thêm/sửa */}
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white border border-gray-100 rounded-2xl p-6 mb-6 shadow-sm"
-        >
+      {/* Form thêm mới (inline) */}
+      {showForm && !editId && (
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-6 shadow-sm">
           <h2 className="font-semibold text-lg text-gray-800 mb-4">
-            {editId ? " Chỉnh sửa sản phẩm" : " Thêm sản phẩm mới"}
+            ➕ Thêm sản phẩm mới
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Tên sản phẩm *
-              </label>
-              <input
-                placeholder="Nhập tên sản phẩm"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Giá (VNĐ) *
-              </label>
-              <input
-                placeholder="0"
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Tồn kho *
-              </label>
-              <input
-                placeholder="0"
-                type="number"
-                value={form.stock}
-                onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Danh mục
-              </label>
-              <select
-                value={form.category_id}
-                onChange={(e) =>
-                  setForm({ ...form, category_id: e.target.value })
-                }
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">-- Chọn danh mục --</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Thương hiệu
-              </label>
-              <input
-                placeholder="Nhập thương hiệu"
-                value={form.brand}
-                onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Mô tả sản phẩm
-              </label>
-              <div
-                contentEditable
-                suppressContentEditableWarning
-                dangerouslySetInnerHTML={{ __html: form.description }}
-                onBlur={(e) =>
-                  setForm({ ...form, description: e.currentTarget.innerHTML })
-                }
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm min-h-[150px] focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                URL hình ảnh
-              </label>
-              <input
-                placeholder="https://..."
-                value={form.image_url}
-                onChange={(e) =>
-                  setForm({ ...form, image_url: e.target.value })
-                }
-                className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-          <div className="flex gap-3 mt-5">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 font-medium text-sm cursor-pointer"
-            >
-              {editId ? "Cập nhật" : "Thêm mới"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-xl hover:bg-gray-50 font-medium text-sm cursor-pointer"
-            >
-              Hủy
-            </button>
-          </div>
-        </form>
+          <ProductForm onCancel={() => setShowForm(false)} />
+        </div>
       )}
 
       {/* Bảng sản phẩm */}
@@ -422,7 +412,7 @@ const AdminProducts = () => {
                         </span>
                         <button
                           onClick={() => handleStopSale(p)}
-                          className="text-xs text-red-400 hover:text-red-600 cursor-pointer whitespace-nowrap"
+                          className="text-xs text-red-400 hover:text-red-600 cursor-pointer"
                         >
                           Tắt
                         </button>
@@ -464,11 +454,42 @@ const AdminProducts = () => {
         </div>
       </div>
 
-      {/* MODAL FLASH SALE */}
+      {/* POPUP CHỈNH SỬA SẢN PHẨM */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-800">
+                ✏️ Chỉnh sửa sản phẩm
+              </h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditId(null);
+                  setForm(emptyForm);
+                }}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none cursor-pointer"
+              >
+                ×
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-6 py-5">
+              <ProductForm
+                onCancel={() => {
+                  setShowEditModal(false);
+                  setEditId(null);
+                  setForm(emptyForm);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL FLASH SALE - giữ nguyên như cũ */}
       {showSaleModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-            {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-800">
                 🏷️ Thiết lập Flash Sale
@@ -480,8 +501,6 @@ const AdminProducts = () => {
                 ×
               </button>
             </div>
-
-            {/* Cài đặt chung */}
             <div className="px-6 py-4 border-b border-gray-100 bg-orange-50 flex flex-wrap gap-6 items-end">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -494,9 +513,9 @@ const AdminProducts = () => {
                     max="99"
                     value={discountPercent === 0 ? "" : discountPercent}
                     onChange={(e) => {
-                      const val = e.target.value;
+                      const v = e.target.value;
                       setDiscountPercent(
-                        val === "" ? 0 : Math.min(99, Math.max(1, Number(val)))
+                        v === "" ? 0 : Math.min(99, Math.max(1, Number(v)))
                       );
                     }}
                     onBlur={() => {
@@ -508,7 +527,7 @@ const AdminProducts = () => {
                   <button
                     type="button"
                     onClick={applyDiscountToAll}
-                    className="text-xs bg-orange-100 text-orange-600 px-3 py-2 rounded-xl hover:bg-orange-200 cursor-pointer whitespace-nowrap transition-colors font-medium"
+                    className="text-xs bg-orange-100 text-orange-600 px-3 py-2 rounded-xl hover:bg-orange-200 cursor-pointer font-medium"
                   >
                     Áp dụng tất cả
                   </button>
@@ -524,9 +543,9 @@ const AdminProducts = () => {
                   max="720"
                   value={durationHours === 0 ? "" : durationHours}
                   onChange={(e) => {
-                    const val = e.target.value;
+                    const v = e.target.value;
                     setDurationHours(
-                      val === "" ? 0 : Math.min(720, Math.max(1, Number(val)))
+                      v === "" ? 0 : Math.min(720, Math.max(1, Number(v)))
                     );
                   }}
                   onBlur={() => {
@@ -540,8 +559,6 @@ const AdminProducts = () => {
                 ⏰ Kết thúc lúc: <span className="font-bold">{expiresAt}</span>
               </div>
             </div>
-
-            {/* Danh sách sản phẩm */}
             <div className="overflow-y-auto flex-1 px-6">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-white z-10">
@@ -607,7 +624,7 @@ const AdminProducts = () => {
                               {p.name}
                             </span>
                             {p.discount_percent > 0 && (
-                              <span className="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-500 rounded-full whitespace-nowrap flex-shrink-0">
+                              <span className="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-500 rounded-full">
                                 -{p.discount_percent}% đang sale
                               </span>
                             )}
@@ -632,7 +649,6 @@ const AdminProducts = () => {
                             {p.stock}
                           </span>
                         </td>
-                        {/* Số lượng sale */}
                         <td className="py-3 text-right">
                           <input
                             type="number"
@@ -641,15 +657,13 @@ const AdminProducts = () => {
                             value={item.qty === 0 ? "" : item.qty}
                             disabled={!item.checked}
                             onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "") {
-                                setSelectedItems((prev) => ({
-                                  ...prev,
-                                  [p.id]: { ...prev[p.id], qty: 0 },
-                                }));
-                              } else {
-                                changeQty(p.id, val, p.stock);
-                              }
+                              const v = e.target.value;
+                              v === ""
+                                ? setSelectedItems((prev) => ({
+                                    ...prev,
+                                    [p.id]: { ...prev[p.id], qty: 0 },
+                                  }))
+                                : changeQty(p.id, v, p.stock);
                             }}
                             onBlur={() => {
                               if (!item.qty || item.qty < 1)
@@ -661,7 +675,6 @@ const AdminProducts = () => {
                             className="w-20 border border-gray-200 px-2 py-1.5 rounded-lg text-sm text-center disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-orange-400"
                           />
                         </td>
-                        {/* % giảm riêng từng sản phẩm */}
                         <td className="py-3 text-right">
                           <input
                             type="number"
@@ -670,15 +683,13 @@ const AdminProducts = () => {
                             value={item.discount === 0 ? "" : item.discount}
                             disabled={!item.checked}
                             onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "") {
-                                setSelectedItems((prev) => ({
-                                  ...prev,
-                                  [p.id]: { ...prev[p.id], discount: 0 },
-                                }));
-                              } else {
-                                changeDiscount(p.id, val);
-                              }
+                              const v = e.target.value;
+                              v === ""
+                                ? setSelectedItems((prev) => ({
+                                    ...prev,
+                                    [p.id]: { ...prev[p.id], discount: 0 },
+                                  }))
+                                : changeDiscount(p.id, v);
                             }}
                             onBlur={() => {
                               if (!item.discount || item.discount < 1)
@@ -690,7 +701,6 @@ const AdminProducts = () => {
                             className="w-20 border border-gray-200 px-2 py-1.5 rounded-lg text-sm text-center disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-orange-400"
                           />
                         </td>
-                        {/* Giá sau giảm */}
                         <td className="py-3 text-right font-semibold whitespace-nowrap">
                           {item.checked ? (
                             <span className="text-orange-500">
@@ -706,8 +716,6 @@ const AdminProducts = () => {
                 </tbody>
               </table>
             </div>
-
-            {/* Footer */}
             <div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-gray-50 rounded-b-2xl">
               <div className="text-sm text-gray-500">
                 Đã chọn:{" "}
@@ -719,18 +727,18 @@ const AdminProducts = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSaleModal(false)}
-                  className="border border-gray-200 text-gray-600 px-5 py-2 rounded-xl text-sm hover:bg-white cursor-pointer transition-colors"
+                  className="border border-gray-200 text-gray-600 px-5 py-2 rounded-xl text-sm hover:bg-white cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   disabled={submittingSale || selectedCount === 0}
                   onClick={handleFlashSaleSubmit}
-                  className="bg-orange-500 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                  className="bg-orange-500 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 disabled:opacity-50 cursor-pointer"
                 >
                   {submittingSale
-                    ? " Đang xử lý..."
-                    : ` Bắt đầu Flash Sale (${selectedCount})`}
+                    ? "Đang xử lý..."
+                    : `Bắt đầu Flash Sale (${selectedCount})`}
                 </button>
               </div>
             </div>

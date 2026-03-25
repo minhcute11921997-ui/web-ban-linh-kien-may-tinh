@@ -17,18 +17,25 @@ exports.getStats = async (req, res) => {
     const [[{ pendingOrders }]] = await db.query(
       "SELECT COUNT(*) as pendingOrders FROM orders WHERE status = 'pending'"
     );
-
-    // ✅ Doanh thu hôm nay
-    const [[{ todayRevenue }]] = await db.query(
-      `SELECT COALESCE(SUM(total_price), 0) as todayRevenue 
-             FROM orders 
-             WHERE status = 'delivered' 
-             AND DATE(created_at) = CURDATE()`
-    );
-
-    // ✅ Số sản phẩm hết hàng
     const [[{ outOfStock }]] = await db.query(
       "SELECT COUNT(*) as outOfStock FROM products WHERE stock = 0"
+    );
+
+    // ✅ Doanh thu theo giờ hôm nay
+    const [revenueByHour] = await db.query(
+      `SELECT HOUR(created_at) as hour, COALESCE(SUM(total_price), 0) as revenue
+       FROM orders
+       WHERE status = 'delivered'
+       AND DATE(created_at) = CURDATE()
+       GROUP BY HOUR(created_at)
+       ORDER BY hour ASC`
+    );
+
+    // ✅ 5 đơn hàng gần nhất
+    const [recentOrders] = await db.query(
+      `SELECT o.id, o.total_price, o.status, o.created_at, u.full_name, u.email
+       FROM orders o JOIN users u ON o.user_id = u.id
+       ORDER BY o.created_at DESC LIMIT 5`
     );
 
     res.json({
@@ -39,8 +46,9 @@ exports.getStats = async (req, res) => {
         totalRevenue,
         totalUsers,
         pendingOrders,
-        todayRevenue,
         outOfStock,
+        revenueByHour,
+        recentOrders,
       },
     });
   } catch (error) {
