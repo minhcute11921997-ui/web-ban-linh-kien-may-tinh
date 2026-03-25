@@ -57,44 +57,39 @@ exports.getStats = async (req, res) => {
 exports.getRevenueReport = async (req, res) => {
   try {
     const range = req.query.range || "day";
+    const limit = parseInt(req.query.limit) || 30; // ✅ Nhận limit từ FE
     let sql = "";
 
     if (range === "day") {
       sql = `
-        SELECT
-          DATE(created_at) AS label,
+        SELECT DATE(created_at) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders
-        WHERE status = 'delivered'
+        FROM orders WHERE status = 'delivered'
         GROUP BY DATE(created_at)
-        ORDER BY DATE(created_at) ASC
-        LIMIT 30
+        ORDER BY DATE(created_at) DESC
+        LIMIT ${limit}
       `;
     } else if (range === "week") {
       sql = `
-        SELECT
-          YEAR(created_at) AS year,
+        SELECT YEAR(created_at) AS year,
           WEEK(created_at, 1) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders
-        WHERE status = 'delivered'
+        FROM orders WHERE status = 'delivered'
         GROUP BY YEAR(created_at), WEEK(created_at, 1)
-        ORDER BY YEAR(created_at) ASC, WEEK(created_at, 1) ASC
-        LIMIT 12
+        ORDER BY YEAR(created_at) DESC, WEEK(created_at, 1) DESC
+        LIMIT 8
       `;
     } else if (range === "quarter") {
       sql = `
-        SELECT
-          YEAR(created_at) AS year,
+        SELECT YEAR(created_at) AS year,
           QUARTER(created_at) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders
-        WHERE status = 'delivered'
+        FROM orders WHERE status = 'delivered'
         GROUP BY YEAR(created_at), QUARTER(created_at)
-        ORDER BY YEAR(created_at) ASC, QUARTER(created_at) ASC
+        ORDER BY YEAR(created_at) DESC, QUARTER(created_at) DESC
         LIMIT 8
       `;
     } else {
@@ -102,7 +97,7 @@ exports.getRevenueReport = async (req, res) => {
     }
 
     const [rows] = await db.query(sql);
-    res.json({ success: true, data: rows });
+    res.json({ success: true, data: rows.reverse() }); // ✅ reverse để sort ASC cho chart
   } catch (error) {
     res.status(500).json({ success: false, message: "Lỗi server", error: error.message });
   }
