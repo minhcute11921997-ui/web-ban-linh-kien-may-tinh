@@ -2,9 +2,10 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
 const menuItems = [
-  { to: '/admin', icon: '', label: 'Dashboard', end: true },
-  { to: '/admin/products', icon: '', label: 'Sản phẩm' },
-  { to: '/admin/orders', icon: '', label: 'Đơn hàng' },
+  { to: '/admin', label: 'Dashboard', end: true },
+  { to: '/admin/products', label: 'Sản phẩm' },
+  { to: '/admin/orders', label: 'Đơn hàng' },
+  { to: '/admin/revenue', label: 'Doanh thu' },
 ];
 
 const AdminLayout = () => {

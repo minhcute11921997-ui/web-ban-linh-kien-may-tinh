@@ -1,6 +1,7 @@
+// fe/src/pages/admin/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "../../api/dashboardApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import {
   AreaChart,
   Area,
@@ -65,7 +66,6 @@ const AdminDashboard = () => {
       </div>
     );
 
-  // Chuẩn bị data biểu đồ 24 giờ hôm nay
   const revenueMap = {};
   (stats?.revenueByHour || []).forEach((r) => {
     revenueMap[r.hour] = Number(r.revenue);
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
       label: "Doanh thu",
       value: `${Number(stats?.totalRevenue || 0).toLocaleString("vi-VN")}₫`,
       color: "from-green-500 to-green-600",
-      link: null,
+      link: "/admin/revenue", 
     },
     {
       label: "Người dùng",
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
       link: "/admin/users",
     },
     {
-      label: " Hết hàng",
+      label: "Hết hàng",
       value: stats?.outOfStock || 0,
       color: "from-red-500 to-red-600",
       link: "/admin/products",
@@ -118,9 +118,7 @@ const AdminDashboard = () => {
           <div
             key={i}
             onClick={() => card.link && navigate(card.link)}
-            className={`bg-gradient-to-br ${
-              card.color
-            } rounded-2xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${
+            className={`bg-gradient-to-br ${card.color} rounded-2xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${
               card.link ? "cursor-pointer hover:scale-[1.02]" : ""
             }`}
           >
