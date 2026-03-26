@@ -17,11 +17,13 @@ import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
 import OrderDetailPage from "./pages/OrderDetailPage";
 
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminUsers from "./pages/admin/AdminUsers";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
-import AdminRevenue from "./pages/admin/AdminRevenue"; // ✅ Thêm mới
+import AdminRevenue from "./pages/admin/AdminRevenue";
 
 import bannerLeft from "./assets/banner-left.png";
 import bannerRight from "./assets/banner-right.png";
@@ -66,6 +68,8 @@ function App() {
             </PrivateRoute>
           }
         >
+          <Route path="categories" element={<AdminCategories />} />
+<Route path="users" element={<AdminUsers />} /> 
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />

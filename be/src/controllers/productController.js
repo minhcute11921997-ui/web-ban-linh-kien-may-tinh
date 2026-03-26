@@ -17,7 +17,8 @@ const getAllProducts = async (req, res) => {
             params.push(specName, specFilters[specName]);
         });
 
-        query += ' WHERE 1=1';
+        const isAdminView = req.query.adminView === 'true';
+query += isAdminView ? ' WHERE 1=1' : ' WHERE p.is_active = 1';
 
         if (search) {
             query += ' AND p.name LIKE ?';
@@ -110,7 +111,7 @@ const getFeaturedProducts = async (req, res) => {
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             LEFT JOIN order_items oi ON oi.product_id = p.id
-            WHERE p.stock > 0
+            WHERE p.stock > 0 AND p.is_active = 1
             GROUP BY p.id
             ORDER BY total_sold DESC, p.id DESC
             LIMIT 8
@@ -129,7 +130,7 @@ const getOnSaleProducts = async (req, res) => {
        FROM products p 
        LEFT JOIN categories c ON p.category_id = c.id 
        WHERE p.discount_percent > 0 
-  AND p.stock > 0 
+  AND p.stock > 0 AND p.is_active = 1
   AND (p.flash_sale_qty IS NULL OR p.flash_sale_qty > 0)
        ORDER BY p.discount_percent DESC LIMIT 20`
     );
@@ -314,4 +315,24 @@ const setFlashSale = async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts, setFlashSale };
+
+const toggleActive = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [[product]] = await db.query('SELECT is_active FROM products WHERE id = ?', [id]);
+    if (!product) return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
+
+    const newStatus = product.is_active ? 0 : 1;
+    await db.query('UPDATE products SET is_active = ? WHERE id = ?', [newStatus, id]);
+
+    res.json({
+      success: true,
+      message: newStatus ? 'Đã bật sản phẩm!' : 'Đã tắt sản phẩm!',
+      is_active: newStatus
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductSpecs, getFilterOptions,getFeaturedProducts, getOnSaleProducts, setFlashSale, toggleActive };

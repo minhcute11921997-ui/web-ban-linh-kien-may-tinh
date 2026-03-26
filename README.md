@@ -4,7 +4,7 @@ Dự án web thương mại điện tử full-stack xây dựng với **React (V
 
 ---
 
-## 📁 Cấu Trúc Dự Án
+##  Cấu Trúc Dự Án
 
 ```
 web-/
@@ -79,7 +79,7 @@ web-/
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Chạy
+##  Hướng Dẫn Cài Đặt & Chạy
 
 ### 1. Clone repository
 
@@ -181,7 +181,7 @@ npm run dev
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 ### Backend
 | Package | Phiên bản | Mục đích |
@@ -208,7 +208,7 @@ npm run dev
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### Auth — `/api/auth`
 | Method | Endpoint | Mô tả |
@@ -266,7 +266,7 @@ npm run dev
 
 ---
 
-## 🔐 Xác Thực
+##  Xác Thực
 
 Dự án sử dụng **JWT (JSON Web Token)**. Sau khi đăng nhập, client nhận được token và đính kèm vào header của mỗi request cần xác thực:
 
@@ -289,7 +289,7 @@ Dự án hỗ trợ thanh toán qua **VNPay sandbox**:
 
 ---
 
-## ⚡ Tính Năng Nổi Bật
+##  Tính Năng Nổi Bật
 
 - ✅ Đăng ký / Đăng nhập với JWT
 - ✅ Xem danh sách & chi tiết sản phẩm
@@ -304,7 +304,7 @@ Dự án hỗ trợ thanh toán qua **VNPay sandbox**:
 
 ---
 
-## 🛠️ Scripts Hữu Ích
+##  Scripts Hữu Ích
 
 ```bash
 # Kiểm tra kết nối database
@@ -322,9 +322,4 @@ cd fe && npm run lint
 
 ---
 
-## 📝 Lưu Ý
 
-- Không commit file `.env` lên Git (đã có trong `.gitignore`)
-- Port mặc định: Backend `3000`, Frontend `5173`
-- Đảm bảo MySQL đang chạy trước khi khởi động backend
-- Để chạy đồng thời cả frontend và backend, mở **2 terminal riêng biệt**

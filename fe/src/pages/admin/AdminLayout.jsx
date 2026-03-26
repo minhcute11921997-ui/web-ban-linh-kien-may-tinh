@@ -6,6 +6,8 @@ const menuItems = [
   { to: '/admin/products', label: 'Sản phẩm' },
   { to: '/admin/orders', label: 'Đơn hàng' },
   { to: '/admin/revenue', label: 'Doanh thu' },
+  { to: '/admin/categories', label: 'Danh mục' },
+  { to: '/admin/users', label: 'Người dùng' },
 ];
 
 const AdminLayout = () => {
@@ -19,7 +21,7 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen bg-gray-100" style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
-      {/* ===== Sidebar ===== */}
+      {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 flex flex-col"
         style={{ background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)' }}>
 

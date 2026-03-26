@@ -97,7 +97,7 @@ exports.getRevenueReport = async (req, res) => {
     }
 
     const [rows] = await db.query(sql);
-    res.json({ success: true, data: rows.reverse() }); // ✅ reverse để sort ASC cho chart
+    res.json({ success: true, data: rows.reverse() });
   } catch (error) {
     res.status(500).json({ success: false, message: "Lỗi server", error: error.message });
   }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { login } from '../api/authApi';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
@@ -8,9 +8,13 @@ const LoginPage = () => {
   const [form, setForm] = useState({ login: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { setAuth } = useAuthStore();
+  const { setAuth, user, initialized } = useAuthStore(); 
   const navigate = useNavigate();
 
+  if (initialized && user) {
+    return <Navigate to={user.role === 'admin' ? '/admin' : '/'} replace />;
+  }
+  
   const handleChange = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
     setErrors({ ...errors, [field]: '' });

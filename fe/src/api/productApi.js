@@ -21,3 +21,6 @@ export const deleteProduct = (id) => {
 };
 export const setFlashSaleApi = (data) =>
   axiosInstance.post('/products/flash-sale', data);
+
+export const toggleProductActive = (id) =>
+  axiosInstance.patch(`/products/${id}/toggle-active`);

@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  getAllProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  setFlashSaleApi,
-} from "../../api/productApi";
 import { getAllCategories } from "../../api/categoryApi";
 import { toast } from "react-toastify";
+
+import { getAllProducts, createProduct, updateProduct,
+  deleteProduct, setFlashSaleApi, toggleProductActive } from "../../api/productApi"
 
 const emptyForm = {
   name: "",
@@ -40,7 +36,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await getAllProducts({ limit: 100 });
+      const res = await getAllProducts({ limit: 100, adminView: true });
       const data = res.data?.data;
       setProducts(Array.isArray(data) ? data : []);
     } catch {
@@ -123,6 +119,18 @@ const AdminProducts = () => {
       toast.error("Lỗi khi tắt flash sale!");
     }
   };
+
+  const handleToggleActive = async (p) => {
+  const action = p.is_active ? 'tắt' : 'bật';
+  if (!window.confirm(`Bạn muốn ${action} sản phẩm "${p.name}"?`)) return;
+  try {
+    await toggleProductActive(p.id);
+    toast.success(p.is_active ? 'Đã tắt sản phẩm!' : 'Đã bật sản phẩm!');
+    fetchProducts();
+  } catch {
+    toast.error('Lỗi khi thay đổi trạng thái!');
+  }
+};
 
   const getCategoryName = (catId) => {
     const cat = categories.find((c) => c.id === catId);
@@ -329,7 +337,7 @@ const AdminProducts = () => {
             onClick={openSaleModal}
             className="bg-orange-500 text-white px-5 py-2.5 rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm cursor-pointer shadow-sm"
           >
-            🏷️ Flash Sale
+             Flash Sale
           </button>
           <button
             onClick={() => {
@@ -348,7 +356,7 @@ const AdminProducts = () => {
       {showForm && !editId && (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-6 shadow-sm">
           <h2 className="font-semibold text-lg text-gray-800 mb-4">
-            ➕ Thêm sản phẩm mới
+             Thêm sản phẩm mới
           </h2>
           <ProductForm onCancel={() => setShowForm(false)} />
         </div>
@@ -369,14 +377,20 @@ const AdminProducts = () => {
                 <th className="text-left px-6 py-3 font-medium">Giá</th>
                 <th className="text-left px-6 py-3 font-medium">Tồn kho</th>
                 <th className="text-left px-6 py-3 font-medium">Giảm giá</th>
+                <th className="text-left px-6 py-3 font-medium">Trạng thái</th>
                 <th className="text-left px-6 py-3 font-medium">Thao tác</th>
+                
               </tr>
             </thead>
             <tbody>
               {products.map((p) => (
                 <tr
                   key={p.id}
-                  className="border-t border-gray-50 hover:bg-gray-50 transition-colors"
+                  className={`border-t border-gray-50 transition-colors ${
+                    p.is_active === 0
+                      ? "opacity-40 bg-gray-50"
+                      : "hover:bg-gray-50"
+                  }`}
                 >
                   <td className="px-6 py-3 text-gray-400">{p.id}</td>
                   <td className="px-6 py-3 font-medium text-gray-800 max-w-xs truncate">
@@ -399,7 +413,7 @@ const AdminProducts = () => {
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {p.stock}
+                    {p.stock === 0 ? 'Hết hàng' : p.stock}
                     </span>
                   </td>
                   <td className="px-6 py-3">
@@ -422,6 +436,18 @@ const AdminProducts = () => {
                     )}
                   </td>
                   <td className="px-6 py-3">
+                    <button
+                      onClick={() => handleToggleActive(p)}
+                      className={`text-xs px-3 py-1 rounded-full font-medium cursor-pointer transition-colors ${
+                        p.is_active !== 0
+                          ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600'
+                          : 'bg-red-100 text-red-600 hover:bg-green-100 hover:text-green-700'
+                      }`}
+                    >
+                      {p.is_active !== 0 ? 'Đang bán' : 'Đã tắt'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-3">
                     <div className="flex gap-3">
                       <button
                         onClick={() => handleEdit(p)}
@@ -442,7 +468,7 @@ const AdminProducts = () => {
               {products.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={9}
                     className="px-6 py-8 text-center text-gray-400"
                   >
                     Chưa có sản phẩm nào
@@ -556,7 +582,7 @@ const AdminProducts = () => {
                 />
               </div>
               <div className="text-sm text-orange-600 font-medium pb-0.5">
-                ⏰ Kết thúc lúc: <span className="font-bold">{expiresAt}</span>
+                Kết thúc lúc: <span className="font-bold">{expiresAt}</span>
               </div>
             </div>
             <div className="overflow-y-auto flex-1 px-6">
@@ -604,8 +630,10 @@ const AdminProducts = () => {
                     return (
                       <tr
                         key={p.id}
-                        className={`border-b border-gray-50 last:border-0 transition-colors ${
-                          item.checked ? "bg-orange-50" : "hover:bg-gray-50"
+                        className={`border-t border-gray-50 transition-colors ${
+                          p.is_active === 0 || p.stock === 0
+                            ? "opacity-50 bg-gray-50"
+                            : "hover:bg-gray-50"
                         }`}
                       >
                         <td className="py-3">

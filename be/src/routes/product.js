@@ -11,7 +11,7 @@ router.post('/flash-sale', verifyToken, verifyAdmin, productController.setFlashS
 router.get('/on-sale', productController.getOnSaleProducts);
 router.get('/:id/specs', productController.getProductSpecs);
 router.get('/:id', productController.getProductById);
-
+router.patch('/:id/toggle-active', verifyToken, verifyAdmin, productController.toggleActive);
 
 // Admin routes
 router.post('/', verifyToken, verifyAdmin, productController.createProduct);
