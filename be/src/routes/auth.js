@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');                          
 const authController = require('../controllers/authController');
-const { verifyToken } = require('../middleware/auth'); 
-const { loginLimiter } = require('../../server');
-const { logout } = require('../controllers/authController');
+const { verifyToken } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { registerSchema, loginSchema } = require('../validators/authValidator');
 
-// POST /api/auth/register
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  message: { success: false, message: 'Quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 router.post('/register', validate(registerSchema), authController.register);
-
-// POST /api/auth/login
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
-router.post('/logout', logout);
-// POST /api/auth/refresh 
+router.post('/logout', authController.logout); 
 router.post('/refresh', authController.refresh);
-
 router.put('/profile', verifyToken, authController.updateProfile);
 
 module.exports = router;
