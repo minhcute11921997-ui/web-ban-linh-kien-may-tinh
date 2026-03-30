@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import { useAuthInit } from "./hooks/useAuthInit";
 import HomePage from "./pages/HomePage";
@@ -24,9 +23,6 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 
-
-
-
 function App() {
   useAuthInit();
 
@@ -42,12 +38,12 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="categories" element={<AdminCategories />} />
-<Route path="users" element={<AdminUsers />} /> 
           <Route index element={<AdminDashboard />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
-          <Route path="revenue" element={<AdminRevenue />} /> {/* ✅ Thêm mới */}
+          <Route path="revenue" element={<AdminRevenue />} />
         </Route>
 
         {/* Customer routes */}
@@ -62,8 +58,11 @@ function App() {
         <Route path="/orders" element={<CustomerLayout><PrivateRoute><OrdersPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/profile" element={<CustomerLayout><PrivateRoute><ProfilePage /></PrivateRoute></CustomerLayout>} />
-      </Routes>
+
+        
         <Route path="*" element={<CustomerLayout><NotFoundPage /></CustomerLayout>} />
+      </Routes>
+
       <ToastContainer position="top-right" autoClose={3000} />
     </BrowserRouter>
   );

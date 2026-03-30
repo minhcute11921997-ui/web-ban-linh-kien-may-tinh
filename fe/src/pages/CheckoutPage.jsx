@@ -179,7 +179,7 @@ const CheckoutPage = () => {
                                         }} />
                                         {shippingFee > 0 && (
                                             <p className="text-sm text-blue-700 mt-2">
-                                            🚚 Phí vận chuyển: <strong>{shippingFee.toLocaleString('vi-VN')} ₫</strong>
+                                             Phí vận chuyển: <strong>{shippingFee.toLocaleString('vi-VN')} ₫</strong>
                                             {shippingFee === 50000 ? ' (Nội thành Hà Nội)' : ' (Tỉnh thành khác)'}
                                             </p>
                                         )}

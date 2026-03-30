@@ -117,7 +117,6 @@ const AddressSelector = ({ onChange }) => {
           type="text"
           value={detail}
           onChange={handleDetailChange}
-          placeholder="VD: 123 Đường Láng"
           className={selectClass}
         />
       </div>

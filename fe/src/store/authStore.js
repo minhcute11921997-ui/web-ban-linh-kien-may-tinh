@@ -1,40 +1,56 @@
 import { create } from 'zustand';
 
+
 const useAuthStore = create((set, get) => ({
   user: null,
   token: null,
   refreshToken: null,
+  isLoading: true,
   initialized: false,
 
-  initAuth: () => {
-    const user = JSON.parse(localStorage.getItem('user')) || null;
-    const token = localStorage.getItem('token') || null;
-    const refreshToken = localStorage.getItem('refreshToken') || null;
-    set({ user, token, refreshToken, initialized: true });
-    console.log('Auth initialized:', { user: user?.username, token: token ? 'present' : 'null' });
+  //  THÊM — LoginPage gọi setAuth sau login
+  setAuth: (user, token, refreshToken) => {
+    localStorage.setItem('token', token);
+    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+    set({ user, token, refreshToken, initialized: true, isLoading: false });
   },
 
-  setAuth: (user, token, refreshToken) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    localStorage.setItem('refreshToken', refreshToken);
-    set({ user, token, refreshToken });
-    console.log('Auth updated:', { user: user?.username, token: token ? 'present' : 'null' });
-  },
+  setUser: (user) => set({ user }),
+  setToken: (token) => set({ token }),
+  setIsLoading: (isLoading) => set({ isLoading }),
 
   logout: () => {
-    localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
-    set({ user: null, token: null, refreshToken: null });
+    set({ user: null, token: null, refreshToken: null, initialized: true, isLoading: false });
   },
 
-  setUser: (userData) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    set({ user: userData });
-  },
+  initAuth: async () => {
+    // Nếu đã initialized rồi (vừa login xong) → không gọi lại
+    if (get().initialized) {
+      set({ isLoading: false });
+      return;
+    }
 
-  isAdmin: () => get().user?.role === 'admin',
+    const token = localStorage.getItem('token');
+    if (!token) {
+      set({ isLoading: false, initialized: true });
+      return;
+    }
+    try {
+      const res = await axiosInstance.get('/auth/profile');
+      set({
+        user: res.data.user || res.data,
+        token,
+        initialized: true,
+      });
+    } catch {
+      localStorage.removeItem('token');
+      set({ user: null, token: null, initialized: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 }));
 
 export default useAuthStore;
