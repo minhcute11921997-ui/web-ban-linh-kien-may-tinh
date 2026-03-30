@@ -237,17 +237,19 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-const getProfile = async (req, res) => {
+exports.getProfile = async (req, res) => {
   try {
-    // req.user được gắn bởi verifyToken middleware
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user) {
+    const userId = req.user.userId; 
+    const [users] = await db.query(
+      'SELECT id, username, full_name, email, phone, address, role FROM users WHERE id = ?',
+      [userId]
+    );
+    if (users.length === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-    res.json({ success: true, user });
+    res.json({ success: true, user: users[0] });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('[getProfile]', error);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
-
-module.exports = { register, login, logout, refresh, updateProfile, getProfile };
