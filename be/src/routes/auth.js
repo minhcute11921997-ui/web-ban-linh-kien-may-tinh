@@ -30,4 +30,6 @@ router.post('/refresh', authController.refresh);
 
 router.put('/profile', verifyToken, authController.updateProfile);
 
+router.get('/profile', verifyToken, authController.getProfile);
+
 module.exports = router;

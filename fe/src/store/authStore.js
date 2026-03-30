@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-
+import axiosInstance from '../api/config';
 
 const useAuthStore = create((set, get) => ({
   user: null,
@@ -44,7 +44,8 @@ const useAuthStore = create((set, get) => ({
         token,
         initialized: true,
       });
-    } catch {
+    } catch (error) {
+      console.error('initAuth failed =', error.response?.status, error.response?.data);
       localStorage.removeItem('token');
       set({ user: null, token: null, initialized: true });
     } finally {
@@ -52,5 +53,6 @@ const useAuthStore = create((set, get) => ({
     }
   },
 }));
+
 
 export default useAuthStore;

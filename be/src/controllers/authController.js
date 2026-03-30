@@ -137,6 +137,8 @@ exports.login = async (req, res) => {
     }
 };
 
+
+
 //LÀM MỚI TOKEN 
 exports.refresh = async (req, res) => {
     try {
@@ -234,3 +236,18 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
+
+const getProfile = async (req, res) => {
+  try {
+    // req.user được gắn bởi verifyToken middleware
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+module.exports = { register, login, logout, refresh, updateProfile, getProfile };

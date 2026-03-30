@@ -97,12 +97,10 @@ exports.createOrder = async (req, res) => {
     `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)`,
     [orderId, item.product_id, item.quantity, item.price]
   );
-  if (paymentMethod === 'vnpay') {
     await db.query(
       `UPDATE products SET stock = stock - ? WHERE id = ?`,
       [item.quantity, item.product_id]
     );
-  }
    await db.query(
     `UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) 
      WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0`,
@@ -177,6 +175,21 @@ exports.vnpayCallback = async (req, res) => {
         }
 
         if (verifyResult.responseCode !== '00') {
+             const [orderItems] = await db.query(
+        `SELECT product_id, quantity FROM order_items WHERE order_id = ?`,
+        [verifyResult.orderId]
+    );
+    for (const item of orderItems) {
+        await db.query(
+            `UPDATE products SET stock = stock + ? WHERE id = ?`,
+            [item.quantity, item.product_id]
+        );
+        await db.query(
+            `UPDATE products SET flash_sale_qty = flash_sale_qty + ? 
+             WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0`,
+            [item.quantity, item.product_id]
+        );
+    }
             await db.query(
                 `UPDATE orders SET payment_status = 'failed', transaction_id = ? WHERE id = ?`,
                 [verifyResult.transactionNo, verifyResult.orderId]
