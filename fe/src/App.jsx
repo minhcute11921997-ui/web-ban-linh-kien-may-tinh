@@ -1,11 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import { useAuthInit } from "./hooks/useAuthInit";
-
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -16,7 +14,8 @@ import OrdersPage from "./pages/OrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
 import OrderDetailPage from "./pages/OrderDetailPage";
-
+import CustomerLayout from "./components/CustomerLayout";
+import NotFoundPage from "./pages/NotFoundPage";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -24,7 +23,6 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRevenue from "./pages/admin/AdminRevenue";
-
 import bannerLeft from "./assets/banner-left.png";
 import bannerRight from "./assets/banner-right.png";
 
@@ -89,7 +87,7 @@ function App() {
         <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/profile" element={<CustomerLayout><PrivateRoute><ProfilePage /></PrivateRoute></CustomerLayout>} />
       </Routes>
-
+        <Route path="*" element={<CustomerLayout><NotFoundPage /></CustomerLayout>} />
       <ToastContainer position="top-right" autoClose={3000} />
     </BrowserRouter>
   );
