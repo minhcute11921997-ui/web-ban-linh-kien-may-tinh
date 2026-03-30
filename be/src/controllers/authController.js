@@ -169,7 +169,21 @@ exports.refresh = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.json({ success: true, token: newToken });
+        await db.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
+
+        const newRefreshToken = jwt.sign(
+            { userId: user.id },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await db.query(
+            'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+            [user.id, newRefreshToken, expiresAt]
+        );
+
+        res.json({ success: true, token: newToken, refreshToken: newRefreshToken });
     } catch (error) {
         console.error('[refresh]', error);
         res.status(401).json({ success: false, message: 'Refresh token không hợp lệ hoặc đã hết hạn' });
