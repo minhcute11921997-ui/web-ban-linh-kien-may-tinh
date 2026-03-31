@@ -100,7 +100,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { userId: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: '1m' }
         );
 
         const refreshToken = jwt.sign(
@@ -168,7 +168,7 @@ exports.refresh = async (req, res) => {
         const newToken = jwt.sign(
             { userId: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: '1m' }
         );
 
         await db.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
