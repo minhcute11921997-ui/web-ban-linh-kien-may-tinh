@@ -761,7 +761,7 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-500">🔽 Sắp xếp:</span>
+          <span className="text-sm font-medium text-gray-500">Sắp xếp:</span>
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}

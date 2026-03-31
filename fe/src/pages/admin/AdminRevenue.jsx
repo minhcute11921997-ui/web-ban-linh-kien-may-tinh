@@ -33,32 +33,26 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const DAY_OPTIONS = [
-  { key: 7, label: "7 ngày" },
-  { key: 14, label: "14 ngày" },
-  { key: 30, label: "30 ngày" },
-];
-
 const RANGES = [
-  { key: "day", label: "Theo ngày" },
-  { key: "week", label: "Theo tuần" },
+  { key: "day",     label: "Theo ngày" },
+  { key: "week",    label: "Theo tuần" },
+  { key: "month",   label: "Theo tháng" },
   { key: "quarter", label: "Theo quý" },
 ];
 
 export default function AdminRevenue() {
   const [range, setRange] = useState("day");
-  const [dayLimit, setDayLimit] = useState(7);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    const limit = range === "day" ? dayLimit : range === "week" ? 8 : 8;
+    const limit = range === "day" ? 30 : 12;
     getRevenueReport(range, limit)
       .then((res) => setRows(res.data?.data || []))
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
-  }, [range, dayLimit]);
+  }, [range]);
 
   const chartData = rows.map((item) => {
     let label = "";
@@ -67,6 +61,8 @@ export default function AdminRevenue() {
       label = `${d.getDate()}/${d.getMonth() + 1}`;
     } else if (range === "week") {
       label = `T${item.label}`;
+    } else if (range === "month") {
+      label = `Th${item.label}/${String(item.year).slice(-2)}`;
     } else {
       label = `Q${item.label}/${item.year}`;
     }
@@ -80,7 +76,6 @@ export default function AdminRevenue() {
   const totalRevenue = rows.reduce((s, r) => s + Number(r.revenue || 0), 0);
   const totalOrders = rows.reduce((s, r) => s + Number(r.orders || 0), 0);
 
-  //Tính độ rộng chart: mỗi điểm cần ít nhất 60px, tối thiểu full container
   const chartWidth = Math.max(600, chartData.length * 60);
   const needScroll = chartData.length > 10;
 
@@ -109,25 +104,6 @@ export default function AdminRevenue() {
         </div>
       </div>
 
-      {/* Bộ lọc số ngày — chỉ hiện khi range = day */}
-      {range === "day" && (
-        <div className="flex gap-2 mb-5">
-          {DAY_OPTIONS.map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => setDayLimit(opt.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                dayLimit === opt.key
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Thẻ tổng */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-5 text-white shadow-lg">
@@ -152,7 +128,6 @@ export default function AdminRevenue() {
         ) : chartData.length === 0 ? (
           <div className="text-center text-gray-400 py-16">Chưa có dữ liệu</div>
         ) : needScroll ? (
-          // Scroll ngang khi nhiều điểm
           <div className="overflow-x-auto pb-2">
             <div style={{ width: chartWidth, height: 300 }}>
               <AreaChart
@@ -188,7 +163,6 @@ export default function AdminRevenue() {
             </div>
           </div>
         ) : (
-
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart
               data={chartData}

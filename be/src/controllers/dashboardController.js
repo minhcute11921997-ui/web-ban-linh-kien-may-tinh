@@ -1,6 +1,5 @@
 const db = require("../config/db");
 
-// Giữ nguyên hàm cũ
 exports.getStats = async (req, res) => {
   try {
     const [[{ totalProducts }]] = await db.query(
@@ -53,11 +52,10 @@ exports.getStats = async (req, res) => {
   }
 };
 
-// ✅ Hàm mới: báo cáo doanh thu theo ngày / tuần / quý
 exports.getRevenueReport = async (req, res) => {
   try {
     const range = req.query.range || "day";
-    const limit = parseInt(req.query.limit) || 30; // ✅ Nhận limit từ FE
+    const limit = parseInt(req.query.limit) || 30;
     let sql = "";
 
     if (range === "day") {
@@ -80,6 +78,17 @@ exports.getRevenueReport = async (req, res) => {
         GROUP BY YEAR(created_at), WEEK(created_at, 1)
         ORDER BY YEAR(created_at) DESC, WEEK(created_at, 1) DESC
         LIMIT 8
+      `;
+    } else if (range === "month") {
+      sql = `
+        SELECT YEAR(created_at) AS year,
+          MONTH(created_at) AS label,
+          COALESCE(SUM(total_price), 0) AS revenue,
+          COUNT(*) AS orders
+        FROM orders WHERE status = 'delivered'
+        GROUP BY YEAR(created_at), MONTH(created_at)
+        ORDER BY YEAR(created_at) DESC, MONTH(created_at) DESC
+        LIMIT 12
       `;
     } else if (range === "quarter") {
       sql = `
