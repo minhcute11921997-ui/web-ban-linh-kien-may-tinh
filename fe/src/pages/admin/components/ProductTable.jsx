@@ -1,3 +1,13 @@
+import {
+  Pencil,
+  Trash2,
+  StopCircle,
+  ToggleRight,
+  ToggleLeft,
+  Tag,
+  PackageX,
+} from "lucide-react";
+
 const ProductTable = ({
   products,
   getCategoryName,
@@ -11,7 +21,7 @@ const ProductTable = ({
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-50 text-gray-500">
-            {["#","Tên sản phẩm","Danh mục","Thương hiệu","Giá","Tồn kho","Giảm giá","Trạng thái","Thao tác"].map(
+            {["#", "Tên sản phẩm", "Danh mục", "Thương hiệu", "Giá", "Tồn kho", "Giảm giá", "Trạng thái", "Thao tác"].map(
               (h) => (
                 <th key={h} className="text-left px-6 py-3 font-medium">{h}</th>
               )
@@ -28,13 +38,24 @@ const ProductTable = ({
                   : "hover:bg-gray-50"
               }`}
             >
+              {/* ID */}
               <td className="px-6 py-3 text-gray-400">{p.id}</td>
+
+              {/* Tên */}
               <td className="px-6 py-3 font-medium text-gray-800 max-w-xs truncate">{p.name}</td>
+
+              {/* Danh mục */}
               <td className="px-6 py-3 text-gray-500">{getCategoryName(p.category_id)}</td>
+
+              {/* Thương hiệu */}
               <td className="px-6 py-3 text-gray-500">{p.brand || "—"}</td>
+
+              {/* Giá */}
               <td className="px-6 py-3 text-blue-600 font-semibold">
                 {Number(p.price).toLocaleString("vi-VN")}₫
               </td>
+
+              {/* Tồn kho */}
               <td className="px-6 py-3">
                 <span
                   className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -48,18 +69,23 @@ const ProductTable = ({
                   {p.stock === 0 ? "Hết hàng" : p.stock}
                 </span>
               </td>
+
+              {/* Giảm giá */}
               <td className="px-6 py-3">
                 {p.discount_percent > 0 &&
                 (!p.discount_expires_at ||
                   new Date(p.discount_expires_at) > new Date()) ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-orange-100 text-orange-600">
+                    <span className="flex items-center gap-0.5 text-xs px-2 py-1 rounded-full font-medium bg-orange-100 text-orange-600">
+                      <Tag size={10} />
                       -{p.discount_percent}%
                     </span>
                     <button
                       onClick={() => onStopSale(p)}
-                      className="text-xs text-red-400 hover:text-red-600 cursor-pointer"
+                      aria-label="Tắt giảm giá"
+                      className="flex items-center gap-0.5 text-xs text-red-400 hover:text-red-600 cursor-pointer transition-colors"
                     >
+                      <StopCircle size={13} />
                       Tắt
                     </button>
                   </div>
@@ -67,40 +93,57 @@ const ProductTable = ({
                   <span className="text-gray-300 text-xs">—</span>
                 )}
               </td>
+
+              {/* Trạng thái */}
               <td className="px-6 py-3">
                 <button
                   onClick={() => onToggleActive(p)}
-                  className={`text-xs px-3 py-1 rounded-full font-medium cursor-pointer transition-colors ${
+                  className={`flex items-center gap-1 text-xs px-3 py-1 rounded-full font-medium cursor-pointer transition-colors ${
                     p.is_active !== 0
                       ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600"
                       : "bg-red-100 text-red-600 hover:bg-green-100 hover:text-green-700"
                   }`}
                 >
-                  {p.is_active !== 0 ? "Đang bán" : "Đã tắt"}
+                  {p.is_active !== 0 ? (
+                    <><ToggleRight size={13} /> Đang bán</>
+                  ) : (
+                    <><ToggleLeft size={13} /> Đã tắt</>
+                  )}
                 </button>
               </td>
+
+              {/* Thao tác */}
               <td className="px-6 py-3">
                 <div className="flex gap-3">
                   <button
                     onClick={() => onEdit(p)}
-                    className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                    aria-label="Sửa sản phẩm"
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium cursor-pointer transition-colors"
                   >
+                    <Pencil size={14} />
                     Sửa
                   </button>
                   <button
                     onClick={() => onDelete(p.id)}
-                    className="text-red-500 hover:text-red-700 font-medium cursor-pointer"
+                    aria-label="Xóa sản phẩm"
+                    className="flex items-center gap-1 text-red-500 hover:text-red-700 font-medium cursor-pointer transition-colors"
                   >
+                    <Trash2 size={14} />
                     Xóa
                   </button>
                 </div>
               </td>
             </tr>
           ))}
+
+          {/* Empty state */}
           {products.length === 0 && (
             <tr>
-              <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
-                Chưa có sản phẩm nào
+              <td colSpan={9} className="px-6 py-10 text-center">
+                <div className="flex flex-col items-center gap-2 text-gray-400">
+                  <PackageX size={32} strokeWidth={1.5} />
+                  <span className="text-sm">Chưa có sản phẩm nào</span>
+                </div>
               </td>
             </tr>
           )}

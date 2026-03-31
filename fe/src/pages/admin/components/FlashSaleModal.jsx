@@ -1,5 +1,16 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import {
+  Zap,
+  X,
+  Percent,
+  Clock,
+  CalendarClock,
+  CheckCheck,
+  Loader2,
+  Tag,
+  PackageCheck,
+} from "lucide-react";
 
 const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
   const [selectedItems, setSelectedItems] = useState(() => {
@@ -50,17 +61,28 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
 
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-800">🏷️ Thiết lập Flash Sale</h2>
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <Zap size={20} className="text-orange-500 fill-orange-500" />
+            Thiết lập Flash Sale
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none cursor-pointer"
-          >×</button>
+            aria-label="Đóng"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-1 transition-colors cursor-pointer"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Controls */}
         <div className="px-6 py-4 border-b border-gray-100 bg-orange-50 flex flex-wrap gap-6 items-end">
+
+          {/* Giảm giá chung */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Giảm giá chung (%)</label>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-1">
+              <Percent size={14} className="text-orange-500" />
+              Giảm giá chung (%)
+            </label>
             <div className="flex gap-2 items-center">
               <input
                 type="number" min="1" max="99"
@@ -76,14 +98,20 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
               <button
                 type="button"
                 onClick={applyDiscountToAll}
-                className="text-xs bg-orange-100 text-orange-600 px-3 py-2 rounded-xl hover:bg-orange-200 cursor-pointer font-medium"
+                className="flex items-center gap-1.5 text-xs bg-orange-100 text-orange-600 px-3 py-2 rounded-xl hover:bg-orange-200 cursor-pointer font-medium transition-colors"
               >
+                <CheckCheck size={14} />
                 Áp dụng tất cả
               </button>
             </div>
           </div>
+
+          {/* Thời gian */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian (giờ)</label>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-1">
+              <Clock size={14} className="text-orange-500" />
+              Thời gian (giờ)
+            </label>
             <input
               type="number" min="1" max="720"
               value={durationHours === 0 ? "" : durationHours}
@@ -96,9 +124,13 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
               className="w-28 border border-gray-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
             />
           </div>
-          <div className="text-sm text-orange-600 font-medium pb-0.5">
-            Kết thúc lúc: <span className="font-bold">{expiresAt}</span>
+
+          {/* Kết thúc lúc */}
+          <div className="flex items-center gap-1.5 text-sm text-orange-600 font-medium pb-0.5">
+            <CalendarClock size={15} className="text-orange-400" />
+            Kết thúc lúc: <span className="font-bold ml-1">{expiresAt}</span>
           </div>
+
         </div>
 
         {/* Table */}
@@ -155,7 +187,8 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-800 truncate max-w-[180px]">{p.name}</span>
                         {p.discount_percent > 0 && (
-                          <span className="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-500 rounded-full">
+                          <span className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 bg-orange-100 text-orange-500 rounded-full">
+                            <Tag size={10} />
                             -{p.discount_percent}% đang sale
                           </span>
                         )}
@@ -169,7 +202,7 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
                     </td>
                     <td className="py-3 text-right">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        p.stock > 10 ? "bg-green-100 text-green-700"
+                        p.stock > 10 ? "bg-blue-100 text-blue-700"
                         : p.stock > 0 ? "bg-yellow-100 text-yellow-700"
                         : "bg-red-100 text-red-700"
                       }`}>
@@ -226,7 +259,8 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-gray-50 rounded-b-2xl">
-          <div className="text-sm text-gray-500">
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <PackageCheck size={16} className="text-orange-400" />
             Đã chọn:{" "}
             <strong className="text-orange-500 text-base">{selectedCount}</strong>{" "}
             / {products.length} sản phẩm
@@ -234,16 +268,27 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="border border-gray-200 text-gray-600 px-5 py-2 rounded-xl text-sm hover:bg-white cursor-pointer"
+              className="flex items-center gap-1.5 border border-gray-200 text-gray-600 px-5 py-2 rounded-xl text-sm hover:bg-white cursor-pointer transition-colors"
             >
+              <X size={15} />
               Hủy
             </button>
             <button
               disabled={submitting || selectedCount === 0}
               onClick={() => onSubmit(selectedItems, durationHours, setSubmitting, onClose)}
-              className="bg-orange-500 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 bg-orange-500 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 disabled:opacity-50 cursor-pointer transition-colors"
             >
-              {submitting ? "Đang xử lý..." : `Bắt đầu Flash Sale (${selectedCount})`}
+              {submitting ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                <>
+                  <Zap size={15} className="fill-white" />
+                  Bắt đầu Flash Sale ({selectedCount})
+                </>
+              )}
             </button>
           </div>
         </div>
