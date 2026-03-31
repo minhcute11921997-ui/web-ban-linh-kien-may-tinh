@@ -77,8 +77,25 @@ const cleanExpiredSales = async () => {
     console.error('Clean expired sales error:', err);
   }
 };
+
+const cleanExpiredRefreshTokens = async () => {
+  try {
+    const [result] = await db.query(
+      'DELETE FROM refresh_tokens WHERE expires_at < NOW()'
+    );
+    if (result.affectedRows > 0) {
+      console.log(`Cleaned ${result.affectedRows} expired refresh tokens`);
+    }
+  } catch (err) {
+    console.error('Clean expired refresh tokens error:', err);
+  }
+};
+
 cleanExpiredSales();
+cleanExpiredRefreshTokens();
+
 setInterval(cleanExpiredSales, 60 * 1000);
+setInterval(cleanExpiredRefreshTokens, 24 * 60 * 60 * 1000);
 app.get('/', (req, res) => {
     res.json({ message: ' Backend API đang chạy!' });
 });
