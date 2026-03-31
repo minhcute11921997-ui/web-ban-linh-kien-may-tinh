@@ -14,7 +14,7 @@ const STATUS_COLOR = {
     pending:    'bg-yellow-100 text-yellow-700 border border-yellow-200',
     processing: 'bg-blue-100 text-blue-700 border border-blue-200',
     shipped:    'bg-blue-100 text-blue-700 border border-blue-200',
-    delivered:  'bg-blue-100 text-blue-700 border border-blue-200',
+    delivered:  'bg-green-100 text-green-700 border border-green-200',
     cancelled:  'bg-red-100 text-red-700 border border-red-200',
 };
 
@@ -28,7 +28,7 @@ const STATUS_LABEL = {
 
 const PAYMENT_STATUS = {
     pending:   { label: 'Chờ thanh toán', color: 'text-yellow-600' },
-    completed: { label: 'Đã thanh toán',  color: 'text-blue-600' },
+    completed: { label: 'Đã thanh toán',  color: 'text-green-600' },
     failed:    { label: 'Thất bại',       color: 'text-red-600' },
 };
 

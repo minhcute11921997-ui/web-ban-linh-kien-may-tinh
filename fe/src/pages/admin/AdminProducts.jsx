@@ -29,7 +29,7 @@ const AdminProducts = () => {
       price: product.price,
       stock: product.stock,
       image_url: product.image_url || "",
-      category_id: product.category_id || "",
+      category_id:product.category_id ? product.category_id.toString() : categories[0]?.id?.toString() || "",
       brand: product.brand || "",
     });
     setEditId(product.id);

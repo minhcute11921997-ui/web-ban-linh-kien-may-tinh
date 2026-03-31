@@ -24,17 +24,7 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 flex flex-col"
-        style={{ background: 'linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%)' }}>
-
-        {/* Logo */}
-        <div className="px-6 py-5 border-b border-white/10">
-          <button onClick={() => navigate('/admin')} className="flex items-center gap-3 cursor-pointer">
-            <div>
-              <h1 className="text-white text-lg font-bold leading-tight">Admin Panel</h1>
-              <p className="text-blue-200 text-xs">Quản trị hệ thống</p>
-            </div>
-          </button>
-        </div>
+        style={{ background: 'linear-gradient(180deg, #1e3a8a 100%)' }}>
 
         {/* Menu */}
         <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
@@ -63,10 +53,6 @@ const AdminLayout = () => {
               <p className="text-blue-200 text-xs">Quản trị viên</p>
             </div>
           </div>
-          <button onClick={() => navigate('/')}
-            className="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 transition-all w-full cursor-pointer">
-            Về trang chủ
-          </button>
         </div>
       </aside>
 
@@ -82,11 +68,8 @@ const AdminLayout = () => {
             <p className="text-xs text-gray-400">Quản trị viên hệ thống</p>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
-              Online
-            </span>
             <button onClick={handleLogout}
-              className="text-sm bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 font-medium transition-colors cursor-pointer px-3 py-1.5 rounded-lg">
+              className="text-sm bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-700 font-medium transition-colors cursor-pointer px-3 py-1.5 rounded-lg">
               Đăng xuất
             </button>
           </div>
