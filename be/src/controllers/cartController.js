@@ -147,7 +147,33 @@ exports.updateCartItem = async (req, res) => {
         if (carts.length === 0) {
             return res.status(403).json({ success: false, message: 'Không có quyền thực hiện' });
         }
-        
+
+        // Lấy product_id từ cart_item để kiểm tra stock
+        const [cartItems] = await db.query(
+            'SELECT product_id FROM cart_items WHERE id = ? AND cart_id = ?',
+            [req.params.id, carts[0].id]
+        );
+        if (cartItems.length === 0) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm trong giỏ' });
+        }
+
+        //Kiểm tra stock thực tế trong database
+        const [products] = await db.query(
+            'SELECT stock FROM products WHERE id = ?',
+            [cartItems[0].product_id]
+        );
+        if (products.length === 0) {
+            return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
+        }
+
+        if (quantity > products[0].stock) {
+            return res.status(400).json({
+                success: false,
+                message: `Chỉ còn ${products[0].stock} sản phẩm trong kho`,
+                maxStock: products[0].stock
+            });
+        }
+
         const [result] = await db.query(
             'UPDATE cart_items SET quantity = ? WHERE id = ? AND cart_id = ?',
             [quantity, req.params.id, carts[0].id]
