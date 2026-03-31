@@ -47,7 +47,7 @@ const RANGES = [
 
 export default function AdminRevenue() {
   const [range, setRange] = useState("day");
-  const [dayLimit, setDayLimit] = useState(7); // chỉ áp dụng khi range === "day"
+  const [dayLimit, setDayLimit] = useState(7);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,7 +80,7 @@ export default function AdminRevenue() {
   const totalRevenue = rows.reduce((s, r) => s + Number(r.revenue || 0), 0);
   const totalOrders = rows.reduce((s, r) => s + Number(r.orders || 0), 0);
 
-  // ✅ Tính độ rộng chart: mỗi điểm cần ít nhất 60px, tối thiểu full container
+  //Tính độ rộng chart: mỗi điểm cần ít nhất 60px, tối thiểu full container
   const chartWidth = Math.max(600, chartData.length * 60);
   const needScroll = chartData.length > 10;
 
@@ -152,7 +152,7 @@ export default function AdminRevenue() {
         ) : chartData.length === 0 ? (
           <div className="text-center text-gray-400 py-16">Chưa có dữ liệu</div>
         ) : needScroll ? (
-          // ✅ Scroll ngang khi nhiều điểm
+          // Scroll ngang khi nhiều điểm
           <div className="overflow-x-auto pb-2">
             <div style={{ width: chartWidth, height: 300 }}>
               <AreaChart
@@ -188,7 +188,7 @@ export default function AdminRevenue() {
             </div>
           </div>
         ) : (
-          // ✅ Responsive bình thường khi ít điểm
+
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart
               data={chartData}

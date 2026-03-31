@@ -130,7 +130,7 @@ const AdminUsers = () => {
                       className="border border-gray-200 px-2 py-1 rounded-lg text-sm">
                       <option value="customer">Khách hàng</option>
                       <option value="admin">Admin</option>
-                      <option value="user">User</option>
+              
                     </select>
                   ) : (
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${ROLE_COLOR[u.role] || 'bg-gray-100 text-gray-700'}`}>

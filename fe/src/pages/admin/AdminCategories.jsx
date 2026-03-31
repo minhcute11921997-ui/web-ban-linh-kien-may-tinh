@@ -72,7 +72,7 @@ const AdminCategories = () => {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white border border-gray-100 rounded-2xl p-6 mb-6 shadow-sm">
           <h2 className="font-semibold text-lg text-gray-800 mb-4">
-            {editId ? '✏️ Chỉnh sửa danh mục' : '➕ Thêm danh mục mới'}
+            {editId ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

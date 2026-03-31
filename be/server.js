@@ -59,6 +59,11 @@ app.use('/api/users', userRoutes);
 
 const dashboardRoutes = require('./src/routes/dashboard');
 app.use('/api/dashboard', dashboardRoutes);
+
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 const cleanExpiredSales = async () => {
   try {
     await db.query(
