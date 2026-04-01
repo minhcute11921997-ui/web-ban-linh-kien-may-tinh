@@ -2,22 +2,21 @@ import { create } from 'zustand';
 import axiosInstance from '../api/config';
 
 const useAuthStore = create((set, get) => ({
-  user: null,
-  token: null,
+  user:         null,
+  token:        null,
   refreshToken: null,
-  isLoading: true,
-  initialized: false,
+  isLoading:    true,
+  initialized:  false,
 
-  //  THÊM — LoginPage gọi setAuth sau login
   setAuth: (user, token, refreshToken) => {
     localStorage.setItem('token', token);
     if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
     set({ user, token, refreshToken, initialized: true, isLoading: false });
   },
 
-  setUser: (user) => set({ user }),
-  setToken: (token) => set({ token }),
-  setIsLoading: (isLoading) => set({ isLoading }),
+  setUser:      (user)  => set({ user }),
+  setToken:     (token) => set({ token }),
+  setIsLoading: (v)     => set({ isLoading: v }),
 
   logout: () => {
     localStorage.removeItem('token');
@@ -26,33 +25,39 @@ const useAuthStore = create((set, get) => ({
   },
 
   initAuth: async () => {
-    // Nếu đã initialized rồi (vừa login xong) → không gọi lại
     if (get().initialized) {
       set({ isLoading: false });
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) {
       set({ isLoading: false, initialized: true });
       return;
     }
+
     try {
       const res = await axiosInstance.get('/auth/profile');
+
+
+      const currentToken        = localStorage.getItem('token');
+      const currentRefreshToken = localStorage.getItem('refreshToken');
+
       set({
-        user: res.data.user || res.data,
-        token,
-        initialized: true,
+        user:         res.data.user || res.data,
+        token:        currentToken,
+        refreshToken: currentRefreshToken,
+        initialized:  true,
       });
-    } catch (error) {
-      console.error('initAuth failed =', error.response?.status, error.response?.data);
+    } catch {
+      // Interceptor đã xử lý redirect nếu refresh thất bại
       localStorage.removeItem('token');
-      set({ user: null, token: null, initialized: true });
+      localStorage.removeItem('refreshToken');
+      set({ user: null, token: null, refreshToken: null, initialized: true });
     } finally {
       set({ isLoading: false });
     }
   },
 }));
-
 
 export default useAuthStore;

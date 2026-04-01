@@ -60,6 +60,9 @@ app.use('/api/users', userRoutes);
 const dashboardRoutes = require('./src/routes/dashboard');
 app.use('/api/dashboard', dashboardRoutes);
 
+const addressRoutes = require('./src/routes/address');
+app.use('/api/addresses', addressRoutes);
+
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

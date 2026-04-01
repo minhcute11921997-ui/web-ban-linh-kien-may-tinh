@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getMyOrders } from '../api/orderApi';
+import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 import {
-  ShoppingBag,
-  Clock,
-  Loader2,
-  Truck,
-  BadgeCheck,
-  XCircle,
-  PackageSearch,
-  Banknote,
-  Landmark,
-  ChevronRight,
+  ShoppingBag, Clock, Loader2, Truck, BadgeCheck, XCircle,
+  PackageSearch, Banknote, Landmark, ChevronRight,
 } from 'lucide-react';
 
 const TABS = [
@@ -60,24 +53,31 @@ const TAB_ICON = {
 };
 
 const OrdersPage = () => {
-  const [orders, setOrders]     = useState([]);
-  const [loading, setLoading]   = useState(true);
+  const { token } = useAuthStore();
+  const [orders, setOrders]       = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [activeTab, setActiveTab] = useState('active');
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    if (!token) {
+      navigate('/login', { replace: true });
+      return;
+    }
+
     getMyOrders()
       .then(res => setOrders(res.data.data || []))
-      .catch(() => toast.error('Không thể tải đơn hàng!'))
+      .catch(err => {
+        
+        if (err?.response?.status === 401 || err?.message === 'No refresh token') return;
+        toast.error('Không thể tải đơn hàng, vui lòng thử lại!');
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
-  const getTabOrders = (tabKey) => {
-    const tab = TABS.find(t => t.key === tabKey);
-    return orders.filter(o => tab.statuses.includes(o.status || o.order_status));
-  };
-
-  const getTabCount  = (tabKey) => getTabOrders(tabKey).length;
+  const getTabOrders   = (key) => orders.filter(o => TABS.find(t => t.key === key)?.statuses.includes(o.status || o.order_status));
+  const getTabCount    = (key) => getTabOrders(key).length;
   const filteredOrders = getTabOrders(activeTab);
 
   if (loading) return (
@@ -89,8 +89,6 @@ const OrdersPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-
-      {/* Tiêu đề */}
       <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 mb-6">
         <ShoppingBag size={24} className="text-blue-500" />
         Đơn Hàng Của Bạn
@@ -99,15 +97,11 @@ const OrdersPage = () => {
       {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-6">
         {TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             className={`relative flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors
               ${activeTab === tab.key
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
-          >
+                : 'text-gray-500 hover:text-gray-700'}`}>
             {TAB_ICON[tab.key]}
             {tab.label}
             {getTabCount(tab.key) > 0 && (
@@ -137,14 +131,10 @@ const OrdersPage = () => {
             const payStatus   = PAYMENT_STATUS[order.payment_status] || PAYMENT_STATUS.pending;
 
             return (
-              <div
-                key={order.id}
+              <div key={order.id}
                 onClick={() => navigate(`/orders/${order.id}`)}
-                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all duration-200"
-              >
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all duration-200">
                 <div className="flex justify-between items-start gap-4">
-
-                  {/* Trái */}
                   <div className="space-y-1.5">
                     <p className="font-bold text-gray-800 text-lg">Đơn hàng #{order.id}</p>
                     <p className="flex items-center gap-1 text-gray-400 text-sm">
@@ -161,8 +151,6 @@ const OrdersPage = () => {
                       </span>
                     </p>
                   </div>
-
-                  {/* Phải */}
                   <div className="flex flex-col items-end gap-2">
                     <span className={`flex items-center gap-1 text-xs px-3 py-1 rounded-full font-semibold ${STATUS_COLOR[orderStatus] || 'bg-gray-100 text-gray-600'}`}>
                       {STATUS_ICON[orderStatus]}
@@ -175,7 +163,6 @@ const OrdersPage = () => {
                       Xem chi tiết <ChevronRight size={13} />
                     </span>
                   </div>
-
                 </div>
               </div>
             );
