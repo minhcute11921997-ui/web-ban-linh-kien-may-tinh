@@ -174,7 +174,7 @@ const updateProduct = async (req, res) => {
         const flashQty    = discountPct > 0 ? (flash_sale_qty    ?? null) : null;
         const [result] = await db.query(
             'UPDATE products SET name=?, description=?, price=?, stock=?,image_url=?, category_id=?, brand=?, discount_percent=?,discount_expires_at=?, flash_sale_qty=?, is_featured=? WHERE id=?',
-            [name, description, price, stock, image_url, category_id, brand, discount_percent || 0, is_featured || 0, req.params.id]
+            [name, description, price, stock, image_url, category_id, brand, discountPct, expiresAt, flashQty, is_featured || 0, req.params.id]
         );
         if (result.affectedRows === 0)
             return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
