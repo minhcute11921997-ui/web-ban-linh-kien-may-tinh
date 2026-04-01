@@ -11,7 +11,6 @@ import slide1 from "../assets/slide1.png";
 import slide2 from "../assets/slide2.png";
 import slide3 from "../assets/slide3.png";
 import {
-  Star,
   Zap,
   Clock,
   LayoutGrid,
@@ -333,20 +332,6 @@ export default function HomePage() {
       .catch(() => {});
   }, []);
 
-  const handleAddToCart = async (product) => {
-    if (!token) {
-      toast.warning("Vui lòng đăng nhập để thêm giỏ hàng!");
-      navigate("/login");
-      return;
-    }
-    try {
-      await addItem(product.id, 1);
-      toast.success(`Đã thêm "${product.name}" vào giỏ hàng!`);
-    } catch (err) {
-      toast.error(err?.message || "Thêm giỏ hàng thất bại!");
-    }
-  };
-
   return (
     <div className="p-4">
       {/* ── Banner Slider ── */}
@@ -411,7 +396,6 @@ export default function HomePage() {
       {featuredProducts.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <Star size={18} className="text-yellow-400 fill-yellow-400" />
             <h2 className="text-lg font-bold text-gray-800">
               Sản phẩm nổi bật
             </h2>
