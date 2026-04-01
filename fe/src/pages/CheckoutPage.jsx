@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import axios from 'axios';
-import useAuthStore from '../store/authStore';
-import useCartStore from '../store/cartStore';
-import { discountApi } from '../api/discountApi';
-import AddressSelector from '../components/AddressSelector';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axiosInstance from "../api/config";
+import useAuthStore from "../store/authStore";
+import useCartStore from "../store/cartStore";
+import { discountApi } from "../api/discountApi";
+import AddressSelector from "../components/AddressSelector";
 import {
   CreditCard,
   ShoppingBag,
@@ -21,81 +21,119 @@ import {
   Loader2,
   LogIn,
   PackageOpen,
-} from 'lucide-react';
+} from "lucide-react";
 
-const labelCls = "flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-2";
-const inputCls = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500";
+const labelCls =
+  "flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-2";
+const inputCls =
+  "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { token } = useAuthStore();
-  const { items, loading: cartLoading, fetchCart, selectedItems } = useCartStore();
-  const [loading, setLoading]           = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cod');
-  const [discountCode, setDiscountCode]   = useState('');
+  const {
+    items,
+    loading: cartLoading,
+    fetchCart,
+    selectedItems,
+  } = useCartStore();
+  const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
 
-  const [customerName, setCustomerName]       = useState('');
-  const [customerPhone, setCustomerPhone]     = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
-  const [customerNotes, setCustomerNotes]     = useState('');
-  const [shippingFee, setShippingFee]         = useState(0);
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [customerNotes, setCustomerNotes] = useState("");
+  const [shippingFee, setShippingFee] = useState(0);
 
   const calculateShippingFee = (address) => {
-    if (!address.trim()) { setShippingFee(0); return; }
-    const hanoi = ['hà nội', 'ha noi', 'hn', 'hanoi', 'hànội'];
-    setShippingFee(hanoi.some(c => address.toLowerCase().includes(c)) ? 50000 : 100000);
+    if (!address.trim()) {
+      setShippingFee(0);
+      return;
+    }
+    const hanoi = ["hà nội", "ha noi", "hn", "hanoi", "hànội"];
+    setShippingFee(
+      hanoi.some((c) => address.toLowerCase().includes(c)) ? 50000 : 100000
+    );
   };
 
-  useEffect(() => { if (token) fetchCart(); }, [token]);
+  useEffect(() => {
+    if (token) fetchCart();
+  }, [token]);
 
-  const cartItems  = items.filter(item => selectedItems.includes(item.id));
-  const subtotal   = cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+  const cartItems = items.filter((item) => selectedItems.includes(item.id));
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0
+  );
   const finalTotal = Math.max(0, subtotal + shippingFee - discountAmount);
 
   const handleApplyDiscount = async () => {
-    if (!discountCode.trim()) { toast.warning('Vui lòng nhập mã giảm giá'); return; }
+    if (!discountCode.trim()) {
+      toast.warning("Vui lòng nhập mã giảm giá");
+      return;
+    }
     try {
-      const response = await discountApi.validateDiscount(discountCode.toUpperCase(), subtotal);
+      const response = await discountApi.validateDiscount(
+        discountCode.toUpperCase(),
+        subtotal
+      );
       const { data } = response.data;
       setDiscountAmount(Number(data.discountAmount) || 0);
       toast.success(`Áp dụng thành công! ${data.description}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Mã giảm giá không hợp lệ');
+      toast.error(error.response?.data?.message || "Mã giảm giá không hợp lệ");
       setDiscountAmount(0);
     }
   };
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0)       { toast.error('Giỏ hàng trống!'); return; }
-    if (!customerName.trim())         { toast.error('Vui lòng nhập tên người nhận!'); return; }
-    if (!customerPhone.trim())        { toast.error('Vui lòng nhập số điện thoại!'); return; }
-    if (!customerAddress.trim())      { toast.error('Vui lòng nhập địa chỉ giao hàng!'); return; }
+    if (cartItems.length === 0) {
+      toast.error("Giỏ hàng trống!");
+      return;
+    }
+    if (!customerName.trim()) {
+      toast.error("Vui lòng nhập tên người nhận!");
+      return;
+    }
+    if (!customerPhone.trim()) {
+      toast.error("Vui lòng nhập số điện thoại!");
+      return;
+    }
+    if (!customerAddress.trim()) {
+      toast.error("Vui lòng nhập địa chỉ giao hàng!");
+      return;
+    }
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        '/api/payments/create-order',
-        {
-          paymentMethod, clientIp: '127.0.0.1',
-          cartItemIds: cartItems.map(i => i.id),
-          customerName, customerPhone, customerAddress,
-          customerNotes, shippingFee, discountAmount,
-          discount_code: discountCode || null,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axiosInstance.post("/payments/create-order", {
+        paymentMethod,
+        clientIp: "127.0.0.1",
+        cartItemIds: cartItems.map((i) => i.id),
+        customerName,
+        customerPhone,
+        customerAddress,
+        customerNotes,
+        shippingFee,
+        discountAmount,
+        discount_code: discountCode || null,
+      });
       if (response.data.success) {
         await fetchCart();
-        if (paymentMethod === 'cod') {
-          toast.success('Đặt hàng thành công!');
-          navigate(`/payment-success?orderId=${response.data.orderId}&method=cod`);
-        } else if (paymentMethod === 'vnpay' && response.data.paymentUrl) {
+        if (paymentMethod === "cod") {
+          toast.success("Đặt hàng thành công!");
+          navigate(
+            `/payment-success?orderId=${response.data.orderId}&method=cod`
+          );
+        } else if (paymentMethod === "vnpay" && response.data.paymentUrl) {
           window.location.href = response.data.paymentUrl;
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Lỗi tạo đơn hàng');
+      toast.error(error.response?.data?.message || "Lỗi tạo đơn hàng");
     } finally {
       setLoading(false);
     }
@@ -104,7 +142,6 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-4">
-
         {/* Tiêu đề */}
         <h1 className="flex items-center gap-3 text-3xl font-bold mb-8">
           <CreditCard size={30} className="text-blue-600" />
@@ -116,28 +153,26 @@ const CheckoutPage = () => {
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <div className="flex flex-col items-center gap-3 text-gray-400 mb-6">
               <LogIn size={48} strokeWidth={1.5} />
-              <p className="text-gray-500 text-lg">Vui lòng đăng nhập để thanh toán</p>
+              <p className="text-gray-500 text-lg">
+                Vui lòng đăng nhập để thanh toán
+              </p>
             </div>
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
               className="flex items-center gap-2 mx-auto bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
             >
               <LogIn size={18} /> Đăng nhập
             </button>
           </div>
-
         ) : cartLoading ? (
           <div className="flex flex-col justify-center items-center min-h-[400px] gap-3 text-gray-400">
             <Loader2 size={36} className="animate-spin text-blue-500" />
             <p className="text-base">Đang tải giỏ hàng...</p>
           </div>
-
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
             {/* Cột trái */}
             <div className="lg:col-span-2 space-y-6">
-
               {/* Danh sách sản phẩm */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="flex items-center gap-2 text-xl font-bold mb-6">
@@ -151,26 +186,39 @@ const CheckoutPage = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cartItems.map(item => (
-                      <div key={item.id} className="flex gap-4 border-b pb-4 items-start">
+                    {cartItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex gap-4 border-b pb-4 items-start"
+                      >
                         <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                           <img
-                            src={item.image_url || 'https://via.placeholder.com/100'}
+                            src={
+                              item.image_url ||
+                              "https://via.placeholder.com/100"
+                            }
                             alt={item.product_name || item.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="flex-1 flex justify-between">
                           <div>
-                            <h3 className="font-semibold text-gray-900">{item.product_name || item.name}</h3>
-                            <p className="text-gray-500 text-sm mt-1">SL: {item.quantity}</p>
+                            <h3 className="font-semibold text-gray-900">
+                              {item.product_name || item.name}
+                            </h3>
+                            <p className="text-gray-500 text-sm mt-1">
+                              SL: {item.quantity}
+                            </p>
                             <p className="text-blue-600 font-semibold mt-2">
-                              {Number(item.price).toLocaleString('vi-VN')} ₫/cái
+                              {Number(item.price).toLocaleString("vi-VN")} ₫/cái
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-lg">
-                              {(item.price * item.quantity).toLocaleString('vi-VN')} ₫
+                              {(item.price * item.quantity).toLocaleString(
+                                "vi-VN"
+                              )}{" "}
+                              ₫
                             </p>
                           </div>
                         </div>
@@ -187,7 +235,6 @@ const CheckoutPage = () => {
                   Thông Tin Giao Hàng
                 </h2>
                 <div className="space-y-4">
-
                   {/* Tên người nhận */}
                   <div>
                     <label className={labelCls}>
@@ -195,9 +242,14 @@ const CheckoutPage = () => {
                       Tên người nhận <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      <input type="text" value={customerName}
-                        onChange={e => setCustomerName(e.target.value)}
+                      <User
+                        size={15}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                      />
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
                         placeholder="Nhập tên người nhận"
                         className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
@@ -211,9 +263,14 @@ const CheckoutPage = () => {
                       Số điện thoại <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      <input type="tel" value={customerPhone}
-                        onChange={e => setCustomerPhone(e.target.value)}
+                      <Phone
+                        size={15}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                      />
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
                         placeholder="Nhập số điện thoại"
                         className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
@@ -226,12 +283,20 @@ const CheckoutPage = () => {
                       <MapPin size={14} className="text-blue-500" />
                       Địa chỉ giao hàng <span className="text-red-500">*</span>
                     </label>
-                    <AddressSelector onChange={(addr) => { setCustomerAddress(addr); calculateShippingFee(addr); }} />
+                    <AddressSelector
+                      onChange={(addr) => {
+                        setCustomerAddress(addr);
+                        calculateShippingFee(addr);
+                      }}
+                    />
                     {shippingFee > 0 && (
                       <p className="flex items-center gap-1.5 text-sm text-blue-700 mt-2">
                         <Truck size={14} className="text-blue-500" />
-                        Phí vận chuyển: <strong>{shippingFee.toLocaleString('vi-VN')} ₫</strong>
-                        {shippingFee === 50000 ? ' (Nội thành Hà Nội)' : ' (Tỉnh thành khác)'}
+                        Phí vận chuyển:{" "}
+                        <strong>{shippingFee.toLocaleString("vi-VN")} ₫</strong>
+                        {shippingFee === 50000
+                          ? " (Nội thành Hà Nội)"
+                          : " (Tỉnh thành khác)"}
                       </p>
                     )}
                   </div>
@@ -242,8 +307,9 @@ const CheckoutPage = () => {
                       <FileText size={14} className="text-blue-500" />
                       Ghi chú đơn hàng
                     </label>
-                    <textarea value={customerNotes}
-                      onChange={e => setCustomerNotes(e.target.value)}
+                    <textarea
+                      value={customerNotes}
+                      onChange={(e) => setCustomerNotes(e.target.value)}
                       placeholder="Nhập ghi chú (tuỳ chọn)"
                       rows="2"
                       className={`${inputCls} resize-none`}
@@ -269,15 +335,24 @@ const CheckoutPage = () => {
                   </label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Tag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      <input type="text" value={discountCode}
-                        onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                      <Tag
+                        size={14}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                      />
+                      <input
+                        type="text"
+                        value={discountCode}
+                        onChange={(e) =>
+                          setDiscountCode(e.target.value.toUpperCase())
+                        }
                         placeholder="Nhập mã giảm giá"
                         className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                       />
                     </div>
-                    <button onClick={handleApplyDiscount}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
+                    <button
+                      onClick={handleApplyDiscount}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm"
+                    >
                       <CheckCircle size={14} /> Áp dụng
                     </button>
                   </div>
@@ -287,14 +362,18 @@ const CheckoutPage = () => {
                 <div className="mb-6 pb-6 border-b border-gray-200 space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tạm tính:</span>
-                    <span className="font-semibold">{subtotal.toLocaleString('vi-VN')} ₫</span>
+                    <span className="font-semibold">
+                      {subtotal.toLocaleString("vi-VN")} ₫
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="flex items-center gap-1 text-gray-600">
                       <Truck size={13} /> Phí vận chuyển:
                     </span>
                     <span className="font-semibold">
-                      {shippingFee === 0 ? 'Chưa xác định' : `${shippingFee.toLocaleString('vi-VN')} ₫`}
+                      {shippingFee === 0
+                        ? "Chưa xác định"
+                        : `${shippingFee.toLocaleString("vi-VN")} ₫`}
                     </span>
                   </div>
                   {discountAmount > 0 && (
@@ -302,12 +381,16 @@ const CheckoutPage = () => {
                       <span className="flex items-center gap-1">
                         <Tag size={13} /> Giảm giá:
                       </span>
-                      <span className="font-semibold">-{discountAmount.toLocaleString('vi-VN')} ₫</span>
+                      <span className="font-semibold">
+                        -{discountAmount.toLocaleString("vi-VN")} ₫
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span>Thành tiền:</span>
-                    <span className="text-blue-600">{finalTotal.toLocaleString('vi-VN')} ₫</span>
+                    <span className="text-blue-600">
+                      {finalTotal.toLocaleString("vi-VN")} ₫
+                    </span>
                   </div>
                 </div>
 
@@ -316,16 +399,27 @@ const CheckoutPage = () => {
                   {/* COD */}
                   <label
                     className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{ borderColor: paymentMethod === 'cod' ? '#3b82f6' : '#e5e7eb', backgroundColor: paymentMethod === 'cod' ? '#eff6ff' : 'transparent' }}
+                    style={{
+                      borderColor:
+                        paymentMethod === "cod" ? "#3b82f6" : "#e5e7eb",
+                      backgroundColor:
+                        paymentMethod === "cod" ? "#eff6ff" : "transparent",
+                    }}
                   >
-                    <input type="radio" name="payment" value="cod"
-                      checked={paymentMethod === 'cod'}
-                      onChange={e => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4" />
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cod"
+                      checked={paymentMethod === "cod"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4"
+                    />
                     <div className="ml-3 flex items-start gap-2">
                       <div>
                         <p className="font-semibold">Tiền Mặt</p>
-                        <p className="text-sm text-gray-500">Thanh toán khi nhận hàng</p>
+                        <p className="text-sm text-gray-500">
+                          Thanh toán khi nhận hàng
+                        </p>
                       </div>
                     </div>
                   </label>
@@ -333,16 +427,27 @@ const CheckoutPage = () => {
                   {/* VNPay */}
                   <label
                     className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{ borderColor: paymentMethod === 'vnpay' ? '#3b82f6' : '#e5e7eb', backgroundColor: paymentMethod === 'vnpay' ? '#eff6ff' : 'transparent' }}
+                    style={{
+                      borderColor:
+                        paymentMethod === "vnpay" ? "#3b82f6" : "#e5e7eb",
+                      backgroundColor:
+                        paymentMethod === "vnpay" ? "#eff6ff" : "transparent",
+                    }}
                   >
-                    <input type="radio" name="payment" value="vnpay"
-                      checked={paymentMethod === 'vnpay'}
-                      onChange={e => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4" />
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="vnpay"
+                      checked={paymentMethod === "vnpay"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4"
+                    />
                     <div className="ml-3 flex items-start gap-2">
                       <div>
                         <p className="font-semibold">VNPay</p>
-                        <p className="text-sm text-gray-500">Thẻ ngân hàng, ví điện tử</p>
+                        <p className="text-sm text-gray-500">
+                          Thẻ ngân hàng, ví điện tử
+                        </p>
                       </div>
                     </div>
                   </label>
@@ -355,14 +460,19 @@ const CheckoutPage = () => {
                   className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition"
                 >
                   {loading ? (
-                    <><Loader2 size={18} className="animate-spin" /> Đang xử lý...</>
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Đang xử
+                      lý...
+                    </>
                   ) : (
-                    <><CreditCard size={18} /> Thanh Toán Ngay</>
+                    <>
+                      <CreditCard size={18} /> Thanh Toán Ngay
+                    </>
                   )}
                 </button>
 
                 <button
-                  onClick={() => navigate('/cart')}
+                  onClick={() => navigate("/cart")}
                   className="w-full mt-3 flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
                 >
                   <ArrowLeft size={16} /> Quay Lại Giỏ Hàng
