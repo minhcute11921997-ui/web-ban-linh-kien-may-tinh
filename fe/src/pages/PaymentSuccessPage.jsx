@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
 
 const STATUS_LABEL = {
-    pending:    'Chờ xử lý',
+    pending: 'Chờ xử lý',
     processing: 'Đang xử lý',
-    shipped:    'Đang giao',
-    delivered:  'Đã giao',
-    cancelled:  'Đã hủy',
+    shipped: 'Đang giao',
+    delivered: 'Đã giao',
+    cancelled: 'Đã hủy',
 };
 
 const PaymentSuccessPage = () => {
@@ -36,9 +36,7 @@ const PaymentSuccessPage = () => {
             return;
         }
 
-        axios.get(`/api/payments/${orderId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        axiosInstance.get(`/payments/${orderId}`)
             .then(res => {
                 if (res.data.success) {
                     setOrder(res.data.data);
