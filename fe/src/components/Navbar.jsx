@@ -1,9 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
-import useAuthStore from '../store/authStore';
-import useCartStore from '../store/cartStore';
-import logo2 from '../assets/logo2.png';
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import useAuthStore from "../store/authStore";
+import useCartStore from "../store/cartStore";
+import logo2 from "../assets/logo1.png";
 import {
   ShoppingCart,
   Package,
@@ -14,8 +14,8 @@ import {
   ClipboardList,
   ChevronDown,
   LogIn,
-  UserPlus
-} from 'lucide-react';
+  UserPlus,
+} from "lucide-react";
 
 const Navbar = () => {
   const { user, logout, token } = useAuthStore();
@@ -31,21 +31,25 @@ const Navbar = () => {
         setShowDropdown(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    if (!user || !token) { setActiveOrderCount(0); return; }
+    if (!user || !token) {
+      setActiveOrderCount(0);
+      return;
+    }
     const fetchOrderCount = () => {
-      axios.get('/api/orders/my-orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => {
+      axios
+        .get("/api/orders/my-orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
           const orders = res.data.data || [];
-          const count = orders.filter(o => {
+          const count = orders.filter((o) => {
             const s = o.status || o.order_status;
-            return ['pending', 'processing', 'shipped'].includes(s);
+            return ["pending", "processing", "shipped"].includes(s);
           }).length;
           setActiveOrderCount(count);
         })
@@ -58,14 +62,15 @@ const Navbar = () => {
 
   useEffect(() => {
     if (items.length > 0 && user && token) {
-      axios.get('/api/orders/my-orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => {
+      axios
+        .get("/api/orders/my-orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
           const orders = res.data.data || [];
-          const count = orders.filter(o => {
+          const count = orders.filter((o) => {
             const s = o.status || o.order_status;
-            return ['pending', 'processing', 'shipped'].includes(s);
+            return ["pending", "processing", "shipped"].includes(s);
           }).length;
           setActiveOrderCount(count);
         })
@@ -76,21 +81,24 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setShowDropdown(false);
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleLogoClick = () => {
-    window.dispatchEvent(new Event('resetHomeFilters'));
-    navigate('/');
+    window.dispatchEvent(new Event("resetHomeFilters"));
+    navigate("/");
   };
 
   return (
     <nav className="bg-blue-600 text-white shadow">
       <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-between">
-
         {/* Logo */}
         <button onClick={handleLogoClick} className="cursor-pointer">
-          <img src={logo2} alt="PC Shop" className="h-14 w-auto object-contain" />
+          <img
+            src={logo2}
+            alt="PC Shop"
+            className="h-14 w-auto object-contain"
+          />
         </button>
 
         <div className="flex items-center gap-1">
@@ -106,7 +114,7 @@ const Navbar = () => {
                 <span className="text-xs font-medium">Giỏ Hàng</span>
                 {items.length > 0 && (
                   <span className="absolute top-1 right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                    {items.length > 9 ? '9+' : items.length}
+                    {items.length > 9 ? "9+" : items.length}
                   </span>
                 )}
               </Link>
@@ -121,19 +129,25 @@ const Navbar = () => {
                 <span className="text-xs font-medium">Đơn Hàng</span>
                 {activeOrderCount > 0 && (
                   <span className="absolute top-1 right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                    {activeOrderCount > 9 ? '9+' : activeOrderCount}
+                    {activeOrderCount > 9 ? "9+" : activeOrderCount}
                   </span>
                 )}
               </Link>
 
               {/* Admin */}
-              {user.role === 'admin' && (
+              {user.role === "admin" && (
                 <Link
                   to="/admin"
                   className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl hover:bg-white/20 transition-colors min-w-[70px]"
                 >
-                  <ShieldCheck size={20} strokeWidth={1.8} className="text-yellow-300" />
-                  <span className="text-xs font-medium text-yellow-300">Admin</span>
+                  <ShieldCheck
+                    size={20}
+                    strokeWidth={1.8}
+                    className="text-yellow-300"
+                  />
+                  <span className="text-xs font-medium text-yellow-300">
+                    Admin
+                  </span>
                 </Link>
               )}
 
@@ -147,7 +161,9 @@ const Navbar = () => {
                     <User size={20} strokeWidth={1.8} />
                     <ChevronDown
                       size={10}
-                      className={`absolute -bottom-1 -right-2 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`}
+                      className={`absolute -bottom-1 -right-2 transition-transform duration-200 ${
+                        showDropdown ? "rotate-180" : ""
+                      }`}
                     />
                   </div>
                   <span className="text-xs font-medium truncate max-w-[80px]">
@@ -161,14 +177,18 @@ const Navbar = () => {
                     <div className="px-4 py-4 bg-gradient-to-br from-blue-500 to-blue-700 text-white">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
-                          {(user.full_name || user.username)?.slice(-1)?.toUpperCase()}
+                          {(user.full_name || user.username)
+                            ?.slice(-1)
+                            ?.toUpperCase()}
                         </div>
                         <div>
                           <p className="font-semibold text-sm leading-tight">
                             {user.full_name || user.username}
                           </p>
                           <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full mt-1 inline-block">
-                            {user.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
+                            {user.role === "admin"
+                              ? "Quản trị viên"
+                              : "Khách hàng"}
                           </span>
                         </div>
                       </div>
@@ -181,11 +201,14 @@ const Navbar = () => {
                         onClick={() => setShowDropdown(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
                       >
-                        <User size={16} className="text-gray-400 group-hover:text-blue-500" />
+                        <User
+                          size={16}
+                          className="text-gray-400 group-hover:text-blue-500"
+                        />
                         Thông tin tài khoản
                       </Link>
 
-                      {user.role === 'admin' && (
+                      {user.role === "admin" && (
                         <>
                           <Link
                             to="/admin/products"
@@ -200,7 +223,10 @@ const Navbar = () => {
                             onClick={() => setShowDropdown(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
                           >
-                            <ClipboardList size={16} className="text-gray-400" />
+                            <ClipboardList
+                              size={16}
+                              className="text-gray-400"
+                            />
                             Quản lý đơn hàng
                           </Link>
                         </>
@@ -240,7 +266,6 @@ const Navbar = () => {
             </>
           )}
         </div>
-
       </div>
     </nav>
   );
