@@ -68,7 +68,7 @@ const cleanExpiredSales = async () => {
   try {
     await db.query(
       `UPDATE products 
-       SET discount_percent = 0, discount_expires_at = NULL 
+       SET discount_percent = 0, discount_expires_at = NULL,flash_sale_qty = NULL 
        WHERE discount_percent > 0 
        AND discount_expires_at IS NOT NULL 
        AND discount_expires_at < NOW()`

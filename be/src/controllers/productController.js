@@ -132,6 +132,7 @@ const getOnSaleProducts = async (req, res) => {
        WHERE p.discount_percent > 0 
   AND p.stock > 0 AND p.is_active = 1
   AND (p.flash_sale_qty IS NULL OR p.flash_sale_qty > 0)
+  AND (p.discount_expires_at IS NULL OR p.discount_expires_at > NOW()) 
        ORDER BY p.discount_percent DESC LIMIT 20`
     );
     const data = rows.map(p => ({
@@ -167,9 +168,12 @@ const createProduct = async (req, res) => {
 // PUT /api/products/:id
 const updateProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, image_url, category_id, brand, discount_percent, is_featured } = req.body;
+        const { name, description, price, stock, image_url, category_id, brand, discount_percent, discount_expires_at, flash_sale_qty, is_featured } = req.body;
+        const discountPct = discount_percent || 0;
+        const expiresAt   = discountPct > 0 ? (discount_expires_at || null) : null;
+        const flashQty    = discountPct > 0 ? (flash_sale_qty    ?? null) : null;
         const [result] = await db.query(
-            'UPDATE products SET name=?, description=?, price=?, stock=?, image_url=?, category_id=?, brand=?, discount_percent=?, is_featured=? WHERE id=?',
+            'UPDATE products SET name=?, description=?, price=?, stock=?,image_url=?, category_id=?, brand=?, discount_percent=?,discount_expires_at=?, flash_sale_qty=?, is_featured=? WHERE id=?',
             [name, description, price, stock, image_url, category_id, brand, discount_percent || 0, is_featured || 0, req.params.id]
         );
         if (result.affectedRows === 0)
@@ -279,7 +283,11 @@ const setFlashSale = async (req, res) => {
 
     // Bước 1: Tắt toàn bộ sale cũ
     await db.query(
-      `UPDATE products SET discount_percent = 0, discount_expires_at = NULL WHERE discount_percent > 0`
+      `UPDATE products
+ SET discount_percent = 0,
+     discount_expires_at = NULL,
+     flash_sale_qty = NULL 
+ WHERE discount_percent > 0`
     );
 
     // Bước 2: Validate rồi set sale mới

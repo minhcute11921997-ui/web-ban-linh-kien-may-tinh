@@ -83,6 +83,7 @@ export const useProducts = () => {
         ...p,
         discount_percent: 0,
         discount_expires_at: null,
+        flash_sale_qty: null,
       });
       toast.success("Đã tắt flash sale!");
       fetchProducts();
