@@ -1,18 +1,21 @@
-import axios from 'axios';
+import api from './config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+//Public
+export const validateDiscount = (code, totalPrice) =>
+  api.get('/discounts/validate', { params: { code, totalPrice } });
 
-export const discountApi = {
-  validateDiscount: (code, totalPrice) => {
-    return axios.get(`${API_BASE_URL}/discounts/validate`, {
-      params: {
-        code,
-        totalPrice
-      }
-    });
-  },
+export const getAvailableDiscounts = () =>
+  api.get('/discounts/available');
 
-  getAvailableDiscounts: () => {
-    return axios.get(`${API_BASE_URL}/discounts/available`);
-  }
-};
+//Admin
+export const adminGetAllDiscounts = () =>
+  api.get('/discounts/admin/all');
+
+export const adminCreateDiscount = (data) =>
+  api.post('/discounts/admin', data);
+
+export const adminUpdateDiscount = (id, data) =>
+  api.put(`/discounts/admin/${id}`, data);
+
+export const adminDeleteDiscount = (id) =>
+  api.delete(`/discounts/admin/${id}`);

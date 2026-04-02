@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRevenue from "./pages/admin/AdminRevenue";
+import AdminDiscounts from "./pages/admin/AdminDiscounts";
 
 function App() {
   useAuthInit();
@@ -44,6 +45,7 @@ function App() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="revenue" element={<AdminRevenue />} />
+          <Route path="discounts" element={<AdminDiscounts />} />
         </Route>
 
         {/* Customer routes */}
@@ -59,7 +61,7 @@ function App() {
         <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/profile" element={<CustomerLayout><PrivateRoute><ProfilePage /></PrivateRoute></CustomerLayout>} />
 
-        
+
         <Route path="*" element={<CustomerLayout><NotFoundPage /></CustomerLayout>} />
       </Routes>
 

@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
   ShieldCheck,
+  Gift,
 } from "lucide-react";
 
 const menuItems = [
@@ -27,6 +28,7 @@ const menuItems = [
     icon: <LayoutGrid size={17} />,
   },
   { to: "/admin/users", label: "Người dùng", icon: <Users size={17} /> },
+  { to: "/admin/discounts", label: "Mã giảm giá", icon: <Gift size={17} /> },
 ];
 
 const AdminLayout = () => {
@@ -69,10 +71,9 @@ const AdminLayout = () => {
               end={item.end}
               // SAU
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-200 ${
-                  isActive
-                    ? "bg-white text-blue-700 shadow-md shadow-blue-900/30"
-                    : "text-white hover:text-white hover:bg-white/10"
+                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-200 ${isActive
+                  ? "bg-white text-blue-700 shadow-md shadow-blue-900/30"
+                  : "text-white hover:text-white hover:bg-white/10"
                 }`
               }
             >

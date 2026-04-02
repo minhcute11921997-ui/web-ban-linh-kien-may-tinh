@@ -6,11 +6,13 @@ import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
 import { discountApi } from "../api/discountApi";
 import { addressApi } from "../api/addressApi";
+import { discountApi } from "../api/discountApi";
 import AddressSelector from "../components/AddressSelector";
+
 import {
   CreditCard, ShoppingBag, Truck, Tag, User, Phone, MapPin,
   FileText, Ticket, CheckCircle, ArrowLeft, Loader2, LogIn,
-  PackageOpen, Star, ChevronDown, ChevronUp, Plus,
+  PackageOpen, Star, ChevronDown, ChevronUp, Plus, X, Gift,
 } from "lucide-react";
 
 const labelCls = "flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-2";
@@ -21,21 +23,25 @@ const CheckoutPage = () => {
   const { token } = useAuthStore();
   const { items, loading: cartLoading, fetchCart, selectedItems } = useCartStore();
 
-  const [loading, setLoading]           = useState(false);
+  const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
-  const [discountCode, setDiscountCode]   = useState("");
+  const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
+  const [discountLoading, setDiscountLoading] = useState(false);
+  const [availableDiscounts, setAvailableDiscounts] = useState([]);
+  const [showAvailable, setShowAvailable] = useState(false);
 
-  const [customerName, setCustomerName]       = useState("");
-  const [customerPhone, setCustomerPhone]     = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  const [customerNotes, setCustomerNotes]     = useState("");
-  const [shippingFee, setShippingFee]         = useState(0);
+  const [customerNotes, setCustomerNotes] = useState("");
+  const [shippingFee, setShippingFee] = useState(0);
 
   /* ── Địa chỉ đã lưu ── */
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddrId, setSelectedAddrId] = useState(null);
-  const [showSaved, setShowSaved]           = useState(true);
+  const [showSaved, setShowSaved] = useState(true);
 
   const calculateShippingFee = (address) => {
     if (!address.trim()) { setShippingFee(0); return; }
@@ -44,8 +50,15 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
+    if (appliedDiscount) {
+      handleApplyDiscount(appliedDiscount.code);
+    }
+  }, [shippingFee]);
+
+  useEffect(() => {
     if (!token) return;
     fetchCart();
+
     addressApi.getAll()
       .then(r => {
         const addrs = r.data.data || [];
@@ -59,11 +72,16 @@ const CheckoutPage = () => {
           calculateShippingFee(def.full_address);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
+
+    getAvailableDiscounts()
+      .then(r => setAvailableDiscounts(r.data.data || []))
+      .catch(() => { });
+
   }, [token]);
 
-  const cartItems  = items.filter(item => selectedItems.includes(item.id));
-  const subtotal   = cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+  const cartItems = items.filter(item => selectedItems.includes(item.id));
+  const subtotal = cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
   const finalTotal = Math.max(0, subtotal + shippingFee - discountAmount);
 
   /* ── Helpers địa chỉ ── */
@@ -84,25 +102,42 @@ const CheckoutPage = () => {
   };
 
   /* ── Discount ── */
-  const handleApplyDiscount = async () => {
-    if (!discountCode.trim()) { toast.warning("Vui lòng nhập mã giảm giá"); return; }
+  const handleApplyDiscount = async (codeOverride) => {
+    const code = (codeOverride || discountCode).trim().toUpperCase();
+    if (!code) { toast.warning('Vui lòng nhập mã giảm giá'); return; }
+
+    setDiscountLoading(true);
     try {
-      const response = await discountApi.validateDiscount(discountCode.toUpperCase(), subtotal);
-      const { data } = response.data;
+      const res = await validateDiscount(code, subtotal + shippingFee);
+      const data = res.data.data;
+      setAppliedDiscount({ ...data, code });
       setDiscountAmount(Number(data.discountAmount) || 0);
-      toast.success(`Áp dụng thành công! ${data.description}`);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Mã giảm giá không hợp lệ");
+      setDiscountCode(code);
+      setShowAvailable(false);
+      toast.success(` Áp dụng "${code}" thành công! Giảm ${Number(data.discountAmount).toLocaleString('vi-VN')}₫`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Mã giảm giá không hợp lệ');
       setDiscountAmount(0);
+      setAppliedDiscount(null);
+    } finally {
+      setDiscountLoading(false);
     }
+  };
+
+  // THÊM hàm hủy mã
+  const handleRemoveDiscount = () => {
+    setDiscountCode('');
+    setDiscountAmount(0);
+    setAppliedDiscount(null);
+    toast.info('Đã hủy mã giảm giá');
   };
 
   /* ── Checkout ── */
   const handleCheckout = async () => {
-    if (cartItems.length === 0)    { toast.error("Giỏ hàng trống!");                      return; }
-    if (!customerName.trim())      { toast.error("Vui lòng nhập tên người nhận!");         return; }
-    if (!customerPhone.trim())     { toast.error("Vui lòng nhập số điện thoại!");          return; }
-    if (!customerAddress.trim())   { toast.error("Vui lòng nhập địa chỉ giao hàng!");     return; }
+    if (cartItems.length === 0) { toast.error("Giỏ hàng trống!"); return; }
+    if (!customerName.trim()) { toast.error("Vui lòng nhập tên người nhận!"); return; }
+    if (!customerPhone.trim()) { toast.error("Vui lòng nhập số điện thoại!"); return; }
+    if (!customerAddress.trim()) { toast.error("Vui lòng nhập địa chỉ giao hàng!"); return; }
 
     setLoading(true);
     try {
@@ -134,9 +169,7 @@ const CheckoutPage = () => {
     }
   };
 
-  /* ══════════════════════════════════════════
-     RENDER
-  ══════════════════════════════════════════ */
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-4">
@@ -372,21 +405,104 @@ const CheckoutPage = () => {
 
                 {/* Mã giảm giá */}
                 <div>
-                  <label className={labelCls}><Ticket size={14} className="text-blue-500" /> Mã giảm giá</label>
-                  <div className="flex gap-2">
-                    <input value={discountCode} onChange={e => setDiscountCode(e.target.value.toUpperCase())}
-                      placeholder="Nhập mã giảm giá"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <button onClick={handleApplyDiscount}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-1.5">
-                      <Tag size={14} /> Áp dụng
-                    </button>
-                  </div>
-                  {discountAmount > 0 && (
-                    <p className="flex items-center gap-1.5 mt-2 text-sm text-green-600 font-medium">
-                      <CheckCircle size={14} />
-                      Giảm {discountAmount.toLocaleString("vi-VN")} ₫
-                    </p>
+                  <label className={labelCls}>
+                    <Ticket size={14} className="text-blue-500" /> Mã giảm giá
+                  </label>
+
+                  {/* Nếu đã áp dụng thành công */}
+                  {appliedDiscount ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-xl px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-green-700 font-mono">{appliedDiscount.code}</p>
+                          <p className="text-xs text-green-600">
+                            {appliedDiscount.type === 'percent'
+                              ? `Giảm ${appliedDiscount.value}%`
+                              : `Giảm ${Number(appliedDiscount.value).toLocaleString('vi-VN')}₫`}
+                            {' — '}
+                            Tiết kiệm <strong>{Number(discountAmount).toLocaleString('vi-VN')}₫</strong>
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRemoveDiscount}
+                        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 ml-2"
+                        title="Hủy mã"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Input nhập mã */}
+                      <div className="flex gap-2">
+                        <input
+                          value={discountCode}
+                          onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                          onKeyDown={e => e.key === 'Enter' && handleApplyDiscount()}
+                          placeholder="Nhập mã giảm giá"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={() => handleApplyDiscount()}
+                          disabled={discountLoading || !discountCode.trim()}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {discountLoading
+                            ? <Loader2 size={14} className="animate-spin" />
+                            : <Tag size={14} />}
+                          Áp dụng
+                        </button>
+                      </div>
+
+                      {/* Danh sách mã có sẵn */}
+                      {availableDiscounts.length > 0 && (
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowAvailable(v => !v)}
+                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors cursor-pointer"
+                          >
+                            <Gift size={12} />
+                            {showAvailable ? 'Ẩn' : `Xem ${availableDiscounts.length} mã có sẵn`}
+                            {showAvailable ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
+
+                          {showAvailable && (
+                            <div className="mt-2 space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                              {availableDiscounts.map(d => (
+                                <button
+                                  key={d.code}
+                                  type="button"
+                                  onClick={() => handleApplyDiscount(d.code)}
+                                  className="w-full flex items-center justify-between gap-2 p-2.5 border border-dashed border-blue-200 hover:border-blue-400 hover:bg-blue-50 rounded-xl text-left transition-all cursor-pointer group"
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="font-mono font-bold text-blue-700 text-xs bg-blue-100 px-2 py-0.5 rounded-lg flex-shrink-0">
+                                      {d.code}
+                                    </span>
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-medium text-gray-700 truncate">
+                                        {d.type === 'percent' ? `Giảm ${d.value}%` : `Giảm ${Number(d.value).toLocaleString('vi-VN')}₫`}
+                                      </p>
+                                      {d.min_order_value > 0 && (
+                                        <p className="text-xs text-gray-400">
+                                          Đơn từ {Number(d.min_order_value).toLocaleString('vi-VN')}₫
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <span className="text-xs text-blue-600 font-semibold group-hover:underline flex-shrink-0">
+                                    Dùng
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -417,7 +533,7 @@ const CheckoutPage = () => {
                   <label className={labelCls}><CreditCard size={14} className="text-blue-500" /> Phương thức thanh toán</label>
                   <div className="space-y-2">
                     {[
-                      { value: "cod",   label: "Thanh toán khi nhận hàng (COD)" },
+                      { value: "cod", label: "Thanh toán khi nhận hàng (COD)" },
                       { value: "vnpay", label: "Thanh toán qua VNPay" },
                     ].map(opt => (
                       <label key={opt.value}
