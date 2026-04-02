@@ -37,14 +37,9 @@ exports.getStats = async (req, res) => {
     res.json({
       success: true,
       data: {
-        totalProducts,
-        totalOrders,
-        totalRevenue,
-        totalUsers,
-        pendingOrders,
-        outOfStock,
-        revenueByHour,
-        recentOrders,
+        totalProducts, totalOrders, totalRevenue,
+        totalUsers, pendingOrders, outOfStock,
+        revenueByHour, recentOrders,
       },
     });
   } catch (error) {
@@ -55,9 +50,15 @@ exports.getStats = async (req, res) => {
 exports.getRevenueReport = async (req, res) => {
   try {
     const range = req.query.range || "day";
+
     const now = new Date();
     const month = parseInt(req.query.month) || (now.getMonth() + 1);
     const year = parseInt(req.query.year) || now.getFullYear();
+
+    // Validate range
+    if (!["day", "month"].includes(range)) {
+      return res.status(400).json({ success: false, message: "range không hợp lệ. Chỉ hỗ trợ: day, month" });
+    }
 
     let sql = "";
     let params = [];
@@ -67,13 +68,15 @@ exports.getRevenueReport = async (req, res) => {
         SELECT DATE(created_at) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders WHERE status = 'delivered' AND MONTH(created_at) = ?
+        FROM orders
+        WHERE status = 'delivered'
+          AND MONTH(created_at) = ?
           AND YEAR(created_at)  = ?
         GROUP BY DATE(created_at)
         ORDER BY DATE(created_at) ASC
-        
       `;
       params = [month, year];
+
     } else if (range === "month") {
       sql = `
         SELECT MONTH(created_at) AS label,
@@ -86,13 +89,13 @@ exports.getRevenueReport = async (req, res) => {
         ORDER BY MONTH(created_at) ASC
       `;
       params = [year];
-    } else {
-      return res.status(400).json({ success: false, message: "range không hợp lệ" });
     }
 
-    const [rows] = await db.query(sql);
-    res.json({ success: true, data: rows.reverse() });
+    const [rows] = await db.query(sql, params);
+    res.json({ success: true, data: rows });
+
   } catch (error) {
+    console.error("[getRevenueReport]", error);
     res.status(500).json({ success: false, message: "Lỗi server", error: error.message });
   }
 };
