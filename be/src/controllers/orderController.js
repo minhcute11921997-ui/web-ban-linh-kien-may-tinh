@@ -2,12 +2,12 @@ const db = require('../config/db');
 const { incrementUsedCount } = require('./discountController');
 
 const STATUS_LABEL = {
-  pending:    'Chờ xử lý',
+  pending: 'Chờ xử lý',
   processing: 'Đang xử lý',
-  shipped:    'Đang giao',
-  delivered:  'Đã giao',
-  cancelled:  'Đã hủy',
-  rejected:   'Đã hủy',
+  shipped: 'Đang giao',
+  delivered: 'Đã giao',
+  cancelled: 'Đã hủy',
+  rejected: 'Đã hủy',
 };
 
 const formatOrder = (order) => ({
@@ -18,7 +18,7 @@ const formatOrder = (order) => ({
 exports.createOrder = async (req, res) => {
   try {
     const { shipping_address, discount_code, discount_amount } = req.body;
-if (!shipping_address)  {
+    if (!shipping_address) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập địa chỉ giao hàng' });
     }
 
@@ -29,7 +29,7 @@ if (!shipping_address)  {
     const cartId = carts[0].id;
 
     const [items] = await db.query(
-  `SELECT ci.*, p.stock, p.name,
+      `SELECT ci.*, p.stock, p.name,
       p.price AS original_price,
       p.discount_percent,
       CASE
@@ -41,8 +41,8 @@ if (!shipping_address)  {
    FROM cart_items ci
    JOIN products p ON ci.product_id = p.id
    WHERE ci.cart_id = ?`,
-  [cartId]
-);
+      [cartId]
+    );
     if (items.length === 0) {
       return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
     }
@@ -57,12 +57,12 @@ if (!shipping_address)  {
     }
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-const total_price = Math.max(0, subtotal - (Number(discount_amount) || 0));
+    const total_price = Math.max(0, subtotal - (Number(discount_amount) || 0));
 
-const [order] = await db.query(
-  'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
-  [req.user.userId, total_price, shipping_address, 'pending']
-);
+    const [order] = await db.query(
+      'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
+      [req.user.userId, total_price, shipping_address, 'pending']
+    );
     for (const item of items) {
       await db.query(
         'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
@@ -73,19 +73,19 @@ const [order] = await db.query(
         [item.quantity, item.product_id]
       );
       await db.query(
-  'UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0',
-  [item.quantity, item.product_id]
-);
+        'UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0',
+        [item.quantity, item.product_id]
+      );
     }
 
-await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
+    await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
 
-// Tăng used_count nếu có dùng mã giảm giá
-if (discount_code) {
-  await incrementUsedCount(discount_code);
-}
+    // Tăng used_count nếu có dùng mã giảm giá
+    if (discount_code) {
+      await discountController.incrementUsedCount(discount_code, req.user?.id, orderId);
+    }
 
-res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId: order.insertId });
+    res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId: order.insertId });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
@@ -105,7 +105,7 @@ exports.getMyOrders = async (req, res) => {
 
 exports.getOrderById = async (req, res) => {
   try {
-    const [orders] = await db.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+    const [orders] = await db.query('SELECT o.*, u.full_name, u.email, u.username, u.phone FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?', [req.params.id]);
     if (orders.length === 0) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
     }
@@ -155,15 +155,21 @@ exports.updateOrderStatus = async (req, res) => {
 
     const order = orders[0];
 
-    let paymentStatusUpdate = '';
-    if (status === 'delivered' && order.payment_method === 'cod') {
-      paymentStatusUpdate = ", payment_status = 'completed'";
+    let extraUpdate = '';
+    const extraValues = [];
+
+    if (status === 'delivered') {
+      extraUpdate += ", delivered_at = NOW()";
+      if (order.payment_method === 'cod') {
+        extraUpdate += ", payment_status = 'completed'";
+      }
     }
 
     const [result] = await db.query(
-      `UPDATE orders SET status = ?${paymentStatusUpdate} WHERE id = ?`,
-      [status, req.params.id]
+      `UPDATE orders SET status = ?${extraUpdate} WHERE id = ?`,
+      [status, req.params.id,]
     );
+
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });

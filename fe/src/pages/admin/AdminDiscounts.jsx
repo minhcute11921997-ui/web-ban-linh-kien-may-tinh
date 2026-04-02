@@ -13,7 +13,7 @@ import {
 
 const EMPTY_FORM = {
     code: '', type: 'percent', value: '', description: '',
-    min_order_value: '', max_uses: '', expires_at: '',
+    min_order_value: '', max_uses: '', max_per_user: '', expires_at: '',
 };
 
 const fmt = (n) => Number(n).toLocaleString('vi-VN');
@@ -65,6 +65,7 @@ export default function AdminDiscounts() {
             description: item.description || '',
             min_order_value: item.min_order_value || '',
             max_uses: item.max_uses ?? '',
+            max_per_user: item.max_per_user ?? '',
             expires_at: item.expires_at
                 ? new Date(item.expires_at).toISOString().slice(0, 16)
                 : '',
@@ -337,18 +338,33 @@ export default function AdminDiscounts() {
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     />
                                 </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-1">
-                                        Số lần dùng tối đa
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        value={form.max_uses}
-                                        onChange={e => setForm({ ...form, max_uses: e.target.value })}
-                                        placeholder="Không giới hạn"
-                                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-1">
+                                            Tổng lượt (toàn hệ thống)
+                                        </label>
+                                        <input
+                                            type="number" min={1}
+                                            value={form.max_uses}
+                                            onChange={e => setForm({ ...form, max_uses: e.target.value })}
+                                            placeholder="Không giới hạn"
+                                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                        />
+
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-1">
+                                            Lượt / mỗi tài khoản
+                                        </label>
+                                        <input
+                                            type="number" min={1}
+                                            value={form.max_per_user}
+                                            onChange={e => setForm({ ...form, max_per_user: e.target.value })}
+                                            placeholder="Không giới hạn"
+                                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                        />
+
+                                    </div>
                                 </div>
                             </div>
 

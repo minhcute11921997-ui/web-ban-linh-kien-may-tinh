@@ -4,9 +4,8 @@ import { toast } from "react-toastify";
 import axiosInstance from "../api/config";
 import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
-import { discountApi } from "../api/discountApi";
 import { addressApi } from "../api/addressApi";
-import { discountApi } from "../api/discountApi";
+import { validateDiscount, getAvailableDiscounts } from "../api/discountApi";
 import AddressSelector from "../components/AddressSelector";
 
 import {

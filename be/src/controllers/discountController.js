@@ -16,22 +16,48 @@ exports.validateDiscount = async (req, res) => {
     if (!discount)
       return res.status(404).json({ success: false, message: 'Mã giảm giá không hợp lệ' });
 
-    // Kiểm tra hết hạn
+    //1. Kiểm tra hết hạn
     if (discount.expires_at && new Date(discount.expires_at) < new Date())
       return res.status(400).json({ success: false, message: 'Mã giảm giá đã hết hạn' });
 
-    // Kiểm tra số lần dùng
+    //2. Kiểm tra tổng lượt toàn hệ thống (global)
     if (discount.max_uses !== null && discount.used_count >= discount.max_uses)
       return res.status(400).json({ success: false, message: 'Mã giảm giá đã hết lượt sử dụng' });
 
-    // Kiểm tra giá trị đơn hàng tối thiểu
+    //3. Kiểm tra lượt dùng của user (per-user)
+    // Lấy user_id từ token nếu có (không bắt buộc đăng nhập để validate)
+    let userId = null;
+    try {
+      const jwt = require('jsonwebtoken');
+      const authHeader = req.headers.authorization;
+      if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.id;
+      }
+    } catch (_) { /* token không hợp lệ hoặc không có — bỏ qua */ }
+
+    if (userId && discount.max_per_user !== null) {
+      const [[usageRow]] = await db.query(
+        'SELECT COUNT(*) as cnt FROM discount_usage WHERE discount_id = ? AND user_id = ?',
+        [discount.id, userId]
+      );
+      if (usageRow.cnt >= discount.max_per_user) {
+        return res.status(400).json({
+          success: false,
+          message: `Bạn đã dùng mã này ${discount.max_per_user} lần (tối đa ${discount.max_per_user} lần/tài khoản)`
+        });
+      }
+    }
+
+    //4. Kiểm tra giá trị đơn hàng tối thiểu
     if (totalPrice && Number(totalPrice) < discount.min_order_value)
       return res.status(400).json({
         success: false,
         message: `Đơn hàng tối thiểu ${Number(discount.min_order_value).toLocaleString('vi-VN')}₫ để dùng mã này`
       });
 
-    // Tính tiền giảm
+    //5. Tính tiền giảm
     let discountAmount = 0;
     if (discount.type === 'percent') {
       discountAmount = Math.floor(Number(totalPrice) * (discount.value / 100));
@@ -42,10 +68,12 @@ exports.validateDiscount = async (req, res) => {
     res.json({
       success: true,
       data: {
+        id: discount.id,
         code: discount.code,
         type: discount.type,
         value: discount.value,
         description: discount.description,
+        max_per_user: discount.max_per_user,
         discountAmount,
       }
     });
@@ -72,11 +100,26 @@ exports.getAvailableDiscounts = async (req, res) => {
 };
 
 // Hàm nội bộ dùng khi tạo order — tăng used_count
-exports.incrementUsedCount = async (code) => {
-  await db.query(
-    'UPDATE discount_codes SET used_count = used_count + 1 WHERE code = ?',
+exports.incrementUsedCount = async (code, userId = null, orderId = null) => {
+  const [[discount]] = await db.query(
+    'SELECT id FROM discount_codes WHERE code = ?',
     [code.toUpperCase()]
   );
+  if (!discount) return;
+
+  // Tăng tổng lượt toàn hệ thống
+  await db.query(
+    'UPDATE discount_codes SET used_count = used_count + 1 WHERE id = ?',
+    [discount.id]
+  );
+
+  // Ghi lại ai đã dùng 
+  if (userId) {
+    await db.query(
+      'INSERT INTO discount_usage (discount_id, user_id, order_id) VALUES (?, ?, ?)',
+      [discount.id, userId, orderId || null]
+    );
+  }
 };
 
 // Admin: Lấy tất cả mã giảm giá
@@ -117,6 +160,8 @@ exports.adminCreate = async (req, res) => {
     if (existing)
       return res.status(409).json({ success: false, message: 'Mã giảm giá đã tồn tại' });
 
+    const { max_per_user } = req.body;
+
     const [result] = await db.query(
       `INSERT INTO discount_codes 
         (code, type, value, description, min_order_value, max_uses, expires_at, active, used_count)
@@ -146,7 +191,7 @@ exports.adminCreate = async (req, res) => {
 exports.adminUpdate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, value, description, min_order_value, max_uses, expires_at, active } = req.body;
+    const { type, value, description, min_order_value, max_uses, max_per_user, expires_at, active } = req.body;
 
     const [[discount]] = await db.query('SELECT * FROM discount_codes WHERE id = ?', [id]);
     if (!discount)
@@ -155,7 +200,7 @@ exports.adminUpdate = async (req, res) => {
     await db.query(
       `UPDATE discount_codes SET
         type = ?, value = ?, description = ?,
-        min_order_value = ?, max_uses = ?,
+        min_order_value = ?, max_uses = ?, max_per_user = ?,
         expires_at = ?, active = ?
        WHERE id = ?`,
       [

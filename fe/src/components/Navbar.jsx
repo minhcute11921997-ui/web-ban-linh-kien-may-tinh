@@ -53,7 +53,7 @@ const Navbar = () => {
           }).length;
           setActiveOrderCount(count);
         })
-        .catch(() => {});
+        .catch(() => { });
     };
     fetchOrderCount();
     const interval = setInterval(fetchOrderCount, 5000);
@@ -74,7 +74,7 @@ const Navbar = () => {
           }).length;
           setActiveOrderCount(count);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [items, user, token]);
 
@@ -161,9 +161,8 @@ const Navbar = () => {
                     <User size={20} strokeWidth={1.8} />
                     <ChevronDown
                       size={10}
-                      className={`absolute -bottom-1 -right-2 transition-transform duration-200 ${
-                        showDropdown ? "rotate-180" : ""
-                      }`}
+                      className={`absolute -bottom-1 -right-2 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""
+                        }`}
                     />
                   </div>
                   <span className="text-xs font-medium truncate max-w-[80px]">
@@ -178,7 +177,10 @@ const Navbar = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
                           {(user.full_name || user.username)
-                            ?.slice(-1)
+                            ?.trim()
+                            ?.split(" ")
+                            ?.at(-1)
+                            ?.charAt(0)
                             ?.toUpperCase()}
                         </div>
                         <div>
