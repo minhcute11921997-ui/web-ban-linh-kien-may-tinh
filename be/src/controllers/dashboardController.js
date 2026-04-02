@@ -55,52 +55,37 @@ exports.getStats = async (req, res) => {
 exports.getRevenueReport = async (req, res) => {
   try {
     const range = req.query.range || "day";
-    const limit = parseInt(req.query.limit) || 30;
+    const now = new Date();
+    const month = parseInt(req.query.month) || (now.getMonth() + 1);
+    const year = parseInt(req.query.year) || now.getFullYear();
+
     let sql = "";
+    let params = [];
 
     if (range === "day") {
       sql = `
         SELECT DATE(created_at) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders WHERE status = 'delivered'
+        FROM orders WHERE status = 'delivered' AND MONTH(created_at) = ?
+          AND YEAR(created_at)  = ?
         GROUP BY DATE(created_at)
-        ORDER BY DATE(created_at) DESC
-        LIMIT ${limit}
+        ORDER BY DATE(created_at) ASC
+        
       `;
-    } else if (range === "week") {
-      sql = `
-        SELECT YEAR(created_at) AS year,
-          WEEK(created_at, 1) AS label,
-          COALESCE(SUM(total_price), 0) AS revenue,
-          COUNT(*) AS orders
-        FROM orders WHERE status = 'delivered'
-        GROUP BY YEAR(created_at), WEEK(created_at, 1)
-        ORDER BY YEAR(created_at) DESC, WEEK(created_at, 1) DESC
-        LIMIT 8
-      `;
+      params = [month, year];
     } else if (range === "month") {
       sql = `
-        SELECT YEAR(created_at) AS year,
-          MONTH(created_at) AS label,
+        SELECT MONTH(created_at) AS label,
           COALESCE(SUM(total_price), 0) AS revenue,
           COUNT(*) AS orders
-        FROM orders WHERE status = 'delivered'
-        GROUP BY YEAR(created_at), MONTH(created_at)
-        ORDER BY YEAR(created_at) DESC, MONTH(created_at) DESC
-        LIMIT 12
+        FROM orders
+        WHERE status = 'delivered'
+          AND YEAR(created_at) = ?
+        GROUP BY MONTH(created_at)
+        ORDER BY MONTH(created_at) ASC
       `;
-    } else if (range === "quarter") {
-      sql = `
-        SELECT YEAR(created_at) AS year,
-          QUARTER(created_at) AS label,
-          COALESCE(SUM(total_price), 0) AS revenue,
-          COUNT(*) AS orders
-        FROM orders WHERE status = 'delivered'
-        GROUP BY YEAR(created_at), QUARTER(created_at)
-        ORDER BY YEAR(created_at) DESC, QUARTER(created_at) DESC
-        LIMIT 8
-      `;
+      params = [year];
     } else {
       return res.status(400).json({ success: false, message: "range không hợp lệ" });
     }
