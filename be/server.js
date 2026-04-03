@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./src/config/db'); 
+const db = require('./src/config/db');
 const app = express();
 
 // Middleware
@@ -66,6 +66,8 @@ app.use('/api/addresses', addressRoutes);
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const reviewRoutes = require('./src/routes/review');
+app.use('/api/reviews', reviewRoutes);
 
 const cleanExpiredSales = async () => {
   try {
@@ -100,10 +102,10 @@ cleanExpiredRefreshTokens();
 setInterval(cleanExpiredSales, 60 * 1000);
 setInterval(cleanExpiredRefreshTokens, 24 * 60 * 60 * 1000);
 app.get('/', (req, res) => {
-    res.json({ message: ' Backend API đang chạy!' });
+  res.json({ message: ' Backend API đang chạy!' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });
