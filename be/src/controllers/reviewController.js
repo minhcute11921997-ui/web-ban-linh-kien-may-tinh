@@ -1,19 +1,5 @@
 const db = require('../config/db');
 const Joi = require('joi');
-const xss = require('xss');
-
-
-const xssOptions = {
-    whiteList: {},
-    stripIgnoreTag: true,
-    stripIgnoreTagBody: ['script', 'style', 'iframe', 'object', 'embed', 'form'],
-    onIgnoreTag(tag, html) { return ''; },
-    onIgnoreTagAttr(tag, name, value) { return ''; },
-};
-const cleanXSS = (str) => {
-    if (!str) return '';
-    return xss(str.trim(), xssOptions).substring(0, 1000);
-};
 
 //Joi schemas 
 const createSchema = Joi.object({
@@ -29,11 +15,7 @@ const createSchema = Joi.object({
 
 const updateSchema = Joi.object({
     rating: Joi.number().integer().min(1).max(5).optional(),
-    comment: Joi.string().min(3).max(1000).optional()
-        .pattern(/^[^<>]*$/, { name: 'no HTML tags' })
-        .messages({
-            'string.pattern.name': 'Bình luận không được chứa ký tự HTML (<, >)',
-        }),
+    comment: Joi.string().min(1).max(2000).optional(),
 });
 
 
@@ -101,11 +83,11 @@ exports.createReview = async (req, res) => {
             return res.status(400).json({ success: false, message: messages[0], errors: messages });
         }
 
-        const userId = req.user.id;
+        const userId = req.user.userId;
         const { product_id, order_id, rating } = value;
 
         // 2. Sanitize comment bằng xss (lớp phòng thủ thứ 2)
-        const comment = cleanXSS(value.comment);
+        const comment = value.comment.trim();
 
         // 3. Kiểm tra đã mua hàng chưa nếu có order_id
         if (order_id) {
@@ -172,7 +154,7 @@ exports.updateReview = async (req, res) => {
             return res.status(400).json({ success: false, message: messages[0], errors: messages });
         }
 
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         const [[review]] = await db.query('SELECT * FROM reviews WHERE id = ?', [reviewId]);
         if (!review)
@@ -181,7 +163,7 @@ exports.updateReview = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa đánh giá này' });
 
         const newRating = value.rating ?? review.rating;
-        const newComment = value.comment ? cleanXSS(value.comment) : review.comment;
+        const newComment = value.comment ? value.comment.trim() : review.comment;
 
         await db.query(
             'UPDATE reviews SET rating = ?, comment = ? WHERE id = ?',
@@ -211,7 +193,7 @@ exports.deleteReview = async (req, res) => {
         if (!Number.isInteger(reviewId) || reviewId <= 0)
             return res.status(400).json({ success: false, message: 'reviewId không hợp lệ' });
 
-        const userId = req.user.id;
+        const userId = req.user.userId;
         const userRole = req.user.role;
 
         const [[review]] = await db.query('SELECT * FROM reviews WHERE id = ?', [reviewId]);
@@ -235,7 +217,7 @@ exports.checkUserReview = async (req, res) => {
         if (!Number.isInteger(productId) || productId <= 0)
             return res.status(400).json({ success: false, message: 'productId không hợp lệ' });
 
-        const userId = req.user.id;
+        const userId = req.user.userId;
         const [[review]] = await db.query(
             'SELECT id, rating, comment FROM reviews WHERE user_id = ? AND product_id = ?',
             [userId, productId]

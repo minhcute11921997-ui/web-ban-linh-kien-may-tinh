@@ -5,7 +5,6 @@ import sanitizeHtml from 'sanitize-html';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import reviewApi from '../api/reviewApi';
-import sanitizeHtml from 'sanitize-html';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -73,23 +72,18 @@ const ProductDetail = () => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!token) { toast.warning('Vui lòng đăng nhập!'); navigate('/login'); return; }
-    const cleanComment = sanitizeComment(reviewForm.comment);
-    if (cleanComment !== reviewForm.comment.trim()) {
-      toast.error('Bình luận không được chứa mã HTML hoặc script!');
-      return;
-    }
-    if (cleanComment.length < 3) {
-      toast.error('Bình luận tối thiểu 3 ký tự!');
+    const cleanComment = reviewForm.comment.trim();
+    if (cleanComment.length < 1) {
+      toast.error('Vui lòng nhập nội dung đánh giá!');
       return;
     }
     setSubmittingReview(true);
     try {
+      const payload = { ...reviewForm, comment: cleanComment };
       if (editingReviewId) {
-        await reviewApi.update(editingReviewId, reviewForm);
-        toast.success('Đã cập nhật đánh giá!');
+        await reviewApi.update(editingReviewId, payload);
       } else {
-        await reviewApi.create({ product_id: parseInt(id), ...reviewForm });
-        toast.success('Đánh giá thành công!');
+        await reviewApi.create({ product_id: parseInt(id), ...payload });
       }
       setShowReviewForm(false);
       setEditingReviewId(null);
@@ -443,12 +437,12 @@ const ProductDetail = () => {
                 value={reviewForm.comment}
                 onChange={(e) => setReviewForm(f => ({ ...f, comment: e.target.value }))}
                 rows={4}
-                maxLength={1000}
+                maxLength={2000}
                 placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 resize-none"
                 required
               />
-              <div className="text-right text-xs text-gray-400">{reviewForm.comment.length}/1000</div>
+              <div className="text-right text-xs text-gray-400">{reviewForm.comment.length}/2000</div>
             </div>
             <div className="flex gap-2">
               <button
