@@ -60,10 +60,8 @@ export const useProducts = () => {
     try {
       if (editId) {
         await updateProduct(editId, form);
-        toast.success("Cập nhật thành công!");
       } else {
         await createProduct(form);
-        toast.success("Thêm sản phẩm thành công!");
       }
       fetchProducts();
       onSuccess?.();
@@ -76,7 +74,6 @@ export const useProducts = () => {
     if (!window.confirm("Bạn chắc chắn muốn xóa?")) return;
     try {
       await deleteProduct(id);
-      toast.success("Đã xóa sản phẩm!");
       fetchProducts();
     } catch {
       toast.error("Xóa thất bại!");
@@ -92,7 +89,6 @@ export const useProducts = () => {
         discount_expires_at: null,
         flash_sale_qty: null,
       });
-      toast.success("Đã tắt flash sale!");
       fetchProducts();
     } catch {
       toast.error("Lỗi khi tắt flash sale!");
@@ -104,7 +100,6 @@ export const useProducts = () => {
     if (!window.confirm(`Bạn muốn ${action} sản phẩm "${p.name}"?`)) return;
     try {
       await toggleProductActive(p.id);
-      toast.success(p.is_active ? "Đã tắt sản phẩm!" : "Đã bật sản phẩm!");
       fetchProducts();
     } catch {
       toast.error("Lỗi khi thay đổi trạng thái!");
@@ -124,9 +119,9 @@ export const useProducts = () => {
         saleQty: v.qty,
         discountPercent: v.discount,
       }));
-    if (!items.length) return toast.warning("Chưa chọn sản phẩm nào!");
+    if (!items.length) return;
     if (!durationHours || durationHours < 1)
-      return toast.warning("Thời gian ít nhất 1 giờ!");
+      return;
     const hasActiveSale = products.some((p) => p.discount_percent > 0);
     if (
       hasActiveSale &&
@@ -136,7 +131,6 @@ export const useProducts = () => {
     setSubmitting(true);
     try {
       await setFlashSaleApi({ items, durationHours });
-      toast.success(`🎉 Flash Sale đã bắt đầu trong ${durationHours} giờ!`);
       fetchProducts();
       onSuccess?.();
     } catch (err) {

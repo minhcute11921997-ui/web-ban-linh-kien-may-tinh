@@ -43,7 +43,6 @@ const ImageUploader = ({ value, onChange }) => {
         const fullUrl = `${API_BASE}${res.data.imageUrl}`;
         setPreview(fullUrl);
         onChange(fullUrl);
-        toast.success("Upload ảnh thành công!");
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Upload ảnh thất bại!");

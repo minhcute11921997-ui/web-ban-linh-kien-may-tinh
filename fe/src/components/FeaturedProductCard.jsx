@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const FeaturedProductCard = ({ product }) => {
   const { addItem } = useCartStore();
@@ -17,7 +16,6 @@ const FeaturedProductCard = ({ product }) => {
     }
     try {
       await addItem(product.id, 1);
-      toast.success("Đã thêm vào giỏ hàng!");
     } catch (error) {
       toast.error(error?.message || "Có lỗi xảy ra!");
     }

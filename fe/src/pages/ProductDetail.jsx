@@ -71,7 +71,7 @@ const ProductDetail = () => {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!token) { toast.warning('Vui lòng đăng nhập!'); navigate('/login'); return; }
+    if (!token) { navigate('/login'); return; }
     setSubmittingReview(true);
     try {
       const payload = { ...reviewForm, comment: reviewForm.comment.trim() || null };
@@ -149,21 +149,17 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!token) {
-      toast.warning('Vui lòng đăng nhập để thêm giỏ hàng!');
       navigate('/login');
       return;
     }
 
-    // Kiểm tra số lượng không vượt quá kho
     if (quantity > product.stock) {
-      toast.error(`Chỉ còn ${product.stock} sản phẩm trong kho!`);
       return;
     }
 
     setAddingToCart(true);
     try {
       await addItem(product.id, quantity);
-      toast.success(`Đã thêm "${product.name}" (x${quantity}) vào giỏ hàng!`);
     } catch (error) {
       console.error('Add to cart error:', error);
       toast.error(error?.message || 'Thêm giỏ hàng thất bại!');
@@ -174,21 +170,17 @@ const ProductDetail = () => {
 
   const handleBuyNow = async () => {
     if (!token) {
-      toast.warning('Vui lòng đăng nhập để mua hàng!');
       navigate('/login');
       return;
     }
 
-    // Kiểm tra số lượng không vượt quá kho
     if (quantity > product.stock) {
-      toast.error(`Chỉ còn ${product.stock} sản phẩm trong kho!`);
       return;
     }
 
     setAddingToCart(true);
     try {
       await addItem(product.id, quantity);
-      toast.success(`Đã thêm "${product.name}" (x${quantity}) vào giỏ hàng!`);
       navigate('/cart');
     } catch (error) {
       console.error('Buy now error:', error);

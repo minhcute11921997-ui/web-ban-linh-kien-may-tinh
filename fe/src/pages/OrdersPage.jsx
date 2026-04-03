@@ -71,7 +71,6 @@ const OrdersPage = () => {
       .catch(err => {
         
         if (err?.response?.status === 401 || err?.message === 'No refresh token') return;
-        toast.error('Không thể tải đơn hàng, vui lòng thử lại!');
       })
       .finally(() => setLoading(false));
   }, [token]);

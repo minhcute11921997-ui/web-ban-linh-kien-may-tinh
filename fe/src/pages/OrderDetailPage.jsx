@@ -77,8 +77,8 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     axios.get(`/api/payments/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => { if (res.data.success) setOrder(res.data.data); else toast.error('Không tìm thấy đơn hàng'); })
-      .catch(() => toast.error('Lỗi tải đơn hàng'))
+      .then(res => { if (res.data.success) setOrder(res.data.data); })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [id, token]);
 

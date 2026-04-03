@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getAllUsers, updateUser, deleteUser } from '../../api/userApi';
-import { toast } from 'react-toastify';
 import {
   Users,
   Pencil,
@@ -38,7 +37,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try { const res = await getAllUsers(); setUsers(res.data.data || []); }
-    catch { toast.error('Không thể tải danh sách người dùng!'); }
+    catch { }
     finally { setLoading(false); }
   };
 
@@ -52,14 +51,14 @@ const AdminUsers = () => {
   };
 
   const handleSave = async () => {
-    try { await updateUser(editId, editForm); toast.success('Cập nhật thành công!'); setEditId(null); fetchUsers(); }
-    catch { toast.error('Cập nhật thất bại!'); }
+    try { await updateUser(editId, editForm); setEditId(null); fetchUsers(); }
+    catch { }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn chắc chắn muốn xóa người dùng này?')) return;
-    try { await deleteUser(id); toast.success('Đã xóa!'); fetchUsers(); }
-    catch { toast.error('Xóa thất bại!'); }
+    try { await deleteUser(id); fetchUsers(); }
+    catch { }
   };
 
   if (loading)

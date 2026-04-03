@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { login } from '../api/authApi';
 import useAuthStore from '../store/authStore';
-import { toast } from 'react-toastify';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ login: '', password: '' });
@@ -36,7 +35,6 @@ const LoginPage = () => {
       const payload = { username: form.login, password: form.password };
       const res = await login(payload);
       setAuth(res.data.user, res.data.token, res.data.refreshToken);
-      toast.success('Đăng nhập thành công!');
       navigate(res.data.user.role === 'admin' ? '/admin' : '/');
     } catch (err) {
       const msg = err.response?.data?.message || 'Đăng nhập thất bại!';

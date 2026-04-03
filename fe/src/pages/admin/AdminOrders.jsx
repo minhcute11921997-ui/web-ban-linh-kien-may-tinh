@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getAllOrders, updateOrderStatus, deleteOrder, getOrderById } from '../../api/orderApi';
-import { toast } from 'react-toastify';
 import {
   ClipboardList, Trash2, Loader2, InboxIcon, AlertTriangle,
   X, ShoppingBag, Clock, Cog, Truck, CheckCircle, XCircle,
@@ -62,19 +61,19 @@ const AdminOrders = () => {
       if (dateTo) params.dateTo = dateTo;
       const res = await getAllOrders(params);
       setOrders(res.data.data);
-    } catch { toast.error('Không thể tải đơn hàng!'); }
+    } catch { }
     finally { setLoading(false); }
   };
 
   const doUpdateStatus = async (id, status) => {
-    try { await updateOrderStatus(id, status); toast.success('Cập nhật thành công!'); fetchOrders(); }
-    catch { toast.error('Cập nhật thất bại!'); }
+    try { await updateOrderStatus(id, status); fetchOrders(); }
+    catch { }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn chắc chắn muốn xóa đơn hàng này?')) return;
-    try { await deleteOrder(id); toast.success('Đã xóa!'); fetchOrders(); }
-    catch { toast.error('Xóa thất bại!'); }
+    try { await deleteOrder(id); fetchOrders(); }
+    catch { }
   };
 
   const handleViewDetail = async (id) => {
@@ -84,7 +83,6 @@ const AdminOrders = () => {
       const res = await getOrderById(id);
       setDetailModal(res.data.data);
     } catch {
-      toast.error('Không thể tải chi tiết đơn hàng!');
       setDetailModal(null);
     } finally {
       setDetailLoading(false);

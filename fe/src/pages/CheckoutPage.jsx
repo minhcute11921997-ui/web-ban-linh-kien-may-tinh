@@ -103,7 +103,7 @@ const CheckoutPage = () => {
   /* ── Discount ── */
   const handleApplyDiscount = async (codeOverride) => {
     const code = (codeOverride || discountCode).trim().toUpperCase();
-    if (!code) { toast.warning('Vui lòng nhập mã giảm giá'); return; }
+    if (!code) { return; }
 
     setDiscountLoading(true);
     try {
@@ -123,20 +123,18 @@ const CheckoutPage = () => {
     }
   };
 
-  // THÊM hàm hủy mã
   const handleRemoveDiscount = () => {
     setDiscountCode('');
     setDiscountAmount(0);
     setAppliedDiscount(null);
-    toast.info('Đã hủy mã giảm giá');
   };
 
   /* ── Checkout ── */
   const handleCheckout = async () => {
-    if (cartItems.length === 0) { toast.error("Giỏ hàng trống!"); return; }
-    if (!customerName.trim()) { toast.error("Vui lòng nhập tên người nhận!"); return; }
-    if (!customerPhone.trim()) { toast.error("Vui lòng nhập số điện thoại!"); return; }
-    if (!customerAddress.trim()) { toast.error("Vui lòng nhập địa chỉ giao hàng!"); return; }
+    if (cartItems.length === 0) { return; }
+    if (!customerName.trim()) { return; }
+    if (!customerPhone.trim()) { return; }
+    if (!customerAddress.trim()) { return; }
 
     setLoading(true);
     try {

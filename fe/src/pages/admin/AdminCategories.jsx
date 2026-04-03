@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '../../api/categoryApi';
 import axiosInstance from '../../api/config';
-import { toast } from 'react-toastify';
 import {
   LayoutGrid,
   Plus,
@@ -30,7 +29,6 @@ const AdminCategories = () => {
       const res = await getAllCategories();
       setCategories(res.data.data || []);
     } catch {
-      toast.error('Không thể tải danh mục!');
     }
   };
 
@@ -39,17 +37,14 @@ const AdminCategories = () => {
     try {
       if (editId) {
         await axiosInstance.put(`/categories/${editId}`, form);
-        toast.success('Cập nhật danh mục thành công!');
       } else {
         await axiosInstance.post('/categories', form);
-        toast.success('Thêm danh mục thành công!');
       }
       setForm(emptyForm);
       setEditId(null);
       setShowForm(false);
       fetchCategories();
     } catch {
-      toast.error('Có lỗi xảy ra!');
     }
   };
 
@@ -63,10 +58,8 @@ const AdminCategories = () => {
     if (!window.confirm('Bạn chắc chắn muốn xóa danh mục này?')) return;
     try {
       await axiosInstance.delete(`/categories/${id}`);
-      toast.success('Đã xóa danh mục!');
       fetchCategories();
     } catch {
-      toast.error('Xóa thất bại! Có thể danh mục đang được sử dụng.');
     }
   };
 

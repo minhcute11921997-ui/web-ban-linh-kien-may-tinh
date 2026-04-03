@@ -45,10 +45,6 @@ const CartPage = () => {
   };
 
   const handleClearAll = () => {
-    if (selectedItems.length === 0) {
-      toast.warning('Vui lòng chọn sản phẩm để xóa!');
-      return;
-    }
     selectedItems.forEach(itemId => removeItem(itemId));
   };
 
@@ -187,7 +183,6 @@ const CartPage = () => {
                             if (!isNaN(numVal)) {
                               if (numVal > item.stock) {
                                 numVal = item.stock;
-                                toast.warning(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
                               }
                               updateItem(item.id, numVal);
                             }
@@ -199,7 +194,6 @@ const CartPage = () => {
                       <button
                         onClick={() => {
                           if (item.quantity >= item.stock) {
-                            toast.warning(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
                             return;
                           }
                           updateItem(item.id, item.quantity + 1);

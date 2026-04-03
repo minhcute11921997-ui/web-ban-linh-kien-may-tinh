@@ -39,7 +39,7 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
 
   const applyDiscountToAll = () => {
     if (!discountPercent || discountPercent < 1)
-      return toast.warning("Nhập % giảm hợp lệ trước!");
+      return;
     setSelectedItems((prev) => {
       const next = { ...prev };
       Object.keys(next).forEach((id) => {
@@ -47,7 +47,6 @@ const FlashSaleModal = ({ products, getCategoryName, onClose, onSubmit }) => {
       });
       return next;
     });
-    toast.info(`Đã áp dụng ${discountPercent}% cho tất cả`);
   };
 
   const selectedCount = Object.values(selectedItems).filter((i) => i.checked).length;

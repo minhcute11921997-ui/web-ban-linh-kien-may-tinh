@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
-import { toast } from "react-toastify";
 
 // Hàm strip HTML tags khỏi description
 const stripHtml = (html) => {
@@ -22,7 +21,6 @@ const ProductCard = ({ product }) => {
     }
     try {
       await addItem(product.id, 1);
-      toast.success("Đã thêm vào giỏ hàng!");
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error(error?.message || "Có lỗi xảy ra!");

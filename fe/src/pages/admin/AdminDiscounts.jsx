@@ -42,7 +42,6 @@ export default function AdminDiscounts() {
             const res = await adminGetAllDiscounts();
             setDiscounts(res.data.data);
         } catch {
-            toast.error('Không thể tải danh sách mã giảm giá');
         } finally {
             setLoading(false);
         }
@@ -88,10 +87,8 @@ export default function AdminDiscounts() {
 
             if (editItem) {
                 await adminUpdateDiscount(editItem.id, payload);
-                toast.success('Cập nhật mã giảm giá thành công!');
             } else {
                 await adminCreateDiscount(payload);
-                toast.success('Tạo mã giảm giá thành công!');
             }
             setShowModal(false);
             fetchAll();
@@ -105,21 +102,17 @@ export default function AdminDiscounts() {
     const handleToggleActive = async (item) => {
         try {
             await adminUpdateDiscount(item.id, { active: item.active ? 0 : 1 });
-            toast.success(item.active ? 'Đã tắt mã giảm giá' : 'Đã bật mã giảm giá');
             fetchAll();
         } catch {
-            toast.error('Không thể cập nhật trạng thái');
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await adminDeleteDiscount(id);
-            toast.success('Đã xóa mã giảm giá');
             setDeleteConfirm(null);
             fetchAll();
         } catch {
-            toast.error('Không thể xóa mã giảm giá');
         }
     };
 

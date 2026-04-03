@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
-import { toast } from 'react-toastify';
 
 const FlashSaleCard = ({ product }) => {
   const { addItem } = useCartStore();
@@ -16,7 +15,6 @@ const FlashSaleCard = ({ product }) => {
     if (!user) { navigate('/login'); return; }
     try {
       await addItem(product.id, 1);
-      toast.success('Đã thêm vào giỏ hàng!');
     } catch (error) {
       toast.error(error?.message || 'Có lỗi xảy ra!');
     }
