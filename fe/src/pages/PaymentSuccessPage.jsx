@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
+
 import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
 
@@ -41,15 +41,10 @@ const PaymentSuccessPage = () => {
                 if (res.data.success) {
                     setOrder(res.data.data);
                     const ps = res.data.data.paymentStatus;
-                    if (ps === 'completed') {
-                        setStatus('success');
-                        toast.success('Thanh toán thành công!');
-                    } else if (ps === 'failed') {
+                    if (ps === 'failed') {
                         setStatus('failed');
-                        toast.error('Thanh toán thất bại');
                     } else {
                         setStatus('success');
-                        toast.success('Đặt hàng thành công!');
                     }
                 } else {
                     setStatus('failed');

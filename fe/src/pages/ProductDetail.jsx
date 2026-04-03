@@ -72,14 +72,9 @@ const ProductDetail = () => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!token) { toast.warning('Vui lòng đăng nhập!'); navigate('/login'); return; }
-    const cleanComment = reviewForm.comment.trim();
-    if (cleanComment.length < 1) {
-      toast.error('Vui lòng nhập nội dung đánh giá!');
-      return;
-    }
     setSubmittingReview(true);
     try {
-      const payload = { ...reviewForm, comment: cleanComment };
+      const payload = { ...reviewForm, comment: reviewForm.comment.trim() || null };
       if (editingReviewId) {
         await reviewApi.update(editingReviewId, payload);
       } else {
@@ -424,7 +419,6 @@ const ProductDetail = () => {
               {editingReviewId ? 'Chỉnh sửa đánh giá' : 'Viết đánh giá của bạn'}
             </h3>
             <div className="mb-3">
-              <label className="text-sm text-gray-600 mb-1 block">Số sao *</label>
               <StarRating
                 value={reviewForm.rating}
                 onChange={(v) => setReviewForm(f => ({ ...f, rating: v }))}
@@ -440,7 +434,6 @@ const ProductDetail = () => {
                 maxLength={2000}
                 placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 resize-none"
-                required
               />
               <div className="text-right text-xs text-gray-400">{reviewForm.comment.length}/2000</div>
             </div>
@@ -497,7 +490,6 @@ const ProductDetail = () => {
           <div className="text-center py-8 text-gray-400">Đang tải đánh giá...</div>
         ) : reviews.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
-            <div className="text-4xl mb-2">⭐</div>
             <p>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
           </div>
         ) : (

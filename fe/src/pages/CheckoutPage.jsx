@@ -155,7 +155,6 @@ const CheckoutPage = () => {
       if (response.data.success) {
         await fetchCart();
         if (paymentMethod === "cod") {
-          toast.success("Đặt hàng thành công!");
           navigate(`/payment-success?orderId=${response.data.orderId}&method=cod`);
         } else if (paymentMethod === "vnpay" && response.data.paymentUrl) {
           window.location.href = response.data.paymentUrl;

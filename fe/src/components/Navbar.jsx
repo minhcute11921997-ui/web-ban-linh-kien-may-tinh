@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../api/config";
 import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
 import logo2 from "../assets/logo1.png";
@@ -41,10 +41,8 @@ const Navbar = () => {
       return;
     }
     const fetchOrderCount = () => {
-      axios
-        .get("/api/orders/my-orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      axiosInstance
+        .get("/orders/my-orders")
         .then((res) => {
           const orders = res.data.data || [];
           const count = orders.filter((o) => {
@@ -56,16 +54,12 @@ const Navbar = () => {
         .catch(() => { });
     };
     fetchOrderCount();
-    const interval = setInterval(fetchOrderCount, 5000);
-    return () => clearInterval(interval);
   }, [user, token]);
 
   useEffect(() => {
     if (items.length > 0 && user && token) {
-      axios
-        .get("/api/orders/my-orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      axiosInstance
+        .get("/orders/my-orders")
         .then((res) => {
           const orders = res.data.data || [];
           const count = orders.filter((o) => {

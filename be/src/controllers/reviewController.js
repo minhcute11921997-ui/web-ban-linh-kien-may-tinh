@@ -6,13 +6,8 @@ const createSchema = Joi.object({
     product_id: Joi.number().integer().positive().required(),
     order_id: Joi.number().integer().positive().allow(null).optional(),
     rating: Joi.number().integer().min(1).max(5).required(),
-    comment: Joi.string().min(1).max(2000).required()
-        .messages({
-            'string.min': 'Vui lòng nhập nội dung đánh giá',
-            'string.max': 'Bình luận tối đa 2000 ký tự',
-        }),
+    comment: Joi.string().min(1).max(2000).optional().allow('', null),
 });
-
 const updateSchema = Joi.object({
     rating: Joi.number().integer().min(1).max(5).optional(),
     comment: Joi.string().min(1).max(2000).optional(),
@@ -86,8 +81,7 @@ exports.createReview = async (req, res) => {
         const userId = req.user.userId;
         const { product_id, order_id, rating } = value;
 
-        // 2. Sanitize comment bằng xss (lớp phòng thủ thứ 2)
-        const comment = value.comment.trim();
+        const comment = value.comment ? value.comment.trim() : null;
 
         // 3. Kiểm tra đã mua hàng chưa nếu có order_id
         if (order_id) {
