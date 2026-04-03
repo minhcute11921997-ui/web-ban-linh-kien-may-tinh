@@ -42,14 +42,27 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState(null);
-  const [detailModal, setDetailModal] = useState(null);   // order detail
+  const [detailModal, setDetailModal] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    fetchOrders(filterStatus, searchText, dateFrom, dateTo);
+  }, [filterStatus, searchText, dateFrom, dateTo]);
 
-  const fetchOrders = async () => {
-    try { const res = await getAllOrders(); setOrders(res.data.data); }
-    catch { toast.error('Không thể tải đơn hàng!'); }
+  const fetchOrders = async (status = '', search = '', dateFrom = '', dateTo = '') => {
+    try {
+      const params = {};
+      if (status) params.status = status;
+      if (search) params.search = search;
+      if (dateFrom) params.dateFrom = dateFrom;
+      if (dateTo) params.dateTo = dateTo;
+      const res = await getAllOrders(params);
+      setOrders(res.data.data);
+    } catch { toast.error('Không thể tải đơn hàng!'); }
     finally { setLoading(false); }
   };
 
@@ -66,7 +79,7 @@ const AdminOrders = () => {
 
   const handleViewDetail = async (id) => {
     setDetailLoading(true);
-    setDetailModal({ id }); // mở modal ngay, hiện loading bên trong
+    setDetailModal({ id });
     try {
       const res = await getOrderById(id);
       setDetailModal(res.data.data);
@@ -77,6 +90,7 @@ const AdminOrders = () => {
       setDetailLoading(false);
     }
   };
+
 
   if (loading)
     return (
@@ -289,6 +303,78 @@ const AdminOrders = () => {
           {orders.length} đơn hàng
         </span>
       </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+
+        {/* Tabs trạng thái */}
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: '', label: 'Tất cả' },
+            { value: 'pending', label: 'Chờ xử lý' },
+            { value: 'processing', label: 'Đang xử lý' },
+            { value: 'shipped', label: 'Đang giao' },
+            { value: 'delivered', label: 'Đã giao' },
+            { value: 'cancelled', label: 'Đã hủy' },
+            { value: 'rejected', label: 'Đã từ chối' },
+          ].map(tab => (
+            <button
+              key={tab.value}
+              onClick={() => setFilterStatus(tab.value)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer
+          ${filterStatus === tab.value
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Từ ngày */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-500 whitespace-nowrap">Từ ngày</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={e => setDateFrom(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+
+        {/* Đến ngày */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-500 whitespace-nowrap">Đến ngày</label>
+          <input
+            type="date"
+            value={dateTo}
+            min={dateFrom}
+            onChange={e => setDateTo(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+
+        {/* Nút reset — chỉ hiện khi đang có filter */}
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => { setDateFrom(''); setDateTo(''); }}
+            className="text-xs text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+          >
+            Xóa ngày
+          </button>
+        )}
+
+        {/* Ô tìm kiếm */}
+        <input
+          type="text"
+          placeholder="Tìm theo tên, email, mã đơn"
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+          className="border border-gray-200 rounded-xl px-4 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+
+      </div>
+
 
       {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">

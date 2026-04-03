@@ -18,6 +18,7 @@ const AdminProducts = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSaleModal, setShowSaleModal] = useState(false);
 
+
   const {
     products,
     categories,
@@ -27,6 +28,9 @@ const AdminProducts = () => {
     handleStopSale,
     handleToggleActive,
     handleFlashSaleSubmit,
+    searchText, setSearchText,
+    filterCategory, setFilterCategory,
+    filterStatus, setFilterStatus
   } = useProducts();
 
   const openEdit = (product) => {
@@ -98,6 +102,49 @@ const AdminProducts = () => {
           />
         </div>
       )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+
+        {/* Bên trái: Lọc danh mục + trạng thái */}
+        <div className="flex flex-wrap items-center gap-3">
+
+          {/* Lọc danh mục */}
+          <select
+            value={filterCategory}
+            onChange={e => setFilterCategory(e.target.value)}
+            className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">Tất cả danh mục</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+
+          {/* Lọc trạng thái */}
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="active">Đang bán</option>
+            <option value="inactive">Đã tắt</option>
+            <option value="out_of_stock">Hết hàng</option>
+            <option value="on_sale">Đang sale</option>
+          </select>
+
+        </div>
+
+        {/* Bên phải: Ô tìm kiếm */}
+        <input
+          type="text"
+          placeholder="Tìm tên sản phẩm..."
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+          className="border border-gray-200 rounded-xl px-4 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+
+      </div>
 
       {/* Bảng sản phẩm */}
       <ProductTable

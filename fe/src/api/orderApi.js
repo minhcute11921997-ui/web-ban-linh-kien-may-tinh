@@ -12,8 +12,8 @@ export const getOrderById = (id) => {
   return axiosInstance.get(`/orders/${id}`);
 };
 
-export const getAllOrders = () => {
-  return axiosInstance.get('/orders/admin/all');
+export const getAllOrders = (params = {}) => {
+  return axiosInstance.get('/orders/admin/all', { params });
 };
 
 export const updateOrderStatus = (id, status) => {

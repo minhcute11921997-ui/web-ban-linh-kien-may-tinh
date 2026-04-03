@@ -23,11 +23,18 @@ export const emptyForm = {
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   useEffect(() => {
-    fetchProducts();
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchProducts(searchText, filterCategory);
+  }, [searchText, filterCategory]);
+
 
   const fetchProducts = async () => {
     try {
@@ -145,9 +152,15 @@ export const useProducts = () => {
     const cat = categories.find((c) => c.id === catId);
     return cat ? cat.name : "—";
   };
-
+  const filteredProducts = products.filter(p => {
+    if (filterStatus === 'active') return p.is_active !== 0;
+    if (filterStatus === 'inactive') return p.is_active === 0;
+    if (filterStatus === 'out_of_stock') return p.stock === 0;
+    if (filterStatus === 'on_sale') return p.discount_percent > 0;
+    return true;
+  });
   return {
-    products,
+    products: filteredProducts,
     categories,
     getCategoryName,
     handleSubmit,
@@ -155,5 +168,8 @@ export const useProducts = () => {
     handleStopSale,
     handleToggleActive,
     handleFlashSaleSubmit,
+    searchText, setSearchText,
+    filterCategory, setFilterCategory,
+    filterStatus, setFilterStatus,
   };
 };

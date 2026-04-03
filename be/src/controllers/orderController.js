@@ -128,11 +128,34 @@ exports.getOrderById = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
+    const { status, search, dateFrom, dateTo } = req.query;
+    let where = '1=1';
+    const params = [];
+
+    if (status) {
+      where += ' AND o.status = ?';
+      params.push(status);
+    }
+    if (search) {
+      where += ' AND (u.full_name LIKE ? OR u.email LIKE ? OR CAST(o.id AS CHAR) = ?)';
+      params.push(`%${search}%`, `%${search}%`, search);
+    }
+
+    if (dateFrom) {
+      where += ' AND DATE(o.created_at) >= ?';
+      params.push(dateFrom);
+    }
+    if (dateTo) {
+      where += ' AND DATE(o.created_at) <= ?';
+      params.push(dateTo);
+    }
 
     const [orders] = await db.query(
       `SELECT o.*, u.username, u.email, u.full_name 
-       FROM orders o JOIN users u ON o.user_id = u.id 
-       ORDER BY o.created_at DESC`
+       FROM orders o JOIN users u ON o.user_id = u.id
+       WHERE ${where}
+       ORDER BY o.created_at DESC`,
+      params
     );
     res.json({ success: true, data: orders.map(formatOrder) });
   } catch (error) {
