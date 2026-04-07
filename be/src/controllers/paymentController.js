@@ -158,6 +158,11 @@ exports.createOrder = async (req, res) => {
                 clientIp
             });
 
+            console.log('=== FULL PAYMENT URL ===');
+            console.log(paymentUrl);
+
+
+
             return res.json({
                 success: true,
                 message: 'Tạo đơn hàng thành công! Chuyển hướng đến VNPay...',

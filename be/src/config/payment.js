@@ -27,11 +27,11 @@ const createVNPayUrl = (orderData) => {
         vnp_Locale:     'vn',
         vnp_CurrCode:   'VND',
         vnp_TxnRef:     String(orderId),
-        vnp_OrderInfo:  orderDescription || `Thanh toan don hang ${orderId}`,
+        vnp_OrderInfo:  `Thanh toan don hang ${orderId}`,
         vnp_OrderType:  'other',
         vnp_Amount:     amount * 100,
         vnp_ReturnUrl:  vnpayConfig.returnUrl,
-        vnp_IpAddr:     clientIp || '127.0.0.1',
+        vnp_IpAddr:     (clientIp === '::1' ? '127.0.0.1' : clientIp) || '127.0.0.1',
         vnp_CreateDate: createDate,
     };
 
@@ -43,12 +43,16 @@ const createVNPayUrl = (orderData) => {
             return result;
         }, {});
 
+    // Hash tính trên raw string
     const signData = qs.stringify(params, { encode: false });
-
     const hmac = crypto.createHmac('sha512', vnpayConfig.secretKey);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    return `${vnpayConfig.vnpUrl}?${signData}&vnp_SecureHash=${signed}`;
+    const urlParts = Object.keys(params).map(key =>
+        `${key}=${encodeURIComponent(String(params[key])).replace(/%20/g, '+')}`
+    ).join('&');
+
+    return `${vnpayConfig.vnpUrl}?${urlParts}&vnp_SecureHash=${signed}`;
 };
 
 const verifyVNPayResponse = (vnpParams) => {
@@ -58,7 +62,6 @@ const verifyVNPayResponse = (vnpParams) => {
     delete params.vnp_SecureHash;
     delete params.vnp_SecureHashType;
 
-    // Sắp xếp alphabet
     params = Object.keys(params)
         .sort()
         .reduce((result, key) => {
@@ -67,7 +70,6 @@ const verifyVNPayResponse = (vnpParams) => {
         }, {});
 
     const signData = qs.stringify(params, { encode: false });
-
     const hmac = crypto.createHmac('sha512', vnpayConfig.secretKey);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
