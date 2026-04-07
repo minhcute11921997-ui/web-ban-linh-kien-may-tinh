@@ -1,90 +1,46 @@
-const crypto = require('crypto');
-const qs = require('qs');
+const { VNPay, ignoreLogger, ProductCode, VnpLocale } = require('vnpay');
 
-const vnpayConfig = {
-    vnpUrl:    'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
-    vnpApiUrl: 'https://sandbox.vnpayment.vn/merchant_webapi/merchant.html',
-    tmnCode:   process.env.VNPAY_TMN_CODE,
-    secretKey: process.env.VNPAY_HASH_SECRET,
-    returnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:3000/api/payments/vnpay-callback'
-};
+const vnpay = new VNPay({
+    tmnCode: process.env.VNPAY_TMN_CODE,
+    secureSecret: process.env.VNPAY_HASH_SECRET,
+    vnpayHost: 'https://sandbox.vnpayment.vn',
+    testMode: true,
+    enableLog: false,
+    loggerFn: ignoreLogger,
+});
 
 const createVNPayUrl = (orderData) => {
-    const { orderId, amount, orderDescription, clientIp } = orderData;
+    const { orderId, amount, clientIp } = orderData;
 
-    const date = new Date();
-    const createDate = date.getFullYear() +
-        ('0' + (date.getMonth() + 1)).slice(-2) +
-        ('0' + date.getDate()).slice(-2) +
-        ('0' + date.getHours()).slice(-2) +
-        ('0' + date.getMinutes()).slice(-2) +
-        ('0' + date.getSeconds()).slice(-2);
+    const paymentUrl = vnpay.buildPaymentUrl({
+        vnp_Amount: amount,
+        vnp_IpAddr: (clientIp === '::1' ? '127.0.0.1' : clientIp) || '127.0.0.1',
+        vnp_TxnRef: String(orderId),
+        vnp_OrderInfo: `Thanh toan don hang ${orderId}`,
+        vnp_OrderType: ProductCode.Other,
+        vnp_ReturnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:3000/api/payments/vnpay-callback',
+        vnp_Locale: VnpLocale.VN,
+    });
 
-    let params = {
-        vnp_Version:    '2.1.0',
-        vnp_Command:    'pay',
-        vnp_TmnCode:    vnpayConfig.tmnCode,
-        vnp_Locale:     'vn',
-        vnp_CurrCode:   'VND',
-        vnp_TxnRef:     String(orderId),
-        vnp_OrderInfo:  `Thanh toan don hang ${orderId}`,
-        vnp_OrderType:  'other',
-        vnp_Amount:     amount * 100,
-        vnp_ReturnUrl:  vnpayConfig.returnUrl,
-        vnp_IpAddr:     (clientIp === '::1' ? '127.0.0.1' : clientIp) || '127.0.0.1',
-        vnp_CreateDate: createDate,
-    };
-
-    // Sắp xếp alphabet
-    params = Object.keys(params)
-        .sort()
-        .reduce((result, key) => {
-            result[key] = params[key];
-            return result;
-        }, {});
-
-    // Hash tính trên raw string
-    const signData = qs.stringify(params, { encode: false });
-    const hmac = crypto.createHmac('sha512', vnpayConfig.secretKey);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-
-    const urlParts = Object.keys(params).map(key =>
-        `${key}=${encodeURIComponent(String(params[key])).replace(/%20/g, '+')}`
-    ).join('&');
-
-    return `${vnpayConfig.vnpUrl}?${urlParts}&vnp_SecureHash=${signed}`;
+    console.log('=== FULL PAYMENT URL ===');
+    console.log(paymentUrl);
+    return paymentUrl;
 };
 
 const verifyVNPayResponse = (vnpParams) => {
-    const secureHash = vnpParams.vnp_SecureHash;
-
-    let params = { ...vnpParams };
-    delete params.vnp_SecureHash;
-    delete params.vnp_SecureHashType;
-
-    params = Object.keys(params)
-        .sort()
-        .reduce((result, key) => {
-            result[key] = params[key];
-            return result;
-        }, {});
-
-    const signData = qs.stringify(params, { encode: false });
-    const hmac = crypto.createHmac('sha512', vnpayConfig.secretKey);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-
+    const isValid = vnpay.verifyReturnUrl(vnpParams);
     return {
-        isValid:       signed === secureHash,
-        orderId:       vnpParams.vnp_TxnRef,
-        amount:        parseInt(vnpParams.vnp_Amount) / 100,
-        responseCode:  vnpParams.vnp_ResponseCode,
+        isValid: isValid.isVerified,
+        orderId: vnpParams.vnp_TxnRef,
+        amount: parseInt(vnpParams.vnp_Amount) / 100,
+        responseCode: vnpParams.vnp_ResponseCode,
         transactionNo: vnpParams.vnp_TransactionNo,
-        bankCode:      vnpParams.vnp_BankCode
+        bankCode: vnpParams.vnp_BankCode
     };
 };
 
 module.exports = {
-    vnpayConfig,
+    vnpayConfig: { tmnCode: process.env.VNPAY_TMN_CODE },
     createVNPayUrl,
     verifyVNPayResponse
 };

@@ -158,8 +158,9 @@ exports.createOrder = async (req, res) => {
                 clientIp
             });
 
-            console.log('=== FULL PAYMENT URL ===');
-            console.log(paymentUrl);
+            const urlObj = new URL(paymentUrl);
+console.log('=== PARAMS GỬI LÊN VNPAY ===');
+urlObj.searchParams.forEach((v, k) => console.log(`${k} = ${v}`));
 
 
 
