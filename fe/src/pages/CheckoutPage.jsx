@@ -140,7 +140,6 @@ const CheckoutPage = () => {
     try {
       const response = await axiosInstance.post("/payments/create-order", {
         paymentMethod,
-        clientIp: "127.0.0.1",
         cartItemIds: cartItems.map(i => i.id),
         customerName,
         customerPhone,
