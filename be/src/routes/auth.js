@@ -6,9 +6,9 @@ const { verifyToken } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { registerSchema, loginSchema } = require('../validators/authValidator');
 
-// loginLimiter định nghĩa đúng chỗ, tại đây — KHÔNG cần ở server.js nữa
+
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 phút
+  windowMs: 15 * 60 * 1000,  
   max: 10,                    
   message: {
     success: false,
@@ -20,12 +20,12 @@ const loginLimiter = rateLimit({
 
 router.post('/register', validate(registerSchema), authController.register);
 
-// loginLimiter đã gắn đúng vào đây — hoạt động bình thường
+// loginLimiter 
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
 
 router.post('/logout', authController.logout);
 
-// Route refresh — controller sẽ xử lý token rotation
+// Route refresh 
 router.post('/refresh', authController.refresh);
 
 router.put('/profile', verifyToken, authController.updateProfile);

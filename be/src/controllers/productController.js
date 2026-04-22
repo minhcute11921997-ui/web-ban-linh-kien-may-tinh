@@ -48,7 +48,7 @@ query += isAdminView ? ' WHERE 1=1' : ' WHERE p.is_active = 1';
         const order = allowedOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
         query += ` ORDER BY p.${sort} ${order}`;
 
-        // Đếm tổng số sản phẩm (không limit)
+        // Đếm tổng số sản phẩm 
 const countQuery = query.replace(
     /^SELECT DISTINCT p\.\*, c\.name as category_name/,
     'SELECT COUNT(DISTINCT p.id) as total'

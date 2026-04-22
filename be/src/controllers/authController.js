@@ -67,13 +67,13 @@ exports.register = async (req, res) => {
 
     // Kiểm tra username hoặc email đã tồn tại chưa
     const [existingUser] = await db.query(
-      "SELECT id FROM users WHERE username = ? OR email = ?", //SỬA: chỉ select id, không cần lấy toàn bộ row
+      "SELECT id FROM users WHERE username = ? OR email = ?", 
       [username, email]
     );
     if (existingUser.length > 0) {
       return res
         .status(409)
-        .json({ success: false, message: "Username hoặc email đã tồn tại" }); // ✅ SỬA: 409 Conflict đúng hơn 400
+        .json({ success: false, message: "Username hoặc email đã tồn tại" }); 
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,7 +100,7 @@ exports.register = async (req, res) => {
       });
   } catch (error) {
     console.error("[register]", error);
-    res.status(500).json({ success: false, message: "Lỗi server" }); //SỬA: không trả error.message ra client (lộ thông tin nội bộ)
+    res.status(500).json({ success: false, message: "Lỗi server" }); 
   }
 };
 
@@ -271,7 +271,7 @@ exports.updateProfile = async (req, res) => {
   try {
     if (email) {
       const [existing] = await db.query(
-        "SELECT id FROM users WHERE email = ? AND id != ?", // SỬA: chỉ select id
+        "SELECT id FROM users WHERE email = ? AND id != ?", 
         [email, userId]
       );
       if (existing.length > 0) {
