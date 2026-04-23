@@ -22,9 +22,65 @@ const getAllProducts = async (req, res) => {
     const isAdminView = req.query.adminView === "true";
     query += isAdminView ? " WHERE 1=1" : " WHERE p.is_active = 1";
 
+<<<<<<< HEAD
     if (search) {
       query += " AND p.name LIKE ?";
       params.push(`%${search}%`);
+=======
+        if (search) {
+            query += ' AND p.name LIKE ?';
+            params.push(`%${search}%`);
+        }
+        if (category) {
+            query += ' AND p.category_id = ?';
+            params.push(category);
+        }
+        if (req.query.brand) {
+            query += ' AND p.brand = ?';
+            params.push(req.query.brand);
+        }
+        if (minPrice) {
+            query += ' AND p.price >= ?';
+            params.push(Number(minPrice));
+        }
+        if (maxPrice) {
+            query += ' AND p.price <= ?';
+            params.push(Number(maxPrice));
+        }
+
+        // Sắp xếp
+        const allowedSort = ['price', 'name', 'created_at', 'id'];
+        const allowedOrder = ['ASC', 'DESC'];
+        const sort = allowedSort.includes(sortBy) ? sortBy : 'id';
+        const order = allowedOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+        query += ` ORDER BY p.${sort} ${order}`;
+
+        // Đếm tổng số sản phẩm 
+const countQuery = query.replace(
+    /^SELECT DISTINCT p\.\*, c\.name as category_name/,
+    'SELECT COUNT(DISTINCT p.id) as total'
+).replace(/ ORDER BY p\.\w+ (ASC|DESC)$/, '');
+const [[{ total }]] = await db.query(countQuery, params);
+
+// Thêm pagination
+const limit = Math.min(parseInt(req.query.limit) || 12, 100);
+const page  = Math.max(parseInt(req.query.page) || 1, 1);
+const offset = (page - 1) * limit;
+query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+const [products] = await db.query(query, params);
+
+res.json({
+    success: true,
+    data: products,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+});
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+>>>>>>> 63a452d7d755934fa914b27c5a1694c7e72f0d12
     }
     if (category) {
       query += " AND p.category_id = ?";
