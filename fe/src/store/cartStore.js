@@ -1,5 +1,11 @@
-import { create } from 'zustand';
-import { getCart, addToCart, updateCartItem, removeFromCart, clearCart } from '../api/cartApi';
+import { create } from "zustand";
+import {
+  getCart,
+  addToCart,
+  updateCartItem,
+  removeFromCart,
+  clearCart,
+} from "../api/cartApi";
 
 const useCartStore = create((set, get) => ({
   items: [],
@@ -12,14 +18,11 @@ const useCartStore = create((set, get) => ({
       const res = await getCart();
       const items = res.data.data?.items || [];
       const currentSelected = get().selectedItems;
-
-      // Nếu chưa có selection nào (lần đầu load) → auto-select tất cả
-      // Nếu đã có selection rồi → giữ nguyên, chỉ loại bỏ id không còn tồn tại
-      const newItemIds = items.map(item => item.id);
-      const updatedSelected = currentSelected.length === 0
-        ? newItemIds
-        : currentSelected.filter(id => newItemIds.includes(id));
-
+      const newItemIds = items.map((item) => item.id);
+      const updatedSelected =
+        currentSelected.length === 0
+          ? newItemIds
+          : currentSelected.filter((id) => newItemIds.includes(id));
       set({ items, selectedItems: updatedSelected });
     } catch {
       set({ items: [], selectedItems: [] });
@@ -31,29 +34,58 @@ const useCartStore = create((set, get) => ({
   addItem: async (productId, quantity) => {
     try {
       const res = await addToCart({ productId, quantity });
-      console.log('addToCart response:', res.data);
       if (res.data.success) {
-        // Fetch lại giỏ hàng để cập nhật chính xác
         await get().fetchCart();
       } else {
-        throw new Error(res.data.message || 'Thêm giỏ hàng thất bại');
+        throw new Error(res.data.message || "Thêm giỏ hàng thất bại");
       }
     } catch (error) {
-      console.error('addItem error:', error);
-      const errorMsg = error.response?.data?.message || error.message || 'Lỗi không xác định';
+      const errorMsg =
+        error.response?.data?.message || error.message || "Lỗi không xác định";
       throw new Error(errorMsg);
     }
   },
 
+  // ✅ Optimistic update — cập nhật UI ngay, KHÔNG fetch lại
   updateItem: async (id, quantity) => {
     if (quantity < 1) return;
-    await updateCartItem(id, { quantity });
-    await get().fetchCart();
+
+    // 1. Lưu lại giá trị cũ để rollback nếu lỗi
+    const prevItems = get().items;
+
+    // 2. Cập nhật UI ngay lập tức (không cần chờ API)
+    set({
+      items: prevItems.map((item) =>
+        item.id === id ? { ...item, quantity } : item
+      ),
+    });
+
+    // 3. Gọi API ngầm phía sau
+    try {
+      await updateCartItem(id, { quantity });
+    } catch {
+      // 4. Nếu API lỗi → rollback về giá trị cũ
+      set({ items: prevItems });
+    }
   },
 
+  // ✅ Optimistic update cho removeItem
   removeItem: async (id) => {
-    await removeFromCart(id);
-    await get().fetchCart();
+    const prevItems = get().items;
+    const prevSelected = get().selectedItems;
+
+    // Xóa khỏi UI ngay
+    set({
+      items: prevItems.filter((item) => item.id !== id),
+      selectedItems: prevSelected.filter((sid) => sid !== id),
+    });
+
+    try {
+      await removeFromCart(id);
+    } catch {
+      // Rollback nếu lỗi
+      set({ items: prevItems, selectedItems: prevSelected });
+    }
   },
 
   clearAll: async () => {
@@ -64,19 +96,18 @@ const useCartStore = create((set, get) => ({
   toggleSelectedItem: (itemId) => {
     const selectedItems = get().selectedItems;
     if (selectedItems.includes(itemId)) {
-      set({ selectedItems: selectedItems.filter(id => id !== itemId) });
+      set({ selectedItems: selectedItems.filter((id) => id !== itemId) });
     } else {
       set({ selectedItems: [...selectedItems, itemId] });
     }
   },
 
   toggleSelectAll: () => {
-    const items = get().items;
-    const selectedItems = get().selectedItems;
+    const { items, selectedItems } = get();
     if (selectedItems.length === items.length) {
       set({ selectedItems: [] });
     } else {
-      set({ selectedItems: items.map(item => item.id) });
+      set({ selectedItems: items.map((item) => item.id) });
     }
   },
 }));

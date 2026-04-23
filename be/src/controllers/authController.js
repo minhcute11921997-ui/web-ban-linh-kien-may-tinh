@@ -4,37 +4,12 @@ const Joi = require("joi");
 const db = require("../config/db");
 
 // Schemas validation (Joi)
-const registerSchema = Joi.object({
-  username: Joi.string()
-    .alphanum()
-    .min(3)
-    .max(30)
-    .required()
-    .messages({ "string.alphanum": "Username chỉ được chứa chữ và số" }),
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({ "string.email": "Email không hợp lệ" }),
-  password: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .messages({ "string.min": "Password phải có ít nhất 6 ký tự" }),
-  full_name: Joi.string().max(100).allow("", null),
-  phone: Joi.string()
-    .pattern(/^[0-9+\-\s]{7,15}$/)
-    .allow("", null)
-    .messages({ "string.pattern.base": "Số điện thoại không hợp lệ" }),
-  address: Joi.string().max(255).allow("", null),
-});
-
-const loginSchema = Joi.object({
-  username: Joi.string().required(),
-  password: Joi.string().required(),
-});
 
 const updateProfileSchema = Joi.object({
-  full_name: Joi.string().max(100).allow("", null),
+  full_name: Joi.string()
+    .max(100)
+    .pattern(/^[a-zA-ZÀ-ỹ\s]+$/)
+    .allow("", null),
   email: Joi.string()
     .email()
     .allow("", null)
@@ -45,35 +20,21 @@ const updateProfileSchema = Joi.object({
     .messages({ "string.pattern.base": "Số điện thoại không hợp lệ" }),
   address: Joi.string().max(255).allow("", null),
 });
-
-//Helper: validate và trả lỗi ngay nếu không hợp lệ
-function validate(schema, data, res) {
-  const { error } = schema.validate(data, { abortEarly: false });
-  if (error) {
-    const messages = error.details.map((d) => d.message).join("; ");
-    res.status(400).json({ success: false, message: messages });
-    return false;
-  }
-  return true;
-}
 
 // ĐĂNG KÝ
 exports.register = async (req, res) => {
   try {
-    // SỬA: validate bằng Joi thay vì check thủ công
-    if (!validate(registerSchema, req.body, res)) return;
-
     const { username, email, password, full_name, phone, address } = req.body;
 
     // Kiểm tra username hoặc email đã tồn tại chưa
     const [existingUser] = await db.query(
-      "SELECT id FROM users WHERE username = ? OR email = ?", //SỬA: chỉ select id, không cần lấy toàn bộ row
+      "SELECT id FROM users WHERE username = ? OR email = ?",
       [username, email]
     );
     if (existingUser.length > 0) {
       return res
         .status(409)
-        .json({ success: false, message: "Username hoặc email đã tồn tại" }); // ✅ SỬA: 409 Conflict đúng hơn 400
+        .json({ success: false, message: "Username hoặc email đã tồn tại" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -91,24 +52,21 @@ exports.register = async (req, res) => {
       ]
     );
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Đăng ký thành công!",
-        userId: result.insertId,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Đăng ký thành công!",
+      userId: result.insertId,
+    });
   } catch (error) {
     console.error("[register]", error);
-    res.status(500).json({ success: false, message: "Lỗi server" }); //SỬA: không trả error.message ra client (lộ thông tin nội bộ)
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
 
 //ĐĂNG NHẬP
 exports.login = async (req, res) => {
   try {
-    // SỬA: validate bằng Joi
-    if (!validate(loginSchema, req.body, res)) return;
+    //  validate bằng Joi
 
     const { username, password } = req.body;
 
@@ -144,7 +102,7 @@ exports.login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // THÊM MỚI: Lưu refresh token vào DB để có thể revoke
+    // Lưu refresh token vào DB
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await db.query(
       "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
@@ -182,18 +140,16 @@ exports.refresh = async (req, res) => {
         .json({ success: false, message: "Thiếu refresh token" });
     }
 
-    //THÊM MỚI: Kiểm tra token có trong DB không (chống replay sau logout)
+    //Kiểm tra token có trong DB không
     const [storedTokens] = await db.query(
       "SELECT * FROM refresh_tokens WHERE token = ? AND expires_at > NOW()",
       [refreshToken]
     );
     if (storedTokens.length === 0) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Refresh token không hợp lệ hoặc đã bị thu hồi",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token không hợp lệ hoặc đã bị thu hồi",
+      });
     }
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
@@ -234,16 +190,14 @@ exports.refresh = async (req, res) => {
     res.json({ success: true, token: newToken, refreshToken: newRefreshToken });
   } catch (error) {
     console.error("[refresh]", error);
-    res
-      .status(401)
-      .json({
-        success: false,
-        message: "Refresh token không hợp lệ hoặc đã hết hạn",
-      });
+    res.status(401).json({
+      success: false,
+      message: "Refresh token không hợp lệ hoặc đã hết hạn",
+    });
   }
 };
 
-//ĐĂNG XUẤT (THÊM MỚI)
+//ĐĂNG XUẤT
 exports.logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -262,7 +216,7 @@ exports.logout = async (req, res) => {
 
 // CẬP NHẬT PROFILE
 exports.updateProfile = async (req, res) => {
-  // SỬA: thêm validate cho updateProfile
+  // thêm validate cho updateProfile
   if (!validate(updateProfileSchema, req.body, res)) return;
 
   const { full_name, email, phone, address } = req.body;
@@ -271,16 +225,14 @@ exports.updateProfile = async (req, res) => {
   try {
     if (email) {
       const [existing] = await db.query(
-        "SELECT id FROM users WHERE email = ? AND id != ?", // SỬA: chỉ select id
+        "SELECT id FROM users WHERE email = ? AND id != ?",
         [email, userId]
       );
       if (existing.length > 0) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "Email đã được sử dụng bởi tài khoản khác",
-          });
+        return res.status(409).json({
+          success: false,
+          message: "Email đã được sử dụng bởi tài khoản khác",
+        });
       }
     }
 

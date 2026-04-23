@@ -1,13 +1,12 @@
-/**
- * Tính giá checkout với shipping fee và discount
- * Logic được chuyển từ CheckoutPage.jsx
- */
+/* Tính giá checkout với shipping fee và discount*/
 exports.calculateCheckout = async (req, res) => {
   try {
     const { cartItems, shippingFee, discountAmount } = req.body;
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
-      return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Giỏ hàng trống" });
     }
 
     // Tính tổng giá của các item được chọn
@@ -18,7 +17,10 @@ exports.calculateCheckout = async (req, res) => {
 
     // Đảm bảo discount không vượt quá subtotal + shipping
     const maxDiscount = subtotal + shippingFee;
-    const actualDiscount = Math.min(Math.max(discountAmount || 0, 0), maxDiscount);
+    const actualDiscount = Math.min(
+      Math.max(discountAmount || 0, 0),
+      maxDiscount
+    );
 
     // Giá cuối cùng
     const total = subtotal + shippingFee - actualDiscount;
@@ -32,9 +34,11 @@ exports.calculateCheckout = async (req, res) => {
 
     res.json({
       success: true,
-      data: priceBreakdown
+      data: priceBreakdown,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Lỗi server", error: error.message });
   }
 };
