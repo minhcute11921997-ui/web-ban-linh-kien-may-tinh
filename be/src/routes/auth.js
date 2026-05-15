@@ -1,37 +1,45 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const rateLimit = require('express-rate-limit');
-const authController = require('../controllers/authController');
-const { verifyToken } = require('../middleware/auth');
-const { validate } = require('../middleware/validate');
-const { registerSchema, loginSchema } = require('../validators/authValidator');
-
+const rateLimit = require("express-rate-limit");
+const authController = require("../controllers/authController");
+const { verifyToken } = require("../middleware/auth");
+const { validate } = require("../middleware/validate");
+const { registerSchema, loginSchema } = require("../validators/authValidator");
 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  
-  max: 10,                    
+  windowMs: 15 * 60 * 1000,
+  max: 10,
   message: {
     success: false,
-    message: 'Quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút.',
+    message: "Quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút.",
   },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-router.post('/register', validate(registerSchema), authController.register);
+router.post("/register", validate(registerSchema), authController.register);
 
-// loginLimiter 
-router.post('/login', loginLimiter, validate(loginSchema), authController.login);
+// loginLimiter
+router.post(
+  "/login",
+  loginLimiter,
+  validate(loginSchema),
+  authController.login
+);
 
+<<<<<<< HEAD
 router.post('/google', loginLimiter, authController.googleLogin);
 
 router.post('/logout', authController.logout);
+=======
+router.post("/logout", authController.logout);
+>>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
 
-// Route refresh 
-router.post('/refresh', authController.refresh);
+// Route refresh
+router.post("/refresh", authController.refresh);
 
-router.put('/profile', verifyToken, authController.updateProfile);
+router.put("/profile", verifyToken, authController.updateProfile);
 
-router.get('/profile', verifyToken, authController.getProfile);
+router.get("/profile", verifyToken, authController.getProfile);
 
 module.exports = router;

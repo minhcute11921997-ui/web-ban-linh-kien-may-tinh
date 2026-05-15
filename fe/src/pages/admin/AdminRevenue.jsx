@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { getRevenueReport } from "../../api/dashboardApi";
 import {
-  ResponsiveContainer, AreaChart, Area,
-  XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
 } from "recharts";
 import {
   TrendingUp,
@@ -45,16 +50,25 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-// ✅ Chỉ còn 2 chế độ: Theo ngày và Theo tháng
+//  Theo ngày và Theo tháng
 const RANGES = [
   { key: "day", label: "Theo ngày", icon: <CalendarDays size={14} /> },
   { key: "month", label: "Theo tháng", icon: <Calendar size={14} /> },
 ];
 
 const MONTHS = [
-  "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4",
-  "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8",
-  "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12",
+  "Tháng 1",
+  "Tháng 2",
+  "Tháng 3",
+  "Tháng 4",
+  "Tháng 5",
+  "Tháng 6",
+  "Tháng 7",
+  "Tháng 8",
+  "Tháng 9",
+  "Tháng 10",
+  "Tháng 11",
+  "Tháng 12",
 ];
 
 const currentYear = new Date().getFullYear();
@@ -114,22 +128,24 @@ export default function AdminRevenue() {
             <TrendingUp size={24} className="text-green-600" />
             Doanh thu
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">Thống kê doanh thu chi tiết</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Thống kê doanh thu chi tiết
+          </p>
         </div>
 
         {/* Controls */}
         <div className="flex items-center gap-3 flex-wrap">
-
           {/* Tab Theo ngày / Theo tháng */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
             {RANGES.map((r) => (
               <button
                 key={r.key}
                 onClick={() => setRange(r.key)}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${range === r.key
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  range === r.key
                     ? "bg-white text-green-700 shadow-sm"
                     : "text-gray-500 hover:text-gray-700"
-                  }`}
+                }`}
               >
                 {r.icon}
                 {r.label}
@@ -146,10 +162,15 @@ export default function AdminRevenue() {
                 className={selectCls}
               >
                 {MONTHS.map((m, i) => (
-                  <option key={i + 1} value={i + 1}>{m}</option>
+                  <option key={i + 1} value={i + 1}>
+                    {m}
+                  </option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <ChevronDown
+                size={14}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
             </div>
           )}
 
@@ -161,12 +182,16 @@ export default function AdminRevenue() {
               className={selectCls}
             >
               {YEARS.map((y) => (
-                <option key={y} value={y}>{y}</option>
+                <option key={y} value={y}>
+                  {y}
+                </option>
               ))}
             </select>
-            <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <ChevronDown
+              size={14}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
           </div>
-
         </div>
       </div>
 
@@ -229,8 +254,12 @@ export default function AdminRevenue() {
         ) : needScroll ? (
           <div className="overflow-x-auto pb-2">
             <div style={{ width: chartWidth, height: 300 }}>
-              <AreaChart width={chartWidth} height={300} data={chartData}
-                margin={{ top: 5, right: 20, left: 10, bottom: 30 }}>
+              <AreaChart
+                width={chartWidth}
+                height={300}
+                data={chartData}
+                margin={{ top: 5, right: 20, left: 10, bottom: 30 }}
+              >
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2} />
@@ -238,18 +267,34 @@ export default function AdminRevenue() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }}
-                  angle={-35} textAnchor="end" height={50} />
-                <YAxis tickFormatter={fmtY} tick={{ fontSize: 11, fill: "#9ca3af" }} />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: "#9ca3af" }}
+                  angle={-35}
+                  textAnchor="end"
+                  height={50}
+                />
+                <YAxis
+                  tickFormatter={fmtY}
+                  tick={{ fontSize: 11, fill: "#9ca3af" }}
+                />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="revenue"
-                  stroke="#22c55e" strokeWidth={2} fill="url(#colorRev)" />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                  fill="url(#colorRev)"
+                />
               </AreaChart>
             </div>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+            >
               <defs>
                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2} />
@@ -258,10 +303,18 @@ export default function AdminRevenue() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#9ca3af" }} />
-              <YAxis tickFormatter={fmtY} tick={{ fontSize: 12, fill: "#9ca3af" }} />
+              <YAxis
+                tickFormatter={fmtY}
+                tick={{ fontSize: 12, fill: "#9ca3af" }}
+              />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="revenue"
-                stroke="#22c55e" strokeWidth={2} fill="url(#colorRev)" />
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="#22c55e"
+                strokeWidth={2}
+                fill="url(#colorRev)"
+              />
             </AreaChart>
           </ResponsiveContainer>
         )}

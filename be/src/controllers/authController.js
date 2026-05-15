@@ -8,37 +8,11 @@ const db = require("../config/db");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Schemas validation (Joi)
-const registerSchema = Joi.object({
-  username: Joi.string()
-    .alphanum()
-    .min(3)
-    .max(30)
-    .required()
-    .messages({ "string.alphanum": "Username chỉ được chứa chữ và số" }),
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({ "string.email": "Email không hợp lệ" }),
-  password: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .messages({ "string.min": "Password phải có ít nhất 6 ký tự" }),
-  full_name: Joi.string().max(100).allow("", null),
-  phone: Joi.string()
-    .pattern(/^[0-9+\-\s]{7,15}$/)
-    .allow("", null)
-    .messages({ "string.pattern.base": "Số điện thoại không hợp lệ" }),
-  address: Joi.string().max(255).allow("", null),
-});
-
-const loginSchema = Joi.object({
-  username: Joi.string().required(),
-  password: Joi.string().required(),
-});
-
 const updateProfileSchema = Joi.object({
-  full_name: Joi.string().max(100).allow("", null),
+  full_name: Joi.string()
+    .max(100)
+    .pattern(/^[a-zA-ZÀ-ỹ\s]+$/)
+    .allow("", null),
   email: Joi.string()
     .email()
     .allow("", null)
@@ -50,6 +24,7 @@ const updateProfileSchema = Joi.object({
   address: Joi.string().max(255).allow("", null),
 });
 
+<<<<<<< HEAD
 //Helper: validate và trả lỗi ngay nếu không hợp lệ
 function validate(schema, data, res) {
   const { error } = schema.validate(data, { abortEarly: false });
@@ -110,23 +85,22 @@ const makeGoogleUsername = async (email) => {
   return `google${crypto.randomBytes(8).toString("hex")}`.slice(0, 30);
 };
 
+=======
+>>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
 // ĐĂNG KÝ
 exports.register = async (req, res) => {
   try {
-    // SỬA: validate bằng Joi thay vì check thủ công
-    if (!validate(registerSchema, req.body, res)) return;
-
     const { username, email, password, full_name, phone, address } = req.body;
 
-    // Kiểm tra username hoặc email đã tồn tại chưa
     const [existingUser] = await db.query(
-      "SELECT id FROM users WHERE username = ? OR email = ?", 
+      "SELECT id FROM users WHERE username = ? OR email = ?",
       [username, email]
     );
+
     if (existingUser.length > 0) {
       return res
         .status(409)
-        .json({ success: false, message: "Username hoặc email đã tồn tại" }); 
+        .json({ success: false, message: "Username hoặc email đã tồn tại" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -144,6 +118,7 @@ exports.register = async (req, res) => {
       ]
     );
 
+<<<<<<< HEAD
     res
       .status(201)
       .json({
@@ -389,6 +364,15 @@ exports.getProfile = async (req, res) => {
     res.json({ success: true, user: users[0] });
   } catch (error) {
     console.error("[getProfile]", error);
+=======
+    res.status(201).json({
+      success: true,
+      message: "Đăng ký thành công!",
+      userId: result.insertId,
+    });
+  } catch (error) {
+    console.error("[register]", error);
+>>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
