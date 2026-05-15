@@ -27,13 +27,9 @@ router.post(
   authController.login
 );
 
-<<<<<<< HEAD
 router.post('/google', loginLimiter, authController.googleLogin);
 
 router.post('/logout', authController.logout);
-=======
-router.post("/logout", authController.logout);
->>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
 
 // Route refresh
 router.post("/refresh", authController.refresh);

@@ -1,16 +1,11 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { register } from '../api/authApi';
-import { toast } from 'react-toastify';
-import GoogleAuthButton from '../components/GoogleAuthButton';
-=======
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/authApi";
 import { toast } from "react-toastify";
 import AddressSelector from "../components/AddressSelector";
->>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
+import GoogleAuthButton from "../components/GoogleAuthButton";
+
+const INVALID_NAME_PATTERN = /[\d\p{P}\p{S}_]/u;
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -81,7 +76,7 @@ const RegisterPage = () => {
       setErrors({ ...errors, full_name: "" });
       return;
     }
-    if (/[0-9!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/`~\-]/.test(value)) {
+    if (INVALID_NAME_PATTERN.test(value)) {
       setErrors({
         ...errors,
         full_name: "Họ tên không được chứa số hoặc kí tự đặc biệt",
@@ -157,7 +152,7 @@ const RegisterPage = () => {
               onCompositionEnd={(e) => {
                 setIsComposing(false);
                 const value = e.target.value;
-                if (/[0-9!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/`~\-]/.test(value)) {
+                if (INVALID_NAME_PATTERN.test(value)) {
                   setErrors({
                     ...errors,
                     full_name: "Họ tên không được chứa số hoặc ký tự đặc biệt",
@@ -243,7 +238,6 @@ const RegisterPage = () => {
             {loading ? "Đang đăng ký..." : "Đăng ký"}
           </button>
         </form>
-<<<<<<< HEAD
         <div className="my-5 flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-200" />
           <span className="text-xs text-gray-400">hoac</span>
@@ -251,11 +245,10 @@ const RegisterPage = () => {
         </div>
         <GoogleAuthButton
           text="signup_with"
-          onSuccessRedirect={(authUser) => navigate(authUser.role === 'admin' ? '/admin' : '/')}
+          onSuccessRedirect={(authUser) =>
+            navigate(authUser.role === "admin" ? "/admin" : "/")
+          }
         />
-=======
-
->>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
         <p className="text-center mt-4 text-sm text-gray-500">
           Đã có tài khoản?{" "}
           <Link

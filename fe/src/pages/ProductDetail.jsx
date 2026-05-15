@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import sanitizeHtml from "sanitize-html";
@@ -54,7 +54,7 @@ const ProductDetail = () => {
     fetchData();
   }, [id]);
 
-  const fetchReviews = async (page = 1) => {
+  const fetchReviews = useCallback(async (page = 1) => {
     setLoadingReviews(true);
     try {
       const res = await reviewApi.getByProduct(id, page);
@@ -68,7 +68,7 @@ const ProductDetail = () => {
     } finally {
       setLoadingReviews(false);
     }
-  };
+  }, [id]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -136,7 +136,7 @@ const ProductDetail = () => {
     );
   };
 
-  const fetchUserReview = async () => {
+  const fetchUserReview = useCallback(async () => {
     if (!token) return;
     try {
       const res = await reviewApi.checkUserReview(id);
@@ -144,19 +144,14 @@ const ProductDetail = () => {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [id, token]);
 
   useEffect(() => {
     if (id) {
       fetchReviews(reviewPage);
       fetchUserReview();
     }
-<<<<<<< HEAD
-
-  }, [id, reviewPage, token]); // eslint-disable-line react-hooks/exhaustive-deps
-=======
-  }, [id, reviewPage, token]);
->>>>>>> 3640fd7702e037ec816e2262cf39e71bca32cb12
+  }, [fetchReviews, fetchUserReview, id, reviewPage, token]);
 
   const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
