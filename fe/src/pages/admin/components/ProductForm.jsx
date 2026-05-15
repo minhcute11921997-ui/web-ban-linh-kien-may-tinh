@@ -1,7 +1,17 @@
 import ImageUploader from "./ImageUploader";
+import sanitizeHtml from "sanitize-html";
 
 const cls =
   "w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+const sanitizeDescription = (html) =>
+  sanitizeHtml(html || "", {
+    allowedTags: ["p", "br", "strong", "em", "u", "ul", "ol", "li", "table", "tbody", "thead", "tr", "td", "th"],
+    allowedAttributes: {
+      td: ["colspan", "rowspan"],
+      th: ["colspan", "rowspan"],
+    },
+  });
 
 const ProductForm = ({ form, setForm, editId, categories, onSubmit, onCancel }) => (
   <form onSubmit={onSubmit}>
@@ -71,9 +81,9 @@ const ProductForm = ({ form, setForm, editId, categories, onSubmit, onCancel }) 
         <div
           contentEditable
           suppressContentEditableWarning
-          dangerouslySetInnerHTML={{ __html: form.description }}
+          dangerouslySetInnerHTML={{ __html: sanitizeDescription(form.description) }}
           onBlur={(e) =>
-            setForm({ ...form, description: e.currentTarget.innerHTML })
+            setForm({ ...form, description: sanitizeDescription(e.currentTarget.innerHTML) })
           }
           className="w-full border border-gray-200 px-4 py-2.5 rounded-xl text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none"
         />

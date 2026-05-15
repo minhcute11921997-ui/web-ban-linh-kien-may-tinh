@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";

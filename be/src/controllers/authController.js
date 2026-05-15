@@ -1,7 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const crypto = require("crypto");
+const { OAuth2Client } = require("google-auth-library");
 const db = require("../config/db");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Schemas validation (Joi)
 const registerSchema = Joi.object({
@@ -56,6 +60,55 @@ function validate(schema, data, res) {
   }
   return true;
 }
+
+const issueAuthTokens = async (user) => {
+  const token = jwt.sign(
+    { userId: user.id, username: user.username, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+  );
+
+  const refreshToken = jwt.sign(
+    { userId: user.id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await db.query(
+    "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
+    [user.id, refreshToken, expiresAt]
+  );
+
+  return { token, refreshToken };
+};
+
+const toAuthUser = (user) => ({
+  id: user.id,
+  username: user.username,
+  full_name: user.full_name,
+  email: user.email,
+  phone: user.phone,
+  address: user.address,
+  role: user.role,
+});
+
+const makeGoogleUsername = async (email) => {
+  const base = email
+    .split("@")[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "")
+    .slice(0, 24) || "googleuser";
+
+  for (let i = 0; i < 8; i += 1) {
+    const suffix = i === 0 ? "" : String(Math.floor(1000 + Math.random() * 9000));
+    const username = `${base}${suffix}`.slice(0, 30);
+    const [rows] = await db.query("SELECT id FROM users WHERE username = ?", [username]);
+    if (rows.length === 0) return username;
+  }
+
+  return `google${crypto.randomBytes(8).toString("hex")}`.slice(0, 30);
+};
 
 // ĐĂNG KÝ
 exports.register = async (req, res) => {
@@ -132,39 +185,15 @@ exports.login = async (req, res) => {
         .json({ success: false, message: "Username hoặc password không đúng" });
     }
 
-    const token = jwt.sign(
-      { userId: user.id, username: user.username, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
-
-    const refreshToken = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
-    );
+    const { token, refreshToken } = await issueAuthTokens(user);
 
     // THÊM MỚI: Lưu refresh token vào DB để có thể revoke
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await db.query(
-      "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
-      [user.id, refreshToken, expiresAt]
-    );
-
     res.json({
       success: true,
       message: "Đăng nhập thành công!",
       token,
       refreshToken,
-      user: {
-        id: user.id,
-        username: user.username,
-        full_name: user.full_name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address,
-        role: user.role,
-      },
+      user: toAuthUser(user),
     });
   } catch (error) {
     console.error("[login]", error);
@@ -173,6 +202,56 @@ exports.login = async (req, res) => {
 };
 
 //LÀM MỚI TOKEN
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ success: false, message: "Chua cau hinh GOOGLE_CLIENT_ID" });
+    }
+    if (!credential) {
+      return res.status(400).json({ success: false, message: "Thieu Google credential" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload?.email || !payload.email_verified) {
+      return res.status(401).json({ success: false, message: "Email Google chua duoc xac minh" });
+    }
+
+    const email = payload.email.toLowerCase();
+    const [existingUsers] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    let user = existingUsers[0];
+
+    if (!user) {
+      const username = await makeGoogleUsername(email);
+      const randomPasswordHash = await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10);
+      const [result] = await db.query(
+        "INSERT INTO users (username, email, password, full_name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [username, email, randomPasswordHash, payload.name || email.split("@")[0], null, null, "customer"]
+      );
+
+      const [users] = await db.query("SELECT * FROM users WHERE id = ?", [result.insertId]);
+      user = users[0];
+    }
+
+    const { token, refreshToken } = await issueAuthTokens(user);
+    res.json({
+      success: true,
+      message: "Dang nhap Google thanh cong!",
+      token,
+      refreshToken,
+      user: toAuthUser(user),
+    });
+  } catch (error) {
+    console.error("[googleLogin]", error);
+    res.status(401).json({ success: false, message: "Dang nhap Google that bai" });
+  }
+};
+
 exports.refresh = async (req, res) => {
   try {
     const { refreshToken } = req.body;

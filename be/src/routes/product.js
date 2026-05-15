@@ -3,8 +3,20 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const jwt = require('jsonwebtoken');
 const productController = require('../controllers/productController');
 const { verifyToken, verifyAdmin } = require('../middleware/auth');
+
+const optionalAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    if (token) {
+      req.user = jwt.verify(token, process.env.JWT_SECRET);
+    }
+  } catch (_) {}
+  next();
+};
 
 //Cấu hình upload ảnh local 
 const uploadDir = path.join(__dirname, '../../uploads/products');
@@ -48,7 +60,7 @@ router.post(
 );
 
 // Public routes
-router.get('/', productController.getAllProducts);
+router.get('/', optionalAuth, productController.getAllProducts);
 router.get('/filters/:categoryId', productController.getFilterOptions);
 router.get('/featured', productController.getFeaturedProducts);
 router.post('/flash-sale', verifyToken, verifyAdmin, productController.setFlashSale);

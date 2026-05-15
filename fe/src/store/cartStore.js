@@ -31,7 +31,6 @@ const useCartStore = create((set, get) => ({
   addItem: async (productId, quantity) => {
     try {
       const res = await addToCart({ productId, quantity });
-      console.log('addToCart response:', res.data);
       if (res.data.success) {
         // Fetch lại giỏ hàng để cập nhật chính xác
         await get().fetchCart();

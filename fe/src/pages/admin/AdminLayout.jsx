@@ -10,6 +10,7 @@ import {
   LogOut,
   ShieldCheck,
   Gift,
+  Images,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { to: "/admin/products", label: "Sản phẩm", icon: <Package size={17} /> },
   { to: "/admin/orders", label: "Đơn hàng", icon: <ShoppingBag size={17} /> },
   { to: "/admin/revenue", label: "Doanh thu", icon: <TrendingUp size={17} /> },
+  { to: "/admin/banners", label: "Banner", icon: <Images size={17} /> },
   {
     to: "/admin/categories",
     label: "Danh mục",

@@ -60,6 +60,9 @@ app.use('/api/users', userRoutes);
 const dashboardRoutes = require('./src/routes/dashboard');
 app.use('/api/dashboard', dashboardRoutes);
 
+const bannerRoutes = require('./src/routes/banner');
+app.use('/api/banners', bannerRoutes);
+
 const addressRoutes = require('./src/routes/address');
 app.use('/api/addresses', addressRoutes);
 

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 
@@ -6,9 +7,6 @@ const FlashSaleCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const discountPercent =
-    product.discount_percent || product.discountPercent || 0;
-
   const stockTotal = product.stockTotal || product.stock || 10;
   const stockLeft = product.stockLeft ?? product.stock ?? 0;
   const handleAddToCart = async (e) => {

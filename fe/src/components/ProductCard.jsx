@@ -1,13 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 
 // Hàm strip HTML tags khỏi description
-const stripHtml = (html) => {
-  if (!html) return "";
-  return html.replace(/<[^>]*>/g, "").trim();
-};
-
 const ProductCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
@@ -26,8 +22,6 @@ const ProductCard = ({ product }) => {
       toast.error(error?.message || "Có lỗi xảy ra!");
     }
   };
-
-  const cleanDescription = stripHtml(product.description);
 
   return (
     <div className="border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 bg-white flex flex-col h-full group">

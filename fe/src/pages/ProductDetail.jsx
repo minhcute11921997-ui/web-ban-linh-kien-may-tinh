@@ -66,9 +66,6 @@ const ProductDetail = () => {
     }
   };
 
-  const sanitizeComment = (text) =>
-    sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} }).trim();
-
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!token) { navigate('/login'); return; }
@@ -142,7 +139,7 @@ const ProductDetail = () => {
       fetchUserReview();
     }
 
-  }, [id, reviewPage, token]);
+  }, [id, reviewPage, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);

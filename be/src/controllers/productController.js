@@ -17,7 +17,7 @@ const getAllProducts = async (req, res) => {
             params.push(specName, specFilters[specName]);
         });
 
-        const isAdminView = req.query.adminView === 'true';
+        const isAdminView = req.query.adminView === 'true' && req.user?.role === 'admin';
 query += isAdminView ? ' WHERE 1=1' : ' WHERE p.is_active = 1';
 
         if (search) {

@@ -23,6 +23,8 @@ router.post('/register', validate(registerSchema), authController.register);
 // loginLimiter 
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
 
+router.post('/google', loginLimiter, authController.googleLogin);
+
 router.post('/logout', authController.logout);
 
 // Route refresh 

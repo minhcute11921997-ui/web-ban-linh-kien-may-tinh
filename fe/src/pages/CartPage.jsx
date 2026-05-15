@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
-import { createOrder } from '../api/orderApi';
-import { toast } from 'react-toastify';
 import {
   ShoppingCart,
   Trash2,
@@ -18,31 +16,18 @@ import {
 const CartPage = () => {
   const {
     items, loading, fetchCart, updateItem, removeItem,
-    clearAll, selectedItems, toggleSelectedItem, toggleSelectAll,
+    selectedItems, toggleSelectedItem, toggleSelectAll,
   } = useCartStore();
   const navigate = useNavigate();
   const [inputValues, setInputValues] = useState({});
 
-  useEffect(() => { fetchCart(); }, []);
+  useEffect(() => { fetchCart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalPrice = items.reduce((sum, item) => {
     if (selectedItems.includes(item.id))
       return sum + Number(item.price) * item.quantity;
     return sum;
   }, 0);
-
-  const handleOrder = async () => {
-    if (items.length === 0) return;
-    try {
-      const selected = items.filter(i => selectedItems.includes(i.id));
-      await createOrder({ items: selected });
-      await clearAll();
-      toast.success('Đặt hàng thành công!');
-      navigate('/orders');
-    } catch {
-      toast.error('Đặt hàng thất bại, vui lòng thử lại!');
-    }
-  };
 
   const handleClearAll = () => {
     selectedItems.forEach(itemId => removeItem(itemId));

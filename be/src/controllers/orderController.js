@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { incrementUsedCount } = require('./discountController');
+const { incrementUsedCount, getValidDiscount } = require('./discountController');
 
 const STATUS_LABEL = {
   pending: 'Chờ xử lý',
@@ -16,8 +16,9 @@ const formatOrder = (order) => ({
 });
 
 exports.createOrder = async (req, res) => {
+  let conn;
   try {
-    const { shipping_address, discount_code, discount_amount } = req.body;
+    const { shipping_address, discount_code } = req.body;
     if (!shipping_address) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập địa chỉ giao hàng' });
     }
@@ -57,9 +58,19 @@ exports.createOrder = async (req, res) => {
     }
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const total_price = Math.max(0, subtotal - (Number(discount_amount) || 0));
+    let discountAmount = 0;
+    let validatedDiscountCode = null;
+    if (discount_code) {
+      const discountResult = await getValidDiscount(discount_code, subtotal, req.user.userId);
+      discountAmount = discountResult.discountAmount;
+      validatedDiscountCode = discountResult.discount.code;
+    }
+    const total_price = Math.max(0, subtotal - discountAmount);
 
-    const [order] = await db.query(
+    conn = await db.getConnection();
+    await conn.beginTransaction();
+
+    const [order] = await conn.query(
       'INSERT INTO orders (user_id, total_price, shipping_address, status) VALUES (?, ?, ?, ?)',
       [req.user.userId, total_price, shipping_address, 'pending']
     );
@@ -68,26 +79,42 @@ exports.createOrder = async (req, res) => {
     const orderId = order.insertId;
 
     for (const item of items) {
-      await db.query(
+      await conn.query(
         'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
         [orderId, item.product_id, item.quantity, item.price]
       );
-      await db.query('UPDATE products SET stock = stock - ? WHERE id = ?', [item.quantity, item.product_id]);
-      await db.query(
+      const [stockUpdate] = await conn.query(
+        'UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?',
+        [item.quantity, item.product_id, item.quantity]
+      );
+      if (stockUpdate.affectedRows === 0) {
+        throw new Error(`San pham "${item.name}" khong du hang trong kho`);
+      }
+      await conn.query(
         'UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?) WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0',
         [item.quantity, item.product_id]
       );
     }
 
-    await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
+    await conn.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
+
+    await conn.commit();
+    conn.release();
+    conn = null;
 
     //
-    if (discount_code) {
-      await incrementUsedCount(discount_code, req.user.userId, orderId);
+    if (validatedDiscountCode) {
+      await incrementUsedCount(validatedDiscountCode, req.user.userId, orderId);
     }
 
     res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderId });
   } catch (error) {
+    if (conn) {
+      try {
+        await conn.rollback();
+        conn.release();
+      } catch (_) {}
+    }
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { login } from '../api/authApi';
 import useAuthStore from '../store/authStore';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ login: '', password: '' });
@@ -95,6 +96,15 @@ const LoginPage = () => {
             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
         </form>
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs text-gray-400">hoac</span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+        <GoogleAuthButton
+          text="signin_with"
+          onSuccessRedirect={(authUser) => navigate(authUser.role === 'admin' ? '/admin' : '/')}
+        />
         <p className="text-center mt-4 text-sm text-gray-500">
           Chưa có tài khoản?{' '}
           <Link to="/register" className="text-blue-600 hover:underline font-medium">

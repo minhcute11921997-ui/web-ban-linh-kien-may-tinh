@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 
 import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
@@ -14,7 +14,6 @@ const STATUS_LABEL = {
 
 const PaymentSuccessPage = () => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
     const { token } = useAuthStore();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);

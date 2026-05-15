@@ -1,5 +1,67 @@
 const db = require("../config/db");
 
+const calculateDiscountAmount = (discount, totalPrice) => {
+  const total = Math.max(0, Number(totalPrice) || 0);
+  if (discount.type === "percent") {
+    return Math.floor(total * (Number(discount.value) / 100));
+  }
+  return Math.min(Number(discount.value) || 0, total);
+};
+
+exports.getValidDiscount = async (code, totalPrice, userId = null) => {
+  if (!code) return { discount: null, discountAmount: 0 };
+
+  const [[discount]] = await db.query(
+    "SELECT * FROM discount_codes WHERE code = ? AND active = 1",
+    [code.toUpperCase()]
+  );
+
+  if (!discount) {
+    const err = new Error("Ma giam gia khong hop le");
+    err.status = 404;
+    throw err;
+  }
+
+  if (discount.expires_at && new Date(discount.expires_at) < new Date()) {
+    const err = new Error("Ma giam gia da het han");
+    err.status = 400;
+    throw err;
+  }
+
+  if (discount.max_uses !== null && discount.used_count >= discount.max_uses) {
+    const err = new Error("Ma giam gia da het luot su dung");
+    err.status = 400;
+    throw err;
+  }
+
+  if (Number(totalPrice) < Number(discount.min_order_value || 0)) {
+    const err = new Error(
+      `Don hang toi thieu ${Number(discount.min_order_value).toLocaleString("vi-VN")} VND de dung ma nay`
+    );
+    err.status = 400;
+    throw err;
+  }
+
+  if (userId && discount.max_per_user !== null) {
+    const [[usageRow]] = await db.query(
+      "SELECT COUNT(*) as cnt FROM discount_usage WHERE discount_id = ? AND user_id = ?",
+      [discount.id, userId]
+    );
+    if (usageRow.cnt >= discount.max_per_user) {
+      const err = new Error(
+        `Ban da dung ma nay ${discount.max_per_user} lan (toi da ${discount.max_per_user} lan/tai khoan)`
+      );
+      err.status = 400;
+      throw err;
+    }
+  }
+
+  return {
+    discount,
+    discountAmount: calculateDiscountAmount(discount, totalPrice),
+  };
+};
+
 exports.validateDiscount = async (req, res) => {
   try {
     const { code, totalPrice } = req.query;
@@ -40,7 +102,7 @@ exports.validateDiscount = async (req, res) => {
       if (authHeader) {
         const token = authHeader.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        userId = decoded.id;
+        userId = decoded.userId || decoded.id;
       }
     } catch (_) {
       /* token không hợp lệ hoặc không có — bỏ qua */
@@ -123,10 +185,11 @@ exports.incrementUsedCount = async (code, userId = null, orderId = null) => {
   if (!discount) return;
 
   // Tăng tổng lượt toàn hệ thống
-  await db.query(
-    "UPDATE discount_codes SET used_count = used_count + 1 WHERE id = ?",
+  const [result] = await db.query(
+    "UPDATE discount_codes SET used_count = used_count + 1 WHERE id = ? AND (max_uses IS NULL OR used_count < max_uses)",
     [discount.id]
   );
+  if (result.affectedRows === 0) return;
 
   // Ghi lại ai đã dùng
   if (userId) {
@@ -201,8 +264,8 @@ exports.adminCreate = async (req, res) => {
 
     const [result] = await db.query(
       `INSERT INTO discount_codes 
-        (code, type, value, description, min_order_value, max_uses, expires_at, active, used_count)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0)`,
+        (code, type, value, description, min_order_value, max_uses, max_per_user, expires_at, active, used_count)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0)`,
       [
         upperCode,
         type,
@@ -210,6 +273,7 @@ exports.adminCreate = async (req, res) => {
         description || null,
         min_order_value || 0,
         max_uses || null,
+        max_per_user || null,
         expires_at || null,
       ]
     );

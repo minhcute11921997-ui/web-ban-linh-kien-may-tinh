@@ -52,7 +52,7 @@ const CheckoutPage = () => {
     if (appliedDiscount) {
       handleApplyDiscount(appliedDiscount.code);
     }
-  }, [shippingFee]);
+  }, [shippingFee]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!token) return;
@@ -77,7 +77,7 @@ const CheckoutPage = () => {
       .then(r => setAvailableDiscounts(r.data.data || []))
       .catch(() => { });
 
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cartItems = items.filter(item => selectedItems.includes(item.id));
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);

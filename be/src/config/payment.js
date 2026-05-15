@@ -22,8 +22,6 @@ const createVNPayUrl = (orderData) => {
         vnp_Locale: VnpLocale.VN,
     });
 
-    console.log('=== FULL PAYMENT URL ===');
-    console.log(paymentUrl);
     return paymentUrl;
 };
 

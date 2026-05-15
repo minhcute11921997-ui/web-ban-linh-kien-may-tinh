@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getMyOrders } from '../api/orderApi';
 import useAuthStore from '../store/authStore';
-import { toast } from 'react-toastify';
 import {
   ShoppingBag, Clock, Loader2, Truck, BadgeCheck, XCircle,
   PackageSearch, Banknote, Landmark, ChevronRight,
@@ -73,7 +72,7 @@ const OrdersPage = () => {
         if (err?.response?.status === 401 || err?.message === 'No refresh token') return;
       })
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, navigate]);
 
   const getTabOrders   = (key) => orders.filter(o => TABS.find(t => t.key === key)?.statuses.includes(o.status || o.order_status));
   const getTabCount    = (key) => getTabOrders(key).length;

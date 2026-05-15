@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../api/authApi';
 import { toast } from 'react-toastify';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -149,6 +150,15 @@ const RegisterPage = () => {
             {loading ? 'Đang đăng ký...' : 'Đăng ký'}
           </button>
         </form>
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs text-gray-400">hoac</span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+        <GoogleAuthButton
+          text="signup_with"
+          onSuccessRedirect={(authUser) => navigate(authUser.role === 'admin' ? '/admin' : '/')}
+        />
         <p className="text-center mt-4 text-sm text-gray-500">
           Đã có tài khoản?{' '}
           <Link to="/login" className="text-blue-600 hover:underline font-medium">Đăng nhập</Link>

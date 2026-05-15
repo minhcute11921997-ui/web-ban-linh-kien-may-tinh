@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getAllCategories } from "../api/categoryApi";
-import useCartStore from "../store/cartStore";
-import useAuthStore from "../store/authStore";
-import { toast } from "react-toastify";
+import { getBanners } from "../api/bannerApi";
 import ProductCard from "../components/ProductCard";
 import FeaturedProductCard from "../components/FeaturedProductCard";
 import FlashSaleCard from "../components/FlashSaleCard";
@@ -36,11 +34,17 @@ const SORT_OPTIONS = [
   { label: "Tên Z → A", value: "name-DESC" },
 ];
 
-const SLIDES = [
+const DEFAULT_SLIDES = [
   { id: 1, image: slide1, link: "/products/69" },
   { id: 2, image: slide2, link: "/products/48" },
   { id: 3, image: slide3, link: "/products/44" },
 ];
+
+const resolveBannerImage = (imageUrl, fallbackImage) => {
+  if (!imageUrl) return fallbackImage;
+  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+  return imageUrl;
+};
 
 const formatPrice = (v) => {
   if (v >= 1000000)
@@ -79,15 +83,13 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const addItem = useCartStore((s) => s.addItem);
-  const token = useAuthStore((s) => s.token);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [categoryBrandsMap, setCategoryBrandsMap] = useState({});
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const [activeSubFilters, setActiveSubFilters] = useState({});
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [slideIndex, setSlideIndex] = useState(0);
   const [slidePaused, setSlidePaused] = useState(false);
   const slideInterval = useRef(null);
@@ -139,11 +141,35 @@ export default function HomePage() {
   useEffect(() => {
     if (slidePaused) return;
     slideInterval.current = setInterval(
-      () => setSlideIndex((p) => (p + 1) % SLIDES.length),
+      () => setSlideIndex((p) => (p + 1) % slides.length),
       4000
     );
     return () => clearInterval(slideInterval.current);
-  }, [slidePaused]);
+  }, [slidePaused, slides.length]);
+
+  useEffect(() => {
+    getBanners()
+      .then((res) => {
+        if (!res.data.success) return;
+
+        const banners = res.data.data || [];
+        const nextSlides = DEFAULT_SLIDES.map((defaultSlide) => {
+          const banner = banners.find(
+            (item) => Number(item.position) === defaultSlide.id
+          );
+
+          return {
+            ...defaultSlide,
+            image: resolveBannerImage(banner?.image_url, defaultSlide.image),
+            link: banner?.link || defaultSlide.link,
+          };
+        });
+
+        setSlides(nextSlides);
+        setSlideIndex((current) => Math.min(current, nextSlides.length - 1));
+      })
+      .catch(() => {});
+  }, []);
 
   // Danh mục
   useEffect(() => {
@@ -344,7 +370,7 @@ export default function HomePage() {
           className="flex transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${slideIndex * 100}%)` }}
         >
-          {SLIDES.map((slide) => (
+          {slides.map((slide) => (
             <Link
               key={slide.id}
               to={slide.link || "/"}
@@ -363,14 +389,14 @@ export default function HomePage() {
         {/* Mũi tên slider */}
         <button
           onClick={() =>
-            setSlideIndex((p) => (p - 1 + SLIDES.length) % SLIDES.length)
+            setSlideIndex((p) => (p - 1 + slides.length) % slides.length)
           }
           className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
         >
           <ChevronLeft size={20} />
         </button>
         <button
-          onClick={() => setSlideIndex((p) => (p + 1) % SLIDES.length)}
+          onClick={() => setSlideIndex((p) => (p + 1) % slides.length)}
           className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
         >
           <ChevronRight size={20} />
@@ -378,7 +404,7 @@ export default function HomePage() {
 
         {/* Dots */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {SLIDES.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setSlideIndex(i)}

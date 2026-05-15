@@ -1,6 +1,6 @@
 const db = require('../config/db');
 const { createVNPayUrl, verifyVNPayResponse } = require('../config/payment');
-const { incrementUsedCount } = require('./discountController');
+const { incrementUsedCount, getValidDiscount } = require('./discountController');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -19,6 +19,7 @@ const getClientIp = (req) => {
  * POST /api/payments/create-order
  */
 exports.createOrder = async (req, res) => {
+    let conn;
     try {
         const {
             paymentMethod,
@@ -27,8 +28,6 @@ exports.createOrder = async (req, res) => {
             customerPhone,
             customerAddress,
             customerNotes,
-            shippingFee,
-            discountAmount,
             discount_code, 
         } = req.body;
         const userId = req.user.userId;
@@ -87,31 +86,43 @@ exports.createOrder = async (req, res) => {
 
         // Tính tiền
         const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const fee = Number(shippingFee) || 0;
-        const discount = Number(discountAmount) || 0;
+        const fee = calculateShippingFee(customerAddress);
+        let discount = 0;
+        let validatedDiscountCode = null;
+        if (discount_code) {
+            const discountResult = await getValidDiscount(discount_code, subtotal + fee, userId);
+            discount = discountResult.discountAmount;
+            validatedDiscountCode = discountResult.discount.code;
+        }
         const totalPrice = Math.max(0, subtotal + fee - discount);
 
         // Tạo order
-        const [orderResult] = await db.query(
+        conn = await db.getConnection();
+        await conn.beginTransaction();
+
+        const [orderResult] = await conn.query(
             `INSERT INTO orders
              (user_id, total_price, payment_method, payment_status, status,
               customer_name, customer_phone, shipping_address, notes, shipping_fee, discount_amount, discount_code)
              VALUES (?, ?, ?, 'pending', 'pending', ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, totalPrice, paymentMethod, customerName, customerPhone, customerAddress, customerNotes || '', fee, discount, discount_code || null]
+            [userId, totalPrice, paymentMethod, customerName, customerPhone, customerAddress, customerNotes || '', fee, discount, validatedDiscountCode]
         );
         const orderId = orderResult.insertId;
 
         // Thêm order items và trừ tồn kho
         for (const item of cartItems) {
-            await db.query(
+            await conn.query(
                 `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)`,
                 [orderId, item.product_id, item.quantity, item.price]
             );
-            await db.query(
-                `UPDATE products SET stock = stock - ? WHERE id = ?`,
-                [item.quantity, item.product_id]
+            const [stockUpdate] = await conn.query(
+                `UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?`,
+                [item.quantity, item.product_id, item.quantity]
             );
-            await db.query(
+            if (stockUpdate.affectedRows === 0) {
+                throw new Error(`San pham "${item.product_name_db}" khong du hang trong kho`);
+            }
+            await conn.query(
                 `UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?)
                  WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0`,
                 [item.quantity, item.product_id]
@@ -121,23 +132,30 @@ exports.createOrder = async (req, res) => {
         // Xóa các cart_items đã thanh toán
         if (cartItemIds && cartItemIds.length > 0) {
             const placeholders = cartItemIds.map(() => '?').join(',');
-            await db.query(
+            await conn.query(
                 `DELETE FROM cart_items WHERE cart_id = ? AND id IN (${placeholders})`,
                 [cartId, ...cartItemIds]
             );
         } else {
-            await db.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
+            if (['failed', 'completed'].includes(order.payment_status)) {
+                return res.json({ RspCode: '00', Message: 'Confirm Success' });
+            }
+            await conn.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
         }
 
         // Xử lý theo phương thức
         if (paymentMethod === 'cod') {
-            await db.query(
+            await conn.query(
                 `UPDATE orders SET payment_status = 'pending', status = 'processing' WHERE id = ?`,
                 [orderId]
             );
 
-            if (discount_code) {
-                await incrementUsedCount(discount_code, userId, orderId);
+            await conn.commit();
+            conn.release();
+            conn = null;
+
+            if (validatedDiscountCode) {
+                await incrementUsedCount(validatedDiscountCode, userId, orderId);
             }
 
             return res.json({
@@ -150,6 +168,10 @@ exports.createOrder = async (req, res) => {
             });
 
         } else if (paymentMethod === 'vnpay') {
+            await conn.commit();
+            conn.release();
+            conn = null;
+
             const clientIp = getClientIp(req);
             const paymentUrl = createVNPayUrl({
                 orderId: `${orderId}`,
@@ -158,9 +180,6 @@ exports.createOrder = async (req, res) => {
                 clientIp
             });
 
-            const urlObj = new URL(paymentUrl);
-console.log('=== PARAMS GỬI LÊN VNPAY ===');
-urlObj.searchParams.forEach((v, k) => console.log(`${k} = ${v}`));
 
 
 
@@ -175,6 +194,12 @@ urlObj.searchParams.forEach((v, k) => console.log(`${k} = ${v}`));
         }
 
     } catch (error) {
+        if (conn) {
+            try {
+                await conn.rollback();
+                conn.release();
+            } catch (_) {}
+        }
         console.error('Lỗi tạo order:', error);
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
@@ -192,6 +217,13 @@ exports.vnpayCallback = async (req, res) => {
         }
 
         if (verifyResult.responseCode !== '00') {
+            const [[orderStatus]] = await db.query(
+                'SELECT payment_status FROM orders WHERE id = ?',
+                [verifyResult.orderId]
+            );
+            if (['failed', 'completed'].includes(orderStatus?.payment_status)) {
+                return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&orderId=${verifyResult.orderId}&method=vnpay`);
+            }
             // Hoàn lại tồn kho khi thanh toán thất bại
             const [orderItems] = await db.query(
                 `SELECT product_id, quantity FROM order_items WHERE order_id = ?`,
@@ -215,7 +247,7 @@ exports.vnpayCallback = async (req, res) => {
             return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&orderId=${verifyResult.orderId}&method=vnpay`);
         }
 
-        await db.query(
+        const [paymentUpdate] = await db.query(
             `UPDATE orders SET payment_status = 'completed', status = 'processing', transaction_id = ?
              WHERE id = ? AND payment_status != 'completed'`,
             [verifyResult.transactionNo, verifyResult.orderId]
@@ -224,7 +256,7 @@ exports.vnpayCallback = async (req, res) => {
             `SELECT user_id, discount_code FROM orders WHERE id = ?`,
             [verifyResult.orderId]
         );
-        if (orderRows.length > 0 && orderRows[0].discount_code) {
+        if (paymentUpdate.affectedRows > 0 && orderRows.length > 0 && orderRows[0].discount_code) {
             await incrementUsedCount(
                 orderRows[0].discount_code,
                 orderRows[0].user_id,
@@ -350,6 +382,9 @@ exports.vnpayIpn = async (req, res) => {
 
         } else {
             // Thanh toán thất bại — hoàn lại tồn kho
+            if (['failed', 'completed'].includes(order.payment_status)) {
+                return res.json({ RspCode: '00', Message: 'Confirm Success' });
+            }
             const [orderItems] = await db.query(
                 'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
                 [verifyResult.orderId]
@@ -376,4 +411,10 @@ exports.vnpayIpn = async (req, res) => {
         console.error('Lỗi IPN VNPay:', error);
         return res.json({ RspCode: '99', Message: 'Server error' });
     }
+};
+
+const calculateShippingFee = (address) => {
+    const normalized = String(address || '').toLowerCase();
+    const hanoiKeywords = ['ha noi', 'hanoi', 'hn', 'hà nội', 'hànội'];
+    return hanoiKeywords.some(keyword => normalized.includes(keyword)) ? 50000 : 100000;
 };

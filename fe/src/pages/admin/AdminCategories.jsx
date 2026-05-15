@@ -22,8 +22,6 @@ const AdminCategories = () => {
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => { fetchCategories(); }, []);
-
   const fetchCategories = async () => {
     try {
       const res = await getAllCategories();
@@ -31,6 +29,8 @@ const AdminCategories = () => {
     } catch {
     }
   };
+
+  useEffect(() => { fetchCategories(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -23,6 +23,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminDiscounts from "./pages/admin/AdminDiscounts";
+import AdminBanners from "./pages/admin/AdminBanners";
 
 function App() {
   useAuthInit();
@@ -46,6 +47,7 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="discounts" element={<AdminDiscounts />} />
+          <Route path="banners" element={<AdminBanners />} />
         </Route>
 
         {/* Customer routes */}
