@@ -1,5 +1,6 @@
 
 import Navbar from '../components/Navbar';
+import ChatbotWidget from './ChatbotWidget';
 import bannerLeft from "../assets/banner-left.png";
 import bannerRight from "../assets/banner-right.png";
 
@@ -25,6 +26,7 @@ const CustomerLayout = ({ children }) => (
         </div>
       </div>
     </div>
+    <ChatbotWidget />
   </>
 );
 

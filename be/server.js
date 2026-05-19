@@ -63,6 +63,9 @@ app.use('/api/dashboard', dashboardRoutes);
 const bannerRoutes = require('./src/routes/banner');
 app.use('/api/banners', bannerRoutes);
 
+const chatbotRoutes = require('./src/routes/chatbot');
+app.use('/api/chatbot', chatbotRoutes);
+
 const addressRoutes = require('./src/routes/address');
 app.use('/api/addresses', addressRoutes);
 
