@@ -32,6 +32,10 @@ exports.createOrder = async (req, res) => {
         } = req.body;
         const userId = req.user.userId;
 
+        if (!Array.isArray(cartItemIds) || cartItemIds.length === 0) {
+            return res.status(400).json({ success: false, message: 'Vui lòng chọn sản phẩm cần thanh toán' });
+        }
+
         // Validate phương thức thanh toán
         if (!['cod', 'vnpay'].includes(paymentMethod)) {
             return res.status(400).json({ success: false, message: 'Phương thức thanh toán không hợp lệ' });
@@ -202,6 +206,116 @@ exports.createOrder = async (req, res) => {
         }
         console.error('Lỗi tạo order:', error);
         res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+};
+
+/**
+ * POST /api/payments/:orderId/retry
+ */
+exports.retryVNPayPayment = async (req, res) => {
+    let conn;
+    try {
+        const { orderId } = req.params;
+        const userId = req.user.userId;
+
+        conn = await db.getConnection();
+        await conn.beginTransaction();
+
+        const [orders] = await conn.query(
+            `SELECT * FROM orders WHERE id = ? AND user_id = ? FOR UPDATE`,
+            [orderId, userId]
+        );
+
+        if (orders.length === 0) {
+            await conn.rollback();
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        const order = orders[0];
+
+        if (order.payment_method !== 'vnpay') {
+            await conn.rollback();
+            return res.status(400).json({ success: false, message: 'Đơn hàng này không thanh toán bằng VNPay' });
+        }
+
+        if (order.payment_status === 'completed') {
+            await conn.rollback();
+            return res.status(400).json({ success: false, message: 'Đơn hàng đã thanh toán' });
+        }
+
+        if (!['pending', 'processing'].includes(order.status)) {
+            await conn.rollback();
+            return res.status(400).json({ success: false, message: 'Trạng thái đơn hàng không thể thanh toán lại' });
+        }
+
+        const [items] = await conn.query(
+            `SELECT oi.product_id, oi.quantity, p.stock, p.name
+             FROM order_items oi
+             JOIN products p ON p.id = oi.product_id
+             WHERE oi.order_id = ?`,
+            [orderId]
+        );
+
+        if (items.length === 0) {
+            await conn.rollback();
+            return res.status(400).json({ success: false, message: 'Đơn hàng không có sản phẩm' });
+        }
+
+        if (order.payment_status === 'failed') {
+            for (const item of items) {
+                if (item.stock < item.quantity) {
+                    await conn.rollback();
+                    return res.status(400).json({
+                        success: false,
+                        message: `Sản phẩm "${item.name}" không đủ hàng trong kho (còn ${item.stock})`
+                    });
+                }
+            }
+
+            for (const item of items) {
+                await conn.query(
+                    `UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?`,
+                    [item.quantity, item.product_id, item.quantity]
+                );
+                await conn.query(
+                    `UPDATE products SET flash_sale_qty = GREATEST(0, flash_sale_qty - ?)
+                     WHERE id = ? AND flash_sale_qty IS NOT NULL AND discount_percent > 0`,
+                    [item.quantity, item.product_id]
+                );
+            }
+        }
+
+        await conn.query(
+            `UPDATE orders SET payment_status = 'pending', transaction_id = NULL WHERE id = ?`,
+            [orderId]
+        );
+
+        await conn.commit();
+        conn.release();
+        conn = null;
+
+        const paymentUrl = createVNPayUrl({
+            orderId: `${orderId}`,
+            amount: order.total_price,
+            orderDescription: `Thanh toan don hang ${orderId}`,
+            clientIp: getClientIp(req)
+        });
+
+        return res.json({
+            success: true,
+            message: 'Tạo lại link thanh toán thành công',
+            orderId,
+            paymentUrl
+        });
+    } catch (error) {
+        if (conn) {
+            try {
+                await conn.rollback();
+                conn.release();
+            } catch (_) {}
+        }
+        console.error('Lỗi thanh toán lại VNPay:', error);
+        return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 

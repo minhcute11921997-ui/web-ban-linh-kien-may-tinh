@@ -23,3 +23,7 @@ export const updateOrderStatus = (id, status) => {
 export const deleteOrder = (id) => {
   return axiosInstance.delete(`/orders/admin/${id}`);
 };
+
+export const retryVNPayPayment = (id) => {
+  return axiosInstance.post(`/payments/${id}/retry`);
+};

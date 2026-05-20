@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getMyOrders } from '../api/orderApi';
+import { getMyOrders, retryVNPayPayment } from '../api/orderApi';
 import useAuthStore from '../store/authStore';
+import { toast } from 'react-toastify';
 import {
   ShoppingBag, Clock, Loader2, Truck, BadgeCheck, XCircle,
-  PackageSearch, Banknote, Landmark, ChevronRight,
+  PackageSearch, Banknote, Landmark, ChevronRight, CreditCard,
 } from 'lucide-react';
 
 const TABS = [
@@ -55,6 +56,7 @@ const OrdersPage = () => {
   const { token } = useAuthStore();
   const [orders, setOrders]       = useState([]);
   const [loading, setLoading]     = useState(true);
+  const [payingOrderId, setPayingOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState('active');
   const navigate = useNavigate();
 
@@ -77,6 +79,21 @@ const OrdersPage = () => {
   const getTabOrders   = (key) => orders.filter(o => TABS.find(t => t.key === key)?.statuses.includes(o.status || o.order_status));
   const getTabCount    = (key) => getTabOrders(key).length;
   const filteredOrders = getTabOrders(activeTab);
+
+  const handleRetryPayment = async (event, orderId) => {
+    event.stopPropagation();
+    setPayingOrderId(orderId);
+    try {
+      const res = await retryVNPayPayment(orderId);
+      if (res.data.success && res.data.paymentUrl) {
+        window.location.href = res.data.paymentUrl;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Không thể tạo lại link thanh toán');
+    } finally {
+      setPayingOrderId(null);
+    }
+  };
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-3 text-gray-400">
@@ -127,6 +144,10 @@ const OrdersPage = () => {
           {filteredOrders.map(order => {
             const orderStatus = order.status || order.order_status;
             const payStatus   = PAYMENT_STATUS[order.payment_status] || PAYMENT_STATUS.pending;
+            const canRetryPayment =
+              order.payment_method === 'vnpay' &&
+              order.payment_status !== 'completed' &&
+              ['pending', 'processing'].includes(orderStatus);
 
             return (
               <div key={order.id}
@@ -157,6 +178,19 @@ const OrdersPage = () => {
                     <p className="text-blue-600 font-bold text-xl">
                       {Number(order.total_price).toLocaleString('vi-VN')} đ
                     </p>
+                    {canRetryPayment && (
+                      <button
+                        type="button"
+                        onClick={(event) => handleRetryPayment(event, order.id)}
+                        disabled={payingOrderId === order.id}
+                        className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-700 transition disabled:opacity-60"
+                      >
+                        {payingOrderId === order.id
+                          ? <Loader2 size={13} className="animate-spin" />
+                          : <CreditCard size={13} />}
+                        Thanh toán lại
+                      </button>
+                    )}
                     <span className="flex items-center gap-0.5 text-xs text-gray-400">
                       Xem chi tiết <ChevronRight size={13} />
                     </span>

@@ -7,10 +7,29 @@ import {
   clearCart,
 } from "../api/cartApi";
 
+const SELECTED_CART_ITEMS_KEY = "selectedCartItems";
+
+const loadSelectedItems = () => {
+  try {
+    const raw = localStorage.getItem(SELECTED_CART_ITEMS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveSelectedItems = (selectedItems) => {
+  localStorage.setItem(SELECTED_CART_ITEMS_KEY, JSON.stringify(selectedItems));
+};
+
+const initialSelectedItems = loadSelectedItems();
+
 const useCartStore = create((set, get) => ({
   items: [],
   loading: false,
-  selectedItems: [],
+  selectedItems: initialSelectedItems || [],
+  hasSavedSelection: Array.isArray(initialSelectedItems),
 
   fetchCart: async () => {
     set({ loading: true });
@@ -18,12 +37,14 @@ const useCartStore = create((set, get) => ({
       const res = await getCart();
       const items = res.data.data?.items || [];
       const currentSelected = get().selectedItems;
+      const hasSavedSelection = get().hasSavedSelection;
       const newItemIds = items.map((item) => item.id);
       const updatedSelected =
-        currentSelected.length === 0
+        !hasSavedSelection && currentSelected.length === 0
           ? newItemIds
           : currentSelected.filter((id) => newItemIds.includes(id));
-      set({ items, selectedItems: updatedSelected });
+      saveSelectedItems(updatedSelected);
+      set({ items, selectedItems: updatedSelected, hasSavedSelection: true });
     } catch {
       set({ items: [], selectedItems: [] });
     } finally {
@@ -75,39 +96,51 @@ const useCartStore = create((set, get) => ({
     const prevSelected = get().selectedItems;
 
     // Xóa khỏi UI ngay
+    const nextSelected = prevSelected.filter((sid) => sid !== id);
     set({
       items: prevItems.filter((item) => item.id !== id),
-      selectedItems: prevSelected.filter((sid) => sid !== id),
+      selectedItems: nextSelected,
+      hasSavedSelection: true,
     });
+    saveSelectedItems(nextSelected);
 
     try {
       await removeFromCart(id);
     } catch {
       // Rollback nếu lỗi
-      set({ items: prevItems, selectedItems: prevSelected });
+      set({ items: prevItems, selectedItems: prevSelected, hasSavedSelection: true });
+      saveSelectedItems(prevSelected);
     }
   },
 
   clearAll: async () => {
     await clearCart();
-    set({ items: [], selectedItems: [] });
+    saveSelectedItems([]);
+    set({ items: [], selectedItems: [], hasSavedSelection: true });
   },
 
   toggleSelectedItem: (itemId) => {
     const selectedItems = get().selectedItems;
     if (selectedItems.includes(itemId)) {
-      set({ selectedItems: selectedItems.filter((id) => id !== itemId) });
+      const nextSelected = selectedItems.filter((id) => id !== itemId);
+      saveSelectedItems(nextSelected);
+      set({ selectedItems: nextSelected, hasSavedSelection: true });
     } else {
-      set({ selectedItems: [...selectedItems, itemId] });
+      const nextSelected = [...selectedItems, itemId];
+      saveSelectedItems(nextSelected);
+      set({ selectedItems: nextSelected, hasSavedSelection: true });
     }
   },
 
   toggleSelectAll: () => {
     const { items, selectedItems } = get();
     if (selectedItems.length === items.length) {
-      set({ selectedItems: [] });
+      saveSelectedItems([]);
+      set({ selectedItems: [], hasSavedSelection: true });
     } else {
-      set({ selectedItems: items.map((item) => item.id) });
+      const nextSelected = items.map((item) => item.id);
+      saveSelectedItems(nextSelected);
+      set({ selectedItems: nextSelected, hasSavedSelection: true });
     }
   },
 }));

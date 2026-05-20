@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
 import {
@@ -25,6 +26,7 @@ import {
   XCircle,
   Banknote,
   Landmark,
+  CreditCard,
 } from 'lucide-react';
 
 const STATUS_COLOR = {
@@ -73,6 +75,7 @@ const OrderDetailPage = () => {
   const [order, setOrder]           = useState(null);
   const [loading, setLoading]       = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [paying, setPaying]         = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
@@ -93,6 +96,20 @@ const OrderDetailPage = () => {
     } finally { setCancelling(false); }
   };
 
+  const handleRetryPayment = async () => {
+    setPaying(true);
+    try {
+      const res = await axiosInstance.post(`/payments/${id}/retry`);
+      if (res.data.success && res.data.paymentUrl) {
+        window.location.href = res.data.paymentUrl;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Không thể tạo lại link thanh toán');
+    } finally {
+      setPaying(false);
+    }
+  };
+
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-3 text-gray-400">
       <Loader2 size={36} className="animate-spin text-blue-500" />
@@ -108,6 +125,10 @@ const OrderDetailPage = () => {
   );
 
   const orderStatus = order.orderStatus || order.status;
+  const canRetryPayment =
+    order.paymentMethod === 'vnpay' &&
+    order.paymentStatus !== 'completed' &&
+    ['pending', 'processing'].includes(orderStatus);
 
   const paymentStatusNode = (() => {
     const map = {
@@ -271,6 +292,15 @@ const OrderDetailPage = () => {
           </div>
 
           {/* Nút hủy đơn */}
+          {canRetryPayment && (
+            <button onClick={handleRetryPayment} disabled={paying}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50">
+              {paying
+                ? <><Loader2 size={16} className="animate-spin" /> Đang tạo link thanh toán...</>
+                : <><CreditCard size={16} /> Thanh toán lại</>}
+            </button>
+          )}
+
           {['pending', 'processing'].includes(orderStatus) && (
             <button onClick={() => setShowConfirm(true)} disabled={cancelling}
               className="w-full flex items-center justify-center gap-2 border border-red-300 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 transition disabled:opacity-50">

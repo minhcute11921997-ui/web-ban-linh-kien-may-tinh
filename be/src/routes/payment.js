@@ -5,6 +5,7 @@ const { verifyToken } = require('../middleware/auth');
 
 // POST /api/payments/create-order - Tạo order và lấy URL thanh toán
 router.post('/create-order', verifyToken, paymentController.createOrder);
+router.post('/:orderId/retry', verifyToken, paymentController.retryVNPayPayment);
 
 
 // GET /api/payments/vnpay-callback - Callback từ VNPay
