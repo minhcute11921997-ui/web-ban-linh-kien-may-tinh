@@ -1,0 +1,266 @@
+{
+  "generated_at": "2026-05-25T08:20:52.516Z",
+  "total": 18252,
+  "errors": 0,
+  "latency": {
+    "min": 16,
+    "max": 3791,
+    "p50": 71,
+    "p90": 373,
+    "p95": 422
+  },
+  "bySource": {
+    "catalog_guard": 886,
+    "local_rag": 9879,
+    "gemini_rag": 25,
+    "exact_match": 3660,
+    "policy_guard": 1144,
+    "compatibility_skill": 374,
+    "account_order_guard": 406,
+    "safety_guard": 374,
+    "ranking_skill": 655,
+    "sales_advisory_skill": 567,
+    "combo_check_skill": 282
+  },
+  "byRetrieval": {
+    "guard": 886,
+    "vector": 13,
+    "hybrid": 9891,
+    "exact_match": 3660,
+    "skill_policy_guard": 1144,
+    "skill_compatibility": 374,
+    "skill_account_order_guard": 406,
+    "skill_safety_guard": 374,
+    "skill_ranking": 655,
+    "skill_sales_advisory": 567,
+    "skill_combo_check": 282
+  },
+  "samples": [
+    {
+      "ts": "2026-05-23T20:08:55.605Z",
+      "message": "C� laptop van ph�ng n�o kh�ng?",
+      "source": "catalog_guard",
+      "retrieval": "guard",
+      "latencyMs": 22,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:08:56.275Z",
+      "message": "Build PC gaming kho?ng 15 tri?u g?m CPU VGA RAM SSD Mainboard",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 668,
+      "productIds": [
+        6,
+        36,
+        21,
+        65,
+        50
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:01.699Z",
+      "message": "Tôi cần RAM 16GB còn hàng, giá khoảng dưới 1 triệu",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 433,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:02.041Z",
+      "message": "SSD NVMe dưới 2 triệu có mẫu nào ổn không?",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 331,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:02.381Z",
+      "message": "Gợi ý CPU Intel dưới 5 triệu",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 336,
+      "productIds": [
+        6,
+        1,
+        11
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:02.713Z",
+      "message": "Tư vấn VGA chơi game Full HD",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 328,
+      "productIds": [
+        42,
+        38,
+        36,
+        41,
+        44,
+        32
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:03.051Z",
+      "message": "Mainboard socket LGA1700 nào còn hàng?",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 335,
+      "productIds": [
+        65,
+        68,
+        67,
+        66,
+        63,
+        62
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:03.395Z",
+      "message": "Build PC gaming khoảng 15 triệu gồm CPU VGA RAM SSD Mainboard",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 340,
+      "productIds": [
+        6,
+        32,
+        21,
+        65,
+        50
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:03.416Z",
+      "message": "Sản phẩm nào đang sale?",
+      "source": "catalog_guard",
+      "retrieval": "guard",
+      "latencyMs": 18,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:03.436Z",
+      "message": "Có laptop văn phòng nào không?",
+      "source": "catalog_guard",
+      "retrieval": "guard",
+      "latencyMs": 18,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:31.351Z",
+      "message": "Tôi cần RAM 16GB còn hàng, giá khoảng dưới 1 triệu",
+      "source": "gemini_rag",
+      "retrieval": "vector",
+      "latencyMs": 1934,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:31.702Z",
+      "message": "SSD NVMe dưới 2 triệu có mẫu nào ổn không?",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 332,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:33.815Z",
+      "message": "Gợi ý CPU Intel dưới 5 triệu",
+      "source": "gemini_rag",
+      "retrieval": "vector",
+      "latencyMs": 2110,
+      "productIds": [
+        6,
+        1,
+        11
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:34.144Z",
+      "message": "Tư vấn VGA chơi game Full HD",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 326,
+      "productIds": [
+        42,
+        38,
+        36,
+        41,
+        44,
+        32
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:34.476Z",
+      "message": "Mainboard socket LGA1700 nào còn hàng?",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 324,
+      "productIds": [
+        65,
+        68,
+        67,
+        66,
+        63,
+        62
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:34.802Z",
+      "message": "Build PC gaming khoảng 15 triệu gồm CPU VGA RAM SSD Mainboard",
+      "source": "local_rag",
+      "retrieval": "vector",
+      "latencyMs": 323,
+      "productIds": [
+        6,
+        32,
+        21,
+        65,
+        50
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:09:34.824Z",
+      "message": "Sản phẩm nào đang sale?",
+      "source": "catalog_guard",
+      "retrieval": "guard",
+      "latencyMs": 19,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:09:34.845Z",
+      "message": "Có laptop văn phòng nào không?",
+      "source": "catalog_guard",
+      "retrieval": "guard",
+      "latencyMs": 19,
+      "productIds": []
+    },
+    {
+      "ts": "2026-05-23T20:50:58.115Z",
+      "message": "VGA h�ng Inno3d c�n h�ng kh�ng?",
+      "source": "local_rag",
+      "retrieval": "hybrid",
+      "latencyMs": 72,
+      "productIds": [
+        45,
+        32,
+        38,
+        44,
+        42
+      ]
+    },
+    {
+      "ts": "2026-05-23T20:50:58.204Z",
+      "message": "Build PC gaming kho?ng 20 tri?u g?m CPU VGA RAM SSD Mainboard",
+      "source": "local_rag",
+      "retrieval": "hybrid",
+      "latencyMs": 161,
+      "productIds": [
+        13,
+        31,
+        21,
+        65,
+        50
+      ]
+    }
+  ]
+}

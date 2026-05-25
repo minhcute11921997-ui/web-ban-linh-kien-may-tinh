@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-05-25T08:27:38.353Z",
+  "output": "E:\\hk2\\web\\btl\\web\\ai-lab\\data\\finetune-chat-dataset.jsonl",
+  "total": 518,
+  "fromTraining": 502,
+  "fromLogs": 16,
+  "note": "This is fine-tune-ready conversation data, but catalog facts should still come from RAG/DB instead of model memory."
+}

@@ -1,0 +1,437 @@
+{
+  "generated_at": "2026-05-25T08:28:21.333Z",
+  "serviceUrl": "http://127.0.0.1:4001",
+  "total": 8,
+  "passed": 8,
+  "failed": 0,
+  "pass_rate": 1,
+  "results": [
+    {
+      "id": "ram-budget",
+      "question": "Tôi cần RAM 16GB còn hàng, giá khoảng dưới 1 triệu",
+      "pass": true,
+      "latencyMs": 134,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình chưa tìm thấy sản phẩm phù hợp trong dữ liệu shop. Bạn có thể nói rõ danh mục, ngân sách hoặc thông số cần tìm hơn một chút.",
+      "products": [],
+      "debug": {
+        "budget": 1000000,
+        "tokens": [
+          "ram",
+          "16gb",
+          "con"
+        ],
+        "categories": [
+          "ram"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 0
+    },
+    {
+      "id": "ssd-budget",
+      "question": "SSD NVMe dưới 2 triệu có mẫu nào ổn không?",
+      "pass": true,
+      "latencyMs": 127,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình chưa tìm thấy sản phẩm phù hợp trong dữ liệu shop. Bạn có thể nói rõ danh mục, ngân sách hoặc thông số cần tìm hơn một chút.",
+      "products": [],
+      "debug": {
+        "budget": 2000000,
+        "tokens": [
+          "ssd",
+          "nvme",
+          "mau",
+          "on"
+        ],
+        "categories": [
+          "ssd"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 0
+    },
+    {
+      "id": "cpu-intel",
+      "question": "Gợi ý CPU Intel dưới 5 triệu",
+      "pass": true,
+      "latencyMs": 116,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình tìm thấy 3 sản phẩm liên quan. Gợi ý nổi bật: Bộ vi xử lý/ CPU Intel Core i3-14100 TRAY (Không box), giá 4.390.000đ. Bạn có thể xem các thẻ sản phẩm trả về để chọn nhanh.",
+      "products": [
+        {
+          "id": 6,
+          "name": "Bộ vi xử lý/ CPU Intel Core i3-14100 TRAY (Không box)",
+          "category_name": "CPU",
+          "sale_price": 4390000,
+          "stock": 20
+        },
+        {
+          "id": 1,
+          "name": "Bộ vi xử lý/ CPU Intel Core i3-13100 TRAY (không box)",
+          "category_name": "CPU",
+          "sale_price": 3790000,
+          "stock": 19
+        },
+        {
+          "id": 11,
+          "name": "CPU Intel Core Ultra 5-225F (10 nhân 10 luồng - Boost tối đa 4.9 GHz - 20MB - 1851)",
+          "category_name": "CPU",
+          "sale_price": 4490000,
+          "stock": 20
+        }
+      ],
+      "debug": {
+        "budget": 5000000,
+        "tokens": [
+          "goi",
+          "cpu",
+          "intel"
+        ],
+        "categories": [
+          "cpu"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 12670000
+    },
+    {
+      "id": "vga-gaming",
+      "question": "Tư vấn VGA chơi game Full HD",
+      "pass": true,
+      "latencyMs": 120,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình tìm thấy 15 sản phẩm liên quan. Gợi ý nổi bật: Card màn hình LEADTEK NVIDIA RTX PRO 4000 24G (24GB GDDR7), giá 63.990.000đ. Bạn có thể xem các thẻ sản phẩm trả về để chọn nhanh.",
+      "products": [
+        {
+          "id": 42,
+          "name": "Card màn hình LEADTEK NVIDIA RTX PRO 4000 24G (24GB GDDR7)",
+          "category_name": "VGA",
+          "sale_price": 63990000,
+          "stock": 19
+        },
+        {
+          "id": 38,
+          "name": "Card màn hình LEADTEK NVIDIA RTX PRO 6000 96G WORKSTATION (96GB GDDR7)",
+          "category_name": "VGA",
+          "sale_price": 342900000,
+          "stock": 20
+        },
+        {
+          "id": 36,
+          "name": "Card màn hình Colorful GeForce RTX 5060 Gaming DUO 8GB-V (8GB GDDR7)",
+          "category_name": "VGA",
+          "sale_price": 9590000,
+          "stock": 20
+        },
+        {
+          "id": 41,
+          "name": "Card màn hình LEADTEK NVIDIA RTX PRO 4000 SFF 24G (24GB GDDR7)",
+          "category_name": "VGA",
+          "sale_price": 62990000,
+          "stock": 20
+        },
+        {
+          "id": 44,
+          "name": "Card màn hình ASUS ROG Astral GeForce RTX 5080 16GB GDDR7 OC HATSUNE MIKU EDITION",
+          "category_name": "VGA",
+          "sale_price": 56390000,
+          "stock": 20
+        }
+      ],
+      "debug": {
+        "budget": null,
+        "tokens": [
+          "vga",
+          "choi",
+          "game",
+          "full",
+          "hd"
+        ],
+        "categories": [
+          "vga"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 1229380000
+    },
+    {
+      "id": "mainboard-socket",
+      "question": "Mainboard socket LGA1700 nào còn hàng?",
+      "pass": true,
+      "latencyMs": 124,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình tìm thấy 5 sản phẩm liên quan. Gợi ý nổi bật: Mainboard Asus H610M-K, giá 1.890.000đ. Bạn có thể xem các thẻ sản phẩm trả về để chọn nhanh.",
+      "products": [
+        {
+          "id": 65,
+          "name": "Mainboard Asus H610M-K",
+          "category_name": "Mainboard",
+          "sale_price": 1890000,
+          "stock": 17
+        },
+        {
+          "id": 71,
+          "name": "Mainboard Msi B760M Gaming WF DDR5",
+          "category_name": "Mainboard",
+          "sale_price": 3090000,
+          "stock": 18
+        },
+        {
+          "id": 68,
+          "name": "Mainboard Asus PRIME B760M-F WIFI DDR5",
+          "category_name": "Mainboard",
+          "sale_price": 2890000,
+          "stock": 19
+        },
+        {
+          "id": 67,
+          "name": "Mainboard Msi PRO H610M-E DDR5",
+          "category_name": "Mainboard",
+          "sale_price": 1890000,
+          "stock": 19
+        },
+        {
+          "id": 72,
+          "name": "Mainboard Msi PRO Z790-P WIFI DDR5",
+          "category_name": "Mainboard",
+          "sale_price": 4990000,
+          "stock": 18
+        }
+      ],
+      "debug": {
+        "budget": null,
+        "tokens": [
+          "mainboard",
+          "socket",
+          "lga1700",
+          "con"
+        ],
+        "categories": [
+          "mainboard"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 14750000
+    },
+    {
+      "id": "build-gaming",
+      "question": "Build PC gaming khoảng 15 triệu gồm CPU VGA RAM SSD Mainboard",
+      "pass": true,
+      "latencyMs": 179,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "local_rag",
+      "reply": "Mình lọc được combo tham khảo từ dữ liệu shop:\nUu tien theo muc dich: Voi nhu cau choi game, nen uu tien VGA manh nhat trong ngan sach truoc, sau do chon CPU du keo VGA, RAM toi thieu 16GB va SSD de tai game nhanh.\nCPU: Bộ vi xử lý/ CPU Intel Core i3-13100 TRAY (không box) - 3.790.000đ\nVGA: Card màn hình Inno3d GeForce RTX 3050 6GB Twin X2 V2 6GB GDDR6  - 6.090.000đ\nRAM: RAM desktop SP XPOWER Zenith (1 x 16GB) DDR5 6000MHz (SP016GXLWU60CFSE) - 6.690.000đ\nMainboard: Mainboard Msi PRO H610M-E DDR5 - 1.890.000đ\nSSD: Ổ cứng gắn trong/ SSD ADATA 2.5\" SU650 SATA III 256G (ASU650SS-256GT-R) - 1.590.000đ\nTổng tạm tính 20.050.000đ, đang vượt ngân sách 15.000.000đ. Kiểm tra tương thích: CPU và mainboard cùng socket 1700, có thể đi cùng nhau. RAM và mainboard cùng chuẩn DDR5.",
+      "products": [
+        {
+          "id": 1,
+          "name": "Bộ vi xử lý/ CPU Intel Core i3-13100 TRAY (không box)",
+          "category_name": "CPU",
+          "sale_price": 3790000,
+          "stock": 19
+        },
+        {
+          "id": 31,
+          "name": "Card màn hình Inno3d GeForce RTX 3050 6GB Twin X2 V2 6GB GDDR6 ",
+          "category_name": "VGA",
+          "sale_price": 6090000,
+          "stock": 20
+        },
+        {
+          "id": 28,
+          "name": "RAM desktop SP XPOWER Zenith (1 x 16GB) DDR5 6000MHz (SP016GXLWU60CFSE)",
+          "category_name": "RAM",
+          "sale_price": 6690000,
+          "stock": 20
+        },
+        {
+          "id": 67,
+          "name": "Mainboard Msi PRO H610M-E DDR5",
+          "category_name": "Mainboard",
+          "sale_price": 1890000,
+          "stock": 19
+        },
+        {
+          "id": 54,
+          "name": "Ổ cứng gắn trong/ SSD ADATA 2.5\" SU650 SATA III 256G (ASU650SS-256GT-R)",
+          "category_name": "SSD",
+          "sale_price": 1590000,
+          "stock": 20
+        }
+      ],
+      "debug": {
+        "budget": 15000000,
+        "tokens": [
+          "build",
+          "pc",
+          "gaming",
+          "15",
+          "gom",
+          "cpu",
+          "vga",
+          "ram",
+          "ssd",
+          "mainboard"
+        ],
+        "categories": [
+          "cpu",
+          "ram",
+          "ssd",
+          "vga",
+          "mainboard"
+        ],
+        "retrievalSource": "hybrid",
+        "vectorModel": "local-hash-embedding-v1"
+      },
+      "totalPrice": 20050000
+    },
+    {
+      "id": "sale",
+      "question": "Sản phẩm nào đang sale?",
+      "pass": true,
+      "latencyMs": 21,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "catalog_guard",
+      "reply": "Hiện dữ liệu shop chưa có sản phẩm nào đang sale hoặc mã giảm giá active.",
+      "products": [],
+      "debug": {
+        "budget": null,
+        "tokens": [],
+        "categories": [
+          "ssd"
+        ],
+        "retrievalSource": "guard"
+      },
+      "totalPrice": 0
+    },
+    {
+      "id": "unknown",
+      "question": "Có laptop văn phòng nào không?",
+      "pass": true,
+      "latencyMs": 19,
+      "checks": {
+        "replyOk": true,
+        "expectedMentionOk": true,
+        "expectedAllTermsOk": true,
+        "categoryOk": true,
+        "allProductsCategoryOk": true,
+        "noProductsOk": true,
+        "emptyProductsOk": true,
+        "maxPriceOk": true,
+        "requiredBuildCategoriesOk": true,
+        "expectedCountOk": true,
+        "totalBudgetOk": true
+      },
+      "source": "catalog_guard",
+      "reply": "Hiện dữ liệu shop trong lab chỉ có linh kiện PC như CPU, RAM, SSD, VGA và Mainboard. Mình chưa thấy danh mục laptop hoặc phụ kiện tương ứng trong catalog, nên không nên gợi ý sản phẩm thay thế.",
+      "products": [],
+      "debug": {
+        "budget": null,
+        "tokens": [
+          "laptop",
+          "phong"
+        ],
+        "categories": [
+          "cpu",
+          "ssd"
+        ],
+        "retrievalSource": "guard"
+      },
+      "totalPrice": 0
+    }
+  ]
+}
