@@ -8,6 +8,7 @@ const FeaturedProductCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const canShop = !user || ["customer", "user"].includes(user.role);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -66,6 +67,7 @@ const FeaturedProductCard = ({ product }) => {
           </p>
         )}
         {/* Nút ghim đáy */}
+        {canShop && (
         <button
           onClick={handleAddToCart}
           disabled={product.stock === 0}
@@ -73,6 +75,7 @@ const FeaturedProductCard = ({ product }) => {
         >
           {product.stock === 0 ? "Hết hàng" : "Thêm vào giỏ "}
         </button>
+        )}
       </div>
     </div>
   );

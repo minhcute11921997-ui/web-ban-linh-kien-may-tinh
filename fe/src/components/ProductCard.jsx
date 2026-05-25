@@ -8,6 +8,7 @@ const ProductCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const canShop = !user || ["customer", "user"].includes(user.role);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -68,6 +69,7 @@ const ProductCard = ({ product }) => {
       </Link>
 
       {/* Nút thêm giỏ hàng - luôn ở đáy */}
+      {canShop && (
       <div className="px-4 pb-4">
         <button
           onClick={handleAddToCart}
@@ -77,6 +79,7 @@ const ProductCard = ({ product }) => {
           {product.stock === 0 ? "Hết hàng" : "Thêm vào giỏ"}
         </button>
       </div>
+      )}
     </div>
   );
 };

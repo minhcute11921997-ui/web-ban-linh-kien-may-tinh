@@ -7,6 +7,7 @@ const FlashSaleCard = ({ product }) => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const canShop = !user || ["customer", "user"].includes(user.role);
   const stockTotal = product.stockTotal || product.stock || 10;
   const stockLeft = product.stockLeft ?? product.stock ?? 0;
   const handleAddToCart = async (e) => {
@@ -77,6 +78,7 @@ const FlashSaleCard = ({ product }) => {
       </div>
 
       {/* Nút */}
+      {canShop && (
       <button
         onClick={handleAddToCart}
         disabled={product.stock === 0}
@@ -84,6 +86,7 @@ const FlashSaleCard = ({ product }) => {
       >
         {product.stock === 0 ? "Hết hàng" : " Mua ngay"}
       </button>
+      )}
     </div>
   );
 };

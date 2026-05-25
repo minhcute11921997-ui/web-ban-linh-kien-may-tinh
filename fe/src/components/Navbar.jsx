@@ -24,6 +24,14 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeOrderCount, setActiveOrderCount] = useState(0);
   const dropdownRef = useRef(null);
+  const canAccessAdmin = ["admin", "staff"].includes(user?.role);
+  const canShop = ["customer", "user"].includes(user?.role);
+  const roleLabel =
+    user?.role === "admin"
+      ? "Quản trị viên"
+      : user?.role === "staff"
+        ? "Nhân viên"
+        : "Khách hàng";
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -36,7 +44,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (!user || !token) {
+    if (!user || !token || !canShop) {
       setActiveOrderCount(0);
       return;
     }
@@ -54,10 +62,10 @@ const Navbar = () => {
         .catch(() => { });
     };
     fetchOrderCount();
-  }, [user, token]);
+  }, [user, token, canShop]);
 
   useEffect(() => {
-    if (items.length > 0 && user && token) {
+    if (items.length > 0 && user && token && canShop) {
       axiosInstance
         .get("/orders/my-orders")
         .then((res) => {
@@ -70,7 +78,7 @@ const Navbar = () => {
         })
         .catch(() => { });
     }
-  }, [items, user, token]);
+  }, [items, user, token, canShop]);
 
   const handleLogout = () => {
     logout();
@@ -99,6 +107,7 @@ const Navbar = () => {
           {user ? (
             <>
               {/* Giỏ hàng */}
+              {canShop && (
               <Link
                 to="/cart"
                 aria-label={`Giỏ hàng (${items.length})`}
@@ -112,8 +121,10 @@ const Navbar = () => {
                   </span>
                 )}
               </Link>
+              )}
 
               {/* Đơn hàng */}
+              {canShop && (
               <Link
                 to="/orders"
                 aria-label={`Đơn hàng (${activeOrderCount})`}
@@ -127,9 +138,10 @@ const Navbar = () => {
                   </span>
                 )}
               </Link>
+              )}
 
               {/* Admin */}
-              {user.role === "admin" && (
+              {canAccessAdmin && (
                 <Link
                   to="/admin"
                   className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl hover:bg-white/20 transition-colors min-w-[70px]"
@@ -140,7 +152,7 @@ const Navbar = () => {
                     className="text-yellow-300"
                   />
                   <span className="text-xs font-medium text-yellow-300">
-                    Admin
+                    {user.role === "staff" ? "Staff" : "Admin"}
                   </span>
                 </Link>
               )}
@@ -182,9 +194,7 @@ const Navbar = () => {
                             {user.full_name || user.username}
                           </p>
                           <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full mt-1 inline-block">
-                            {user.role === "admin"
-                              ? "Quản trị viên"
-                              : "Khách hàng"}
+                            {roleLabel}
                           </span>
                         </div>
                       </div>
@@ -204,16 +214,18 @@ const Navbar = () => {
                         Thông tin tài khoản
                       </Link>
 
-                      {user.role === "admin" && (
+                      {canAccessAdmin && (
                         <>
-                          <Link
-                            to="/admin/products"
-                            onClick={() => setShowDropdown(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                          >
-                            <Settings size={16} className="text-gray-400" />
-                            Quản lý sản phẩm
-                          </Link>
+                          {user.role === "admin" && (
+                            <Link
+                              to="/admin/products"
+                              onClick={() => setShowDropdown(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                            >
+                              <Settings size={16} className="text-gray-400" />
+                              Quản lý sản phẩm
+                            </Link>
+                          )}
                           <Link
                             to="/admin/orders"
                             onClick={() => setShowDropdown(false)}

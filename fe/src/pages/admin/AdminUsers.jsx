@@ -15,12 +15,14 @@ import {
 
 const ROLE_COLOR = {
   admin:    'bg-indigo-100 text-indigo-700',
+  staff:    'bg-emerald-100 text-emerald-700',
   customer: 'bg-blue-100 text-blue-700',
   user:     'bg-gray-100 text-gray-700',
 };
-const ROLE_LABEL = { admin: 'Quản trị viên', customer: 'Khách hàng', user: 'Người dùng' };
+const ROLE_LABEL = { admin: 'Quản trị viên', staff: 'Nhân viên', customer: 'Khách hàng', user: 'Người dùng' };
 const ROLE_ICON  = {
   admin:    <ShieldCheck size={11} />,
+  staff:    <UserCheck   size={11} />,
   customer: <UserCheck   size={11} />,
   user:     <User        size={11} />,
 };
@@ -32,6 +34,7 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [editId, setEditId]   = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [error, setError] = useState('');
 
   useEffect(() => { fetchUsers(); }, []);
 
@@ -42,23 +45,31 @@ const AdminUsers = () => {
   };
 
   const handleEdit = (user) => {
+    setError('');
     setEditId(user.id);
     setEditForm({
       full_name: user.full_name || '', email: user.email || '',
       phone: user.phone || '', address: user.address || '',
-      role: user.role || 'customer',
+      role: user.role === 'user' ? 'customer' : user.role || 'customer',
     });
   };
 
   const handleSave = async () => {
-    try { await updateUser(editId, editForm); setEditId(null); fetchUsers(); }
-    catch { }
+    try {
+      setError('');
+      await updateUser(editId, editForm);
+      setEditId(null);
+      fetchUsers();
+    }
+    catch (err) {
+      setError(err.response?.data?.message || 'Không thể cập nhật người dùng');
+    }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn chắc chắn muốn xóa người dùng này?')) return;
-    try { await deleteUser(id); fetchUsers(); }
-    catch { }
+    try { setError(''); await deleteUser(id); fetchUsers(); }
+    catch (err) { setError(err.response?.data?.message || 'Không thể xóa người dùng'); }
   };
 
   if (loading)
@@ -83,6 +94,12 @@ const AdminUsers = () => {
           {users.length} người dùng
         </span>
       </div>
+
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          {error}
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
@@ -142,6 +159,7 @@ const AdminUsers = () => {
                         onChange={e => setEditForm({ ...editForm, role: e.target.value })}
                         className="border border-blue-200 focus:ring-2 focus:ring-blue-300 outline-none px-2 py-1 rounded-lg text-sm">
                         <option value="customer">Khách hàng</option>
+                        <option value="staff">Nhân viên</option>
                         <option value="admin">Admin</option>
                       </select>
                     : <span className={`flex items-center gap-1 w-fit text-xs px-2.5 py-1 rounded-full font-medium ${ROLE_COLOR[u.role] || 'bg-gray-100 text-gray-700'}`}>

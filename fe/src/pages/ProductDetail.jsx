@@ -10,7 +10,8 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCartStore();
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
+  const canShop = !user || ["customer", "user"].includes(user.role);
   const [product, setProduct] = useState(null);
   const [specs, setSpecs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +75,10 @@ const ProductDetail = () => {
     e.preventDefault();
     if (!token) {
       navigate("/login");
+      return;
+    }
+    if (!canShop) {
+      toast.error("Tài khoản nhân viên không thể mua hàng");
       return;
     }
     setSubmittingReview(true);
@@ -162,6 +167,10 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!token) {
       navigate("/login");
+      return;
+    }
+    if (!canShop) {
+      toast.error("Tài khoản nhân viên không thể mua hàng");
       return;
     }
 
@@ -348,6 +357,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Buttons */}
+          {canShop ? (
           <div className="flex gap-3 mt-2">
             <button
               disabled={product.stock === 0 || addingToCart}
@@ -364,6 +374,11 @@ const ProductDetail = () => {
               {addingToCart ? "Đang xử lý..." : "Mua ngay"}
             </button>
           </div>
+          ) : (
+            <div className="mt-2 rounded-xl border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm font-medium text-yellow-700">
+              Tài khoản nhân viên không thể mua hàng.
+            </div>
+          )}
         </div>
       </div>
 

@@ -25,6 +25,14 @@ import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminDiscounts from "./pages/admin/AdminDiscounts";
 import AdminBanners from "./pages/admin/AdminBanners";
 
+const adminRoles = ["admin", "staff"];
+const ownerRoles = ["admin"];
+const customerRoles = ["customer", "user"];
+
+const AdminOnly = ({ children }) => (
+  <PrivateRoute allowedRoles={ownerRoles}>{children}</PrivateRoute>
+);
+
 function App() {
   useAuthInit();
 
@@ -35,19 +43,19 @@ function App() {
         <Route
           path="/admin"
           element={
-            <PrivateRoute adminOnly={true}>
+            <PrivateRoute allowedRoles={adminRoles}>
               <AdminLayout />
             </PrivateRoute>
           }
         >
           <Route index element={<AdminDashboard />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminOnly><AdminCategories /></AdminOnly>} />
+          <Route path="users" element={<AdminOnly><AdminUsers /></AdminOnly>} />
+          <Route path="products" element={<AdminOnly><AdminProducts /></AdminOnly>} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="revenue" element={<AdminRevenue />} />
-          <Route path="discounts" element={<AdminDiscounts />} />
-          <Route path="banners" element={<AdminBanners />} />
+          <Route path="discounts" element={<AdminOnly><AdminDiscounts /></AdminOnly>} />
+          <Route path="banners" element={<AdminOnly><AdminBanners /></AdminOnly>} />
         </Route>
 
         {/* Customer routes */}
@@ -55,12 +63,12 @@ function App() {
         <Route path="/login" element={<CustomerLayout><LoginPage /></CustomerLayout>} />
         <Route path="/register" element={<CustomerLayout><RegisterPage /></CustomerLayout>} />
         <Route path="/products/:id" element={<CustomerLayout><ProductDetail /></CustomerLayout>} />
-        <Route path="/cart" element={<CustomerLayout><PrivateRoute><CartPage /></PrivateRoute></CustomerLayout>} />
-        <Route path="/checkout" element={<CustomerLayout><PrivateRoute><CheckoutPage /></PrivateRoute></CustomerLayout>} />
-        <Route path="/payment-success" element={<CustomerLayout><PrivateRoute><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
-        <Route path="/payment-callback" element={<CustomerLayout><PrivateRoute><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
-        <Route path="/orders" element={<CustomerLayout><PrivateRoute><OrdersPage /></PrivateRoute></CustomerLayout>} />
-        <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/cart" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CartPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/checkout" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CheckoutPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/payment-success" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/payment-callback" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/orders" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><OrdersPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/orders/:id" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><OrderDetailPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/profile" element={<CustomerLayout><PrivateRoute><ProfilePage /></PrivateRoute></CustomerLayout>} />
 
 

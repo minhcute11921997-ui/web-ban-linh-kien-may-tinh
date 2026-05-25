@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAllOrders, updateOrderStatus, deleteOrder, getOrderById } from '../../api/orderApi';
+import useAuthStore from '../../store/authStore';
 import {
   ClipboardList, Trash2, Loader2, InboxIcon, AlertTriangle,
   X, ShoppingBag, Clock, Cog, Truck, CheckCircle, XCircle,
@@ -38,6 +39,7 @@ const NEXT_STATUS_ICON = {
 };
 
 const AdminOrders = () => {
+  const { user } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -47,6 +49,7 @@ const AdminOrders = () => {
   const [searchText, setSearchText] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const canDeleteOrders = user?.role === 'admin';
 
   useEffect(() => {
     fetchOrders(filterStatus, searchText, dateFrom, dateTo);
@@ -445,6 +448,7 @@ const AdminOrders = () => {
                         >
                           <Eye size={14} /> Xem
                         </button>
+                        {canDeleteOrders && (
                         <button
                           onClick={() => handleDelete(order.id)}
                           aria-label="Xóa đơn hàng"
@@ -452,6 +456,7 @@ const AdminOrders = () => {
                         >
                           <Trash2 size={14} /> Xóa
                         </button>
+                        )}
                       </div>
                     </td>
                   </tr>

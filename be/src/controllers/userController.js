@@ -16,6 +16,11 @@ exports.getAllUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         const { full_name, email, phone, address, role } = req.body;
+        const allowedRoles = ['admin', 'staff', 'customer', 'user'];
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).json({ success: false, message: 'Role không hợp lệ' });
+        }
+
         const [result] = await db.query(
             'UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, role = ? WHERE id = ?',
             [full_name, email, phone, address, role, req.params.id]

@@ -142,7 +142,7 @@ exports.getOrderById = async (req, res) => {
     }
 
     const order = orders[0];
-    if (order.user_id !== req.user.userId && req.user.role !== 'admin') {
+    if (order.user_id !== req.user.userId && !['admin', 'staff'].includes(req.user.role)) {
       return res.status(403).json({ success: false, message: 'Bạn không có quyền xem đơn hàng này' });
     }
 

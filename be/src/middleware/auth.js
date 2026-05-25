@@ -26,3 +26,15 @@ exports.verifyAdmin = (req, res, next) => {
         return res.status(403).json({ success: false, message: 'Chỉ admin mới có quyền truy cập' });
     next();
 };
+
+exports.verifyAdminOrStaff = (req, res, next) => {
+    if (!['admin', 'staff'].includes(req.user?.role))
+        return res.status(403).json({ success: false, message: 'Không có quyền truy cập' });
+    next();
+};
+
+exports.verifyCustomer = (req, res, next) => {
+    if (!['customer', 'user'].includes(req.user?.role))
+        return res.status(403).json({ success: false, message: 'Chỉ khách hàng mới có quyền mua hàng' });
+    next();
+};

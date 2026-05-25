@@ -10,9 +10,10 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const { setAuth, user, initialized } = useAuthStore(); 
   const navigate = useNavigate();
+  const getRedirectPath = (role) => (['admin', 'staff'].includes(role) ? '/admin' : '/');
 
   if (initialized && user) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/'} replace />;
+    return <Navigate to={getRedirectPath(user.role)} replace />;
   }
   
   const handleChange = (field) => (e) => {
@@ -36,7 +37,7 @@ const LoginPage = () => {
       const payload = { username: form.login, password: form.password };
       const res = await login(payload);
       setAuth(res.data.user, res.data.token, res.data.refreshToken);
-      navigate(res.data.user.role === 'admin' ? '/admin' : '/');
+      navigate(getRedirectPath(res.data.user.role));
     } catch (err) {
       const msg = err.response?.data?.message || 'Đăng nhập thất bại!';
       if (msg.toLowerCase().includes('password')) setErrors({ password: msg });
@@ -103,7 +104,7 @@ const LoginPage = () => {
         </div>
         <GoogleAuthButton
           text="signin_with"
-          onSuccessRedirect={(authUser) => navigate(authUser.role === 'admin' ? '/admin' : '/')}
+          onSuccessRedirect={(authUser) => navigate(getRedirectPath(authUser.role))}
         />
         <p className="text-center mt-4 text-sm text-gray-500">
           Chưa có tài khoản?{' '}

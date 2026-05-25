@@ -160,6 +160,11 @@ const ProfilePage = () => {
     email:     user?.email     || '',
     phone:     user?.phone     || '',
   });
+  const roleBadge = user?.role === 'admin'
+    ? <><ShieldCheck size={12} /> Quản trị viên</>
+    : user?.role === 'staff'
+      ? <><ShieldCheck size={12} /> Nhân viên</>
+      : <><UserCircle size={12} /> Khách hàng</>;
 
   const showToast = (type, msg) => {
     setToast({ type, msg });
@@ -297,9 +302,7 @@ const handleUpdateAddress = async (data) => {
             <div>
               <p className="text-xl font-semibold">{user?.full_name || user?.username}</p>
               <span className="flex items-center gap-1 text-sm bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full w-fit">
-                {user?.role === 'admin'
-                  ? <><ShieldCheck size={12} /> Quản trị viên</>
-                  : <><UserCircle  size={12} /> Khách hàng</>}
+                {roleBadge}
               </span>
             </div>
           </div>

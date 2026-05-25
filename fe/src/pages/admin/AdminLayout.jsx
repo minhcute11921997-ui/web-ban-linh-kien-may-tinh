@@ -33,9 +33,20 @@ const menuItems = [
   { to: "/admin/discounts", label: "Mã giảm giá", icon: <Gift size={17} /> },
 ];
 
+const staffMenuPaths = new Set(["/admin", "/admin/orders", "/admin/revenue"]);
+
+const ROLE_LABEL = {
+  admin: "Quản trị viên",
+  staff: "Nhân viên",
+};
+
 const AdminLayout = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const visibleMenuItems =
+    user?.role === "staff"
+      ? menuItems.filter((item) => staffMenuPaths.has(item.to))
+      : menuItems;
 
   const handleLogout = () => {
     logout();
@@ -66,7 +77,7 @@ const AdminLayout = () => {
 
         {/* Menu */}
         <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -103,7 +114,9 @@ const AdminLayout = () => {
               <p className="text-white text-xs font-semibold truncate">
                 {user?.full_name || user?.username}
               </p>
-              <p className="text-blue-200 text-xs">Quản trị viên</p>
+              <p className="text-blue-200 text-xs">
+                {ROLE_LABEL[user?.role] || user?.role}
+              </p>
             </div>
           </div>
         </div>
@@ -117,7 +130,9 @@ const AdminLayout = () => {
             <h2 className="text-lg font-semibold text-gray-800">
               Xin chào, {user?.full_name || user?.username}
             </h2>
-            <p className="text-xs text-gray-400">Quản trị viên hệ thống</p>
+            <p className="text-xs text-gray-400">
+              {ROLE_LABEL[user?.role] || user?.role}
+            </p>
           </div>
           <button
             onClick={handleLogout}

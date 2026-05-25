@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 
-const PrivateRoute = ({ children, adminOnly = false }) => {
+const PrivateRoute = ({ children, adminOnly = false, allowedRoles }) => {
   const { user, isLoading } = useAuthStore();
 
   if (isLoading) {
@@ -13,7 +13,8 @@ const PrivateRoute = ({ children, adminOnly = false }) => {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (adminOnly && user.role !== 'admin') return <Navigate to="/" replace />;
+  const roles = allowedRoles || (adminOnly ? ['admin'] : null);
+  if (roles && !roles.includes(user.role)) return <Navigate to="/" replace />;
 
   return children;
 };
