@@ -78,7 +78,7 @@ const ProductDetail = () => {
       return;
     }
     if (!canShop) {
-      toast.error("Tài khoản nhân viên không thể mua hàng");
+      toast.error("Tài khoản nhân viên không thể đánh giá sản phẩm");
       return;
     }
     setSubmittingReview(true);
@@ -142,14 +142,17 @@ const ProductDetail = () => {
   };
 
   const fetchUserReview = useCallback(async () => {
-    if (!token) return;
+    if (!token || !canShop) {
+      setUserReview(null);
+      return;
+    }
     try {
       const res = await reviewApi.checkUserReview(id);
       if (res.data.success) setUserReview(res.data.data);
     } catch (err) {
       console.error(err);
     }
-  }, [id, token]);
+  }, [canShop, id, token]);
 
   useEffect(() => {
     if (id) {
@@ -475,7 +478,7 @@ const ProductDetail = () => {
               </span>
             )}
           </h2>
-          {token && !userReview && !showReviewForm && (
+          {token && canShop && !userReview && !showReviewForm && (
             <button
               onClick={() => setShowReviewForm(true)}
               className="px-4 py-2 bg-blue-500 text-white rounded-xl text-sm font-semibold hover:bg-blue-600 transition"
@@ -523,7 +526,7 @@ const ProductDetail = () => {
         )}
 
         {/* Form viết đánh giá */}
-        {showReviewForm && (
+        {canShop && showReviewForm && (
           <form
             onSubmit={handleSubmitReview}
             className="mb-6 p-5 border border-blue-200 rounded-xl bg-blue-50"
@@ -584,7 +587,7 @@ const ProductDetail = () => {
         )}
 
         {/* Đánh giá của user hiện tại (nếu đã đánh giá) */}
-        {userReview && !showReviewForm && (
+        {canShop && userReview && !showReviewForm && (
           <div className="mb-5 p-4 border-2 border-blue-300 bg-blue-50 rounded-xl">
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-semibold text-blue-600">

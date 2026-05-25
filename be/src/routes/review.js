@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, verifyAdmin } = require('../middleware/auth');
+const { verifyToken, verifyCustomer } = require('../middleware/auth');
 const {
     getReviewsByProduct,
     createReview,
@@ -13,9 +13,9 @@ const {
 router.get('/product/:productId', getReviewsByProduct);
 
 // Private 
-router.post('/', verifyToken, createReview);
-router.put('/:id', verifyToken, updateReview);
+router.post('/', verifyToken, verifyCustomer, createReview);
+router.put('/:id', verifyToken, verifyCustomer, updateReview);
 router.delete('/:id', verifyToken, deleteReview);
-router.get('/check/:productId', verifyToken, checkUserReview);
+router.get('/check/:productId', verifyToken, verifyCustomer, checkUserReview);
 
 module.exports = router;

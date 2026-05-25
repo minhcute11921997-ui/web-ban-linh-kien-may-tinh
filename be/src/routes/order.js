@@ -8,6 +8,7 @@ router.post('/', verifyToken, verifyCustomer, orderController.createOrder);
 router.get('/my-orders', verifyToken, verifyCustomer, orderController.getMyOrders);
 // Admin routes
 router.get('/admin/all', verifyToken, verifyAdminOrStaff, orderController.getAllOrders);
+router.get('/admin/:id', verifyToken, verifyAdminOrStaff, orderController.getAdminOrderById);
 router.put('/admin/:id/status', verifyToken, verifyAdminOrStaff, orderController.updateOrderStatus);
 router.delete('/admin/:id', verifyToken, verifyAdmin, orderController.deleteOrder);
 router.get('/:id', verifyToken, verifyCustomer, orderController.getOrderById);

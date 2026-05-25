@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAllOrders, updateOrderStatus, deleteOrder, getOrderById } from '../../api/orderApi';
+import { getAllOrders, updateOrderStatus, deleteOrder, getAdminOrderById } from '../../api/orderApi';
 import useAuthStore from '../../store/authStore';
 import {
   ClipboardList, Trash2, Loader2, InboxIcon, AlertTriangle,
@@ -83,7 +83,7 @@ const AdminOrders = () => {
     setDetailLoading(true);
     setDetailModal({ id });
     try {
-      const res = await getOrderById(id);
+      const res = await getAdminOrderById(id);
       setDetailModal(res.data.data);
     } catch {
       setDetailModal(null);

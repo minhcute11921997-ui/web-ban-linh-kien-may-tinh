@@ -12,6 +12,10 @@ export const getOrderById = (id) => {
   return axiosInstance.get(`/orders/${id}`);
 };
 
+export const getAdminOrderById = (id) => {
+  return axiosInstance.get(`/orders/admin/${id}`);
+};
+
 export const getAllOrders = (params = {}) => {
   return axiosInstance.get('/orders/admin/all', { params });
 };

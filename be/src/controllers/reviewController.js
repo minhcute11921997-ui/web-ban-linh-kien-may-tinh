@@ -6,11 +6,11 @@ const createSchema = Joi.object({
   product_id: Joi.number().integer().positive().required(),
   order_id: Joi.number().integer().positive().allow(null).optional(),
   rating: Joi.number().integer().min(1).max(5).required(),
+  comment: Joi.string().min(1).max(2000).optional().allow("", null),
 });
 const updateSchema = Joi.object({
-  comment: Joi.string().min(1).max(2000).optional().allow("", null),
   rating: Joi.number().integer().min(1).max(5).optional(),
-  comment: Joi.string().min(1).max(2000).optional(),
+  comment: Joi.string().min(1).max(2000).optional().allow("", null),
 });
 
 // GET /api/reviews/product/:productId

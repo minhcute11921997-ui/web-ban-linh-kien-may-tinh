@@ -15,6 +15,21 @@ const formatOrder = (order) => ({
   status_label: STATUS_LABEL[order.status] || order.status,
 });
 
+const getOrderDetails = async (orderId) => {
+  const [orders] = await db.query(
+    'SELECT o.*, u.full_name, u.email, u.username, u.phone FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?',
+    [orderId]
+  );
+  if (orders.length === 0) return null;
+
+  const [orderItems] = await db.query(
+    'SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?',
+    [orderId]
+  );
+
+  return { ...formatOrder(orders[0]), items: orderItems };
+};
+
 exports.createOrder = async (req, res) => {
   let conn;
   try {
@@ -154,6 +169,18 @@ exports.getOrderById = async (req, res) => {
     res.json({ success: true, data: { ...formatOrder(order), items: orderItems } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
+exports.getAdminOrderById = async (req, res) => {
+  try {
+    const order = await getOrderDetails(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'KhĂ´ng tĂ¬m tháº¥y Ä‘Æ¡n hĂ ng' });
+    }
+    res.json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lá»—i server', error: error.message });
   }
 };
 
