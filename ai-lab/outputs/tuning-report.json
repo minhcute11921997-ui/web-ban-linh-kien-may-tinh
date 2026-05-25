@@ -1,0 +1,147 @@
+{
+  "ok": true,
+  "trained_at": "2026-05-25T08:26:10.665Z",
+  "examples": 502,
+  "config": "E:\\hk2\\web\\btl\\web\\ai-lab\\data\\tuning-config.json",
+  "learned": {
+    "category_aliases": {
+      "mainboard": [
+        "mainboard",
+        "mainboard chu",
+        "main",
+        "msi",
+        "asus",
+        "ddr5",
+        "ngan sach",
+        "ram",
+        "1700",
+        "h610",
+        "b760",
+        "am5",
+        "ddr4"
+      ],
+      "ssd": [
+        "ssd",
+        "nvme",
+        "adata",
+        "patriot",
+        "crucial",
+        "512gb",
+        "1tb",
+        "o",
+        "ct1000x9ssd9",
+        "sdssde61",
+        "chot",
+        "ngan sach",
+        "nang cap",
+        "sata",
+        "so sanh",
+        "ssdd"
+      ],
+      "ram": [
+        "ram",
+        "bo nho",
+        "kingston",
+        "patriot",
+        "sp",
+        "16gb",
+        "ddr5",
+        "ddr4",
+        "chot",
+        "ngan sach",
+        "so sanh",
+        "nang cap"
+      ],
+      "cpu": [
+        "cpu",
+        "vi xu ly",
+        "intel",
+        "amd",
+        "bo",
+        "chot",
+        "so sanh",
+        "mainboard",
+        "ngan sach",
+        "i3",
+        "chua",
+        "khong",
+        "phu hop"
+      ],
+      "vga": [
+        "vga",
+        "card man hinh",
+        "gpu",
+        "inno3d",
+        "colorful",
+        "pny",
+        "rtx",
+        "gddr7",
+        "card",
+        "chot",
+        "so sanh",
+        "cpu",
+        "nang cap"
+      ]
+    },
+    "unsupported_terms": [
+      "laptop van phong",
+      "chuot gaming",
+      "man hinh 24 inch",
+      "ban phim co",
+      "tai nghe",
+      "iphone 15 pro max",
+      "ho tro lap dat"
+    ],
+    "build_terms": [
+      "build pc",
+      "pc gaming",
+      "cau hinh",
+      "combo"
+    ],
+    "sale_terms": [
+      "sale",
+      "dang sale",
+      "dang giam gia",
+      "khuyen mai",
+      "uu dai",
+      "voucher",
+      "coupon",
+      "ma giam",
+      "deal",
+      "giam sau",
+      "flashsale",
+      "flash sale"
+    ],
+    "soft_tokens": [
+      "can",
+      "tim",
+      "mua",
+      "hang",
+      "shop",
+      "mau",
+      "goi",
+      "san",
+      "pham"
+    ]
+  },
+  "counts": {
+    "category_aliases_before": {
+      "cpu": 20,
+      "ram": 14,
+      "ssd": 21,
+      "vga": 16,
+      "mainboard": 17
+    },
+    "category_aliases_after": {
+      "cpu": 20,
+      "ram": 14,
+      "ssd": 21,
+      "vga": 16,
+      "mainboard": 17
+    },
+    "unsupported_terms": 30,
+    "build_terms": 13,
+    "sale_terms": 14,
+    "soft_tokens": 33
+  }
+}

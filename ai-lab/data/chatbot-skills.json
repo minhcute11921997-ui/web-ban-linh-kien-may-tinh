@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "skills": {
+    "policy_guard": {
+      "description": "Refuse to invent shop policy data that is not in catalog.",
+      "terms": [
+        "giao hang",
+        "ship",
+        "shipping",
+        "bao hanh",
+        "warranty",
+        "doi tra",
+        "tra hang",
+        "hoan tien",
+        "thanh toan",
+        "cod",
+        "vnpay",
+        "tra gop",
+        "freeship",
+        "hoa don",
+        "vat",
+        "xuat hoa don",
+        "lap dat",
+        "giao hoa toc",
+        "van chuyen",
+        "phi van chuyen",
+        "nguyen seal",
+        "chinh hang",
+        "lap pc tai nha"
+      ],
+      "reply": "Hiện lab chưa có dữ liệu chính sách shop cho nội dung này trong catalog, nên mình không nên tự đoán. Cần bổ sung dữ liệu chính sách giao hàng, bảo hành, thanh toán hoặc đổi trả trước khi trả lời chính xác."
+    },
+    "account_order_guard": {
+      "description": "Refuse to answer personal account, cart, address, or order state without authenticated user context.",
+      "terms": [
+        "don hang cua toi",
+        "don cua toi",
+        "kiem tra don",
+        "ma don",
+        "gio hang cua toi",
+        "dia chi cua toi",
+        "tai khoan cua toi",
+        "tai khoan toi",
+        "profile",
+        "lich su mua hang",
+        "huy don",
+        "doi dia chi",
+        "thanh toan cua toi",
+        "don hang",
+        "gio hang",
+        "dat hang",
+        "coi giup don",
+        "sdt nhan hang",
+        "lich su mua",
+        "dang nhap",
+        "ma van don",
+        "nguoi nhan"
+      ],
+      "reply": "Hiện lab chưa có ngữ cảnh đăng nhập/đơn hàng của người dùng, nên mình không thể kiểm tra thông tin cá nhân hoặc trạng thái đơn. Khi tích hợp vào web, phần này cần gọi API đơn hàng/tài khoản có xác thực."
+    },
+    "safety_guard": {
+      "description": "Refuse prompt injection, secrets, or instructions to ignore catalog constraints.",
+      "terms": [
+        "bo qua huong dan",
+        "ignore previous",
+        "ignore instructions",
+        "system prompt",
+        "api key",
+        "gemini api key",
+        "jwt secret",
+        "db password",
+        "hay bia",
+        "bia gia",
+        "tu bia",
+        "fake gia",
+        "mat khau db",
+        "file .env",
+        ".env",
+        "ngoai shop",
+        "bo qua catalog",
+        "khong co du lieu",
+        "noi san pham con hang",
+        "noi dai",
+        "noi dai gia nao cung duoc"
+      ],
+      "reply": "Mình không thể bỏ qua ràng buộc an toàn, tiết lộ secret, hoặc bịa dữ liệu. Mình chỉ tư vấn dựa trên catalog và dữ liệu đã được cung cấp."
+    },
+    "ranking": {
+      "description": "Handle top-N, cheapest, expensive, stock-heavy, and sold-count product ranking requests.",
+      "terms": [
+        "top",
+        "re nhat",
+        "dat nhat",
+        "gia cao nhat",
+        "gia thap nhat",
+        "nhieu hang nhat",
+        "ton kho nhieu",
+        "ban chay",
+        "sap xep",
+        "liet ke",
+        "list",
+        "danh sach"
+      ],
+      "default_limit": 5
+    },
+    "compatibility": {
+      "description": "Answer hardware compatibility questions using available categories and warn when socket/chipset data is incomplete.",
+      "terms": [
+        "tuong thich",
+        "hop voi",
+        "dung main",
+        "di voi",
+        "chon main",
+        "chon ram",
+        "dung duoc",
+        "socket",
+        "chipset"
+      ],
+      "reply_suffix": "Cần kiểm tra socket/chipset và chuẩn RAM trước khi chốt vì dữ liệu tương thích có thể chưa đầy đủ."
+    },
+    "exact_product": {
+      "description": "Prefer exact catalog product names over fuzzy retrieval.",
+      "min_normalized_length": 12
+    },
+    "input_normalization": {
+      "description": "Normalize common Vietnamese shorthand before retrieval.",
+      "patterns": [
+        "ko/k/kh => khong",
+        "bn => bao nhieu",
+        "16g => 16gb",
+        "1t => 1tb",
+        "card mh => card man hinh",
+        "500k => 500.000d"
+      ]
+    },
+    "use_case_build": {
+      "description": "Map user workloads to PC build categories before product retrieval.",
+      "terms": [
+        "autocad",
+        "livestream",
+        "stream",
+        "edit video",
+        "video edit",
+        "dung phim",
+        "ai",
+        "machine learning",
+        "hoc online",
+        "ke toan",
+        "van phong"
+      ],
+      "gpu_required_terms": [
+        "autocad",
+        "livestream",
+        "stream",
+        "edit video",
+        "video edit",
+        "dung phim",
+        "ai",
+        "machine learning"
+      ],
+      "base_categories": [
+        "CPU",
+        "RAM",
+        "Mainboard",
+        "SSD"
+      ],
+      "gpu_categories": [
+        "CPU",
+        "VGA",
+        "RAM",
+        "Mainboard",
+        "SSD"
+      ],
+      "workload_priorities": {
+        "gaming": [
+          "VGA mạnh nhất trong ngân sách",
+          "CPU đủ kéo VGA",
+          "RAM tối thiểu 16GB",
+          "SSD để tải game nhanh"
+        ],
+        "gaming_esports": [
+          "CPU ổn định/xung cao để giữ FPS",
+          "VGA vừa đủ mức màn hình",
+          "RAM tối thiểu 16GB",
+          "SSD để vào trận nhanh"
+        ],
+        "gaming_aaa_2k_4k": [
+          "VGA và VRAM mạnh nhất trong ngân sách",
+          "CPU đủ kéo VGA",
+          "RAM 16GB trở lên",
+          "SSD"
+        ],
+        "render_edit": [
+          "CPU nhiều nhân",
+          "RAM dung lượng cao",
+          "SSD nhanh",
+          "VGA nếu phần mềm tận dụng GPU"
+        ],
+        "ai_ml": [
+          "VGA mạnh và VRAM lớn",
+          "RAM hệ thống",
+          "CPU ổn định",
+          "SSD nhanh"
+        ],
+        "office_study": [
+          "CPU tiết kiệm",
+          "SSD cho tốc độ phản hồi",
+          "RAM đủ dùng",
+          "không ưu tiên VGA rời nếu không cần"
+        ],
+        "programming": [
+          "CPU ổn định",
+          "RAM 16GB trở lên nếu chạy IDE/nhiều service",
+          "SSD nhanh",
+          "VGA rời chỉ cần nếu làm AI/đồ họa"
+        ]
+      }
+    },
+    "workload_priority": {
+      "description": "Explain what hardware should be prioritized for a stated purpose before listing products.",
+      "terms": [
+        "choi game",
+        "gaming",
+        "render",
+        "edit video",
+        "do hoa",
+        "autocad",
+        "machine learning",
+        "ai",
+        "livestream",
+        "stream",
+        "van phong",
+        "hoc tap",
+        "ke toan",
+        "lap trinh",
+        "code",
+        "dev",
+        "developer",
+        "photoshop",
+        "blender",
+        "valorant",
+        "cs2",
+        "lol",
+        "pubg",
+        "2k",
+        "4k",
+        "aaa",
+        "fps",
+        "uu tien",
+        "manh nhat",
+        "can manh cai gi"
+      ]
+    },
+    "sales_advisory": {
+      "description": "Handle sales consultation intents: decision support, budget objection, upsell, cross-sell, and comparison without inventing policies.",
+      "terms": [
+        "co nen mua",
+        "dang mua",
+        "chot",
+        "lay mau nao",
+        "mua mau nao",
+        "dat qua",
+        "mac qua",
+        "re hon",
+        "tiet kiem",
+        "qua ngan sach",
+        "phan van",
+        "so sanh",
+        "khac nhau",
+        "nen chon cai nao",
+        "chon cai nao",
+        "mua kem",
+        "di kem",
+        "combo voi",
+        "chon them",
+        "can them",
+        "nang cap",
+        "cao hon",
+        "manh hon",
+        "tot hon",
+        "len doi",
+        "dang tien",
+        "hop ly",
+        "chi co"
+      ],
+      "intents": [
+        "decision",
+        "objection",
+        "compare",
+        "cross_sell",
+        "upsell",
+        "consult"
+      ],
+      "reply_rules": [
+        "Use only catalog products",
+        "Prefer in-stock items",
+        "Mention budget fit when budget is present",
+        "Do not invent warranty, shipping, discounts, or payment policy"
+      ]
+    },
+    "combo_check": {
+      "description": "Detect user-provided PC combos, match mentioned parts against catalog, calculate total price, and check CPU-mainboard socket plus RAM-mainboard standard compatibility.",
+      "terms": [
+        "combo",
+        "cau hinh nay",
+        "build nay",
+        "di duoc khong",
+        "co hop khong",
+        "co tuong thich khong",
+        "kiem tra cau hinh",
+        "kiem tra combo",
+        "ktra combo",
+        "kt combo",
+        "check combo",
+        "check cau hinh",
+        "tong gia",
+        "tong bao nhieu",
+        "lap bo nay",
+        "lap may",
+        "thieu",
+        "bo nay",
+        "hop nhau"
+      ],
+      "checks": [
+        "catalog_match",
+        "total_price",
+        "cpu_mainboard_socket",
+        "ram_mainboard_standard",
+        "out_of_stock_warning_only"
+      ]
+    }
+  }
+}

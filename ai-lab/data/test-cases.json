@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ram-budget",
+    "question": "Tôi cần RAM 16GB còn hàng, giá khoảng dưới 1 triệu",
+    "expected_category": "RAM",
+    "expected_terms": ["chưa", "không", "phù hợp"],
+    "must_return_products": false
+  },
+  {
+    "id": "ssd-budget",
+    "question": "SSD NVMe dưới 2 triệu có mẫu nào ổn không?",
+    "expected_category": "SSD",
+    "expected_terms": ["chưa", "không", "phù hợp"],
+    "must_return_products": false
+  },
+  {
+    "id": "cpu-intel",
+    "question": "Gợi ý CPU Intel dưới 5 triệu",
+    "expected_category": "CPU",
+    "expected_terms": ["cpu", "intel"],
+    "must_return_products": true,
+    "all_products_must_match_category": true
+  },
+  {
+    "id": "vga-gaming",
+    "question": "Tư vấn VGA chơi game Full HD",
+    "expected_category": "VGA",
+    "expected_terms": ["vga", "card", "gpu"],
+    "must_return_products": true,
+    "all_products_must_match_category": true
+  },
+  {
+    "id": "mainboard-socket",
+    "question": "Mainboard socket LGA1700 nào còn hàng?",
+    "expected_category": "Mainboard",
+    "expected_terms": ["mainboard", "lga1700"],
+    "must_return_products": true,
+    "all_products_must_match_category": true
+  },
+  {
+    "id": "build-gaming",
+    "question": "Build PC gaming khoảng 15 triệu gồm CPU VGA RAM SSD Mainboard",
+    "expected_terms": ["cpu", "vga", "ram", "ssd", "mainboard"],
+    "must_return_products": true
+  },
+  {
+    "id": "sale",
+    "question": "Sản phẩm nào đang sale?",
+    "expected_terms": ["chưa", "không", "sale"],
+    "must_return_products": false
+  },
+  {
+    "id": "unknown",
+    "question": "Có laptop văn phòng nào không?",
+    "expected_terms": ["chưa", "không", "laptop"],
+    "must_return_products": false
+  }
+]

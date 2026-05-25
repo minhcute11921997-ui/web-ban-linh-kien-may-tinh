@@ -1,0 +1,133 @@
+{
+  "ok": true,
+  "generated_at": "2026-05-25T08:30:14.834Z",
+  "serviceUrl": "http://127.0.0.1:4001",
+  "files": [
+    {
+      "path": "data/knowledge-base.json",
+      "ok": true
+    },
+    {
+      "path": "data/vector-index.json",
+      "ok": true
+    },
+    {
+      "path": "data/training-examples.json",
+      "ok": true
+    },
+    {
+      "path": "data/training-examples.jsonl",
+      "ok": true
+    },
+    {
+      "path": "data/tuning-config.json",
+      "ok": true
+    },
+    {
+      "path": "outputs/eval-report.json",
+      "ok": true
+    },
+    {
+      "path": "outputs/training-eval-report.json",
+      "ok": true
+    },
+    {
+      "path": "outputs/service-eval-report.json",
+      "ok": true
+    },
+    {
+      "path": "outputs/service-training-eval-report.json",
+      "ok": true
+    },
+    {
+      "path": "outputs/quality-report.html",
+      "ok": true
+    },
+    {
+      "path": "outputs/chat-log-summary.json",
+      "ok": true
+    },
+    {
+      "path": "API_CONTRACT.md",
+      "ok": true
+    },
+    {
+      "path": "PRE_INTEGRATION_CHECKLIST.md",
+      "ok": true
+    }
+  ],
+  "reports": {
+    "smoke": {
+      "ok": true,
+      "passed": 8,
+      "total": 8,
+      "failed": 0,
+      "passRate": 1
+    },
+    "training": {
+      "ok": true,
+      "passed": 502,
+      "total": 502,
+      "failed": 0,
+      "passRate": 1
+    },
+    "serviceSmoke": {
+      "ok": true,
+      "passed": 8,
+      "total": 8,
+      "failed": 0,
+      "passRate": 1
+    },
+    "serviceTraining": {
+      "ok": true,
+      "passed": 502,
+      "total": 502,
+      "failed": 0,
+      "passRate": 1
+    }
+  },
+  "data": {
+    "products": 74,
+    "categories": 5,
+    "vectorItems": 74,
+    "vectorProvider": "local",
+    "vectorModel": "local-hash-embedding-v1",
+    "logRequests": 18252,
+    "logErrors": 0
+  },
+  "service": {
+    "ok": true,
+    "health": {
+      "ok": true,
+      "service": "ai-lab-chat-service",
+      "startedAt": "2026-05-25T08:27:39.676Z",
+      "lastReloadAt": "2026-05-25T08:27:39.706Z",
+      "reloadCount": 1,
+      "knowledgeBase": {
+        "generatedAt": "2026-05-23T19:35:57.906Z",
+        "products": 74,
+        "categories": 5,
+        "activeDiscounts": 0
+      },
+      "vectorIndex": {
+        "generatedAt": "2026-05-23T19:46:20.480Z",
+        "provider": "local",
+        "model": "local-hash-embedding-v1",
+        "dimensions": 512,
+        "count": 74
+      },
+      "endpoints": {
+        "health": "GET /health",
+        "chat": "POST /chat",
+        "reload": "POST /reload"
+      }
+    },
+    "chat": {
+      "status": 200,
+      "success": true,
+      "source": "local_rag",
+      "products": 3,
+      "latencyMs": 114
+    }
+  }
+}

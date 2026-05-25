@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-05-25T08:30:14.521Z",
+  "serviceUrl": "http://127.0.0.1:4001",
+  "total": 1506,
+  "passed": 1506,
+  "failed": 0,
+  "durationMs": 113144,
+  "concurrency": 4,
+  "rounds": 3,
+  "latency": {
+    "min": 68,
+    "max": 730,
+    "p50": 301,
+    "p90": 469,
+    "p95": 516
+  },
+  "failedSamples": []
+}
