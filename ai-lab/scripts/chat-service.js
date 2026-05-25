@@ -95,6 +95,30 @@ const appendLog = (entry) => {
 
 const toBase64 = (value) => Buffer.from(String(value || ""), "utf8").toString("base64");
 
+const normalizeHistory = (history) => {
+  if (!Array.isArray(history)) return [];
+  return history
+    .filter((item) => ["user", "assistant"].includes(item?.role) && item?.text)
+    .slice(-6)
+    .map((item) => ({
+      role: item.role,
+      text: String(item.text).slice(0, 1000),
+      products: Array.isArray(item.products)
+        ? item.products.slice(0, 8).map((product) => ({
+            id: product.id,
+            name: product.name,
+            brand: product.brand,
+            category_name: product.category_name,
+            price: product.price,
+            sale_price: product.sale_price,
+            discount_percent: product.discount_percent,
+            stock: product.stock,
+            image_url: product.image_url,
+          }))
+        : [],
+    }));
+};
+
 const healthPayload = () => ({
   ok: Boolean(state.knowledgeBase),
   service: "ai-lab-chat-service",
@@ -142,11 +166,11 @@ const handleChat = async (req, res) => {
     });
   }
 
-  const useGemini = body.useGemini !== false;
   const limit = Math.min(Math.max(Number(body.limit || 8), 1), 20);
+  const history = normalizeHistory(body.history);
 
   try {
-    const result = await answerQuestion({ message, useGemini, limit });
+    const result = await answerQuestion({ message, history, limit });
     const latencyMs = Date.now() - started;
     const payload = {
       success: true,
@@ -161,8 +185,8 @@ const handleChat = async (req, res) => {
       request: {
         message,
         messageBase64: toBase64(message),
-        useGemini,
         limit,
+        historyCount: history.length,
       },
       response: {
         source: result.source,
@@ -180,7 +204,7 @@ const handleChat = async (req, res) => {
       ts: new Date().toISOString(),
       route: "/chat",
       latencyMs,
-      request: { message, useGemini, limit },
+      request: { message, limit, historyCount: history.length },
       requestBase64: { message: toBase64(message) },
       error: error.message,
     });

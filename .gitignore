@@ -1,6 +1,7 @@
 # Dependencies
 be/node_modules/
 fe/node_modules/
+ai-lab/node_modules/
 
 # Environment variables
 be/.env
@@ -8,6 +9,7 @@ fe/.env
 
 # Logs
 *.log
+ai-lab/.pm2/
 
 # Docker data
 mysql_data/

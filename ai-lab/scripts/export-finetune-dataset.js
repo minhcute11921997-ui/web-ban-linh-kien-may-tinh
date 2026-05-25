@@ -69,7 +69,6 @@ const main = async () => {
   for (const item of training) {
     const result = await answerQuestion({
       message: item.question,
-      useGemini: false,
       limit: 8,
     });
     examples.push(

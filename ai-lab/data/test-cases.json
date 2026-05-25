@@ -27,7 +27,9 @@
     "expected_category": "VGA",
     "expected_terms": ["vga", "card", "gpu"],
     "must_return_products": true,
-    "all_products_must_match_category": true
+    "all_products_must_match_category": true,
+    "max_price": 20000000,
+    "forbidden_terms": ["rtx pro", "workstation", "quadro"]
   },
   {
     "id": "mainboard-socket",
@@ -41,7 +43,9 @@
     "id": "build-gaming",
     "question": "Build PC gaming khoảng 15 triệu gồm CPU VGA RAM SSD Mainboard",
     "expected_terms": ["cpu", "vga", "ram", "ssd", "mainboard"],
-    "must_return_products": true
+    "must_return_products": true,
+    "build_required_categories": ["CPU", "VGA", "RAM", "Mainboard", "SSD"],
+    "max_total_price": 16500000
   },
   {
     "id": "sale",

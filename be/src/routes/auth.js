@@ -29,6 +29,10 @@ router.post(
 
 router.post('/google', loginLimiter, authController.googleLogin);
 
+router.post('/verify-email', authController.verifyEmail);
+
+router.post('/resend-verification', authController.resendVerification);
+
 router.post('/logout', authController.logout);
 
 // Route refresh

@@ -6,6 +6,7 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME,
     port:     Number(process.env.DB_PORT) || 3306,
+    charset:  'utf8mb4',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -44,10 +45,50 @@ const ensureStaffRole = async (conn) => {
     }
 };
 
+const ensureEmailVerificationSchema = async (conn) => {
+    try {
+        const [columns] = await conn.query(
+            `SELECT COLUMN_NAME
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'users'
+               AND COLUMN_NAME = 'email_verified_at'`
+        );
+
+        if (columns.length === 0) {
+            await conn.query("ALTER TABLE users ADD COLUMN email_verified_at DATETIME NULL");
+            await conn.query("UPDATE users SET email_verified_at = NOW() WHERE email_verified_at IS NULL");
+            console.log('Da them users.email_verified_at');
+        }
+
+        await conn.query(
+            `CREATE TABLE IF NOT EXISTS email_verifications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                code_hash VARCHAR(64) NOT NULL,
+                expires_at DATETIME NOT NULL,
+                used_at DATETIME NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_email_verifications_email (email),
+                INDEX idx_email_verifications_user_id (user_id),
+                CONSTRAINT fk_email_verifications_user
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                    ON DELETE CASCADE
+             )`
+        );
+    } catch (err) {
+        console.error('Loi khoi tao email verification:', err.message);
+    }
+};
+
 pool.getConnection()
     .then(conn => {
         console.log('✅ Kết nối MySQL thành công!');
-        return ensureStaffRole(conn).finally(() => conn.release());
+        return Promise.all([
+            ensureStaffRole(conn),
+            ensureEmailVerificationSchema(conn),
+        ]).finally(() => conn.release());
     })
     .catch(err => console.error('❌ Lỗi kết nối MySQL:', err.message));
 

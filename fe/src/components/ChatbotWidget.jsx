@@ -14,6 +14,7 @@ import { sendChatMessage } from "../api/chatbotApi";
 const INITIAL_MESSAGES = [
   {
     role: "bot",
+    seed: true,
     text: "Chào bạn, mình là trợ lý tư vấn sản phẩm. Bạn có thể hỏi: RAM 16GB, SSD dưới 2 triệu, sản phẩm đang sale, còn mã giảm giá không?",
   },
 ];
@@ -25,6 +26,9 @@ const DEFAULT_SUGGESTIONS = [
   "Có mã giảm giá không?",
 ];
 
+const CHAT_MESSAGES_KEY = "pc_shop_chatbot_messages";
+const CHAT_SUGGESTIONS_KEY = "pc_shop_chatbot_suggestions";
+
 const formatPrice = (value) =>
   `${Math.round(Number(value || 0)).toLocaleString("vi-VN")}đ`;
 
@@ -34,17 +38,96 @@ const resolveImage = (imageUrl) => {
   return imageUrl;
 };
 
+const safeReadJson = (key, fallback) => {
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+};
+
+const sanitizeProduct = (product) => ({
+  id: product.id,
+  name: product.name,
+  brand: product.brand,
+  category_name: product.category_name,
+  price: product.price,
+  sale_price: product.sale_price,
+  discount_percent: product.discount_percent,
+  stock: product.stock,
+  image_url: product.image_url,
+});
+
+const sanitizeMessage = (message) => ({
+  role: message.role,
+  text: message.text,
+  seed: Boolean(message.seed),
+  products: Array.isArray(message.products)
+    ? message.products.slice(0, 8).map(sanitizeProduct)
+    : [],
+});
+
+const loadMessages = () => {
+  const stored = safeReadJson(CHAT_MESSAGES_KEY, null);
+  if (!Array.isArray(stored) || stored.length === 0) return INITIAL_MESSAGES;
+
+  const messages = stored
+    .filter((message) => ["user", "bot"].includes(message?.role) && message?.text)
+    .map(sanitizeMessage);
+
+  return messages.length ? messages : INITIAL_MESSAGES;
+};
+
+const loadSuggestions = () => {
+  const stored = safeReadJson(CHAT_SUGGESTIONS_KEY, null);
+  if (!Array.isArray(stored) || stored.length === 0) return DEFAULT_SUGGESTIONS;
+
+  const suggestions = stored.filter((item) => typeof item === "string" && item.trim());
+  return suggestions.length ? suggestions : DEFAULT_SUGGESTIONS;
+};
+
+const toChatHistory = (items) =>
+  items
+    .filter((item) => !item.seed && item.text && (item.role === "user" || item.role === "bot"))
+    .slice(-6)
+    .map((item) => ({
+      role: item.role === "bot" ? "assistant" : "user",
+      text: item.text,
+      products: (item.products || []).slice(0, 8).map(sanitizeProduct),
+    }));
+
 export default function ChatbotWidget() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const [messages, setMessages] = useState(loadMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTIONS);
+  const [suggestions, setSuggestions] = useState(loadSuggestions);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open, loading]);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      CHAT_MESSAGES_KEY,
+      JSON.stringify(messages.map(sanitizeMessage))
+    );
+  }, [messages]);
+
+  useEffect(() => {
+    sessionStorage.setItem(CHAT_SUGGESTIONS_KEY, JSON.stringify(suggestions));
+  }, [suggestions]);
+
+  const handleClearChat = () => {
+    sessionStorage.removeItem(CHAT_MESSAGES_KEY);
+    sessionStorage.removeItem(CHAT_SUGGESTIONS_KEY);
+    setMessages(INITIAL_MESSAGES);
+    setSuggestions(DEFAULT_SUGGESTIONS);
+    setInput("");
+  };
 
   const handleSend = async (messageOverride) => {
     const message = (messageOverride || input).trim();
@@ -55,7 +138,8 @@ export default function ChatbotWidget() {
     setLoading(true);
 
     try {
-      const res = await sendChatMessage(message);
+      const history = toChatHistory(messages);
+      const res = await sendChatMessage(message, history);
       const data = res.data;
       setMessages((prev) => [
         ...prev,
@@ -97,6 +181,13 @@ export default function ChatbotWidget() {
                 </p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={handleClearChat}
+              className="mr-1 px-2 h-8 rounded-md hover:bg-white/15 text-xs font-medium"
+            >
+              Xóa chat
+            </button>
             <button
               type="button"
               onClick={() => setOpen(false)}

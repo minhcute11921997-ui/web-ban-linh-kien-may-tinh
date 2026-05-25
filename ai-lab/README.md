@@ -5,17 +5,20 @@ Thu muc nay la moi truong thu nghiem tach rieng cho chatbot tu van san pham. No 
 ## Chay nhanh
 
 ```powershell
-node ai-lab/scripts/export-knowledge-base.js
-node ai-lab/scripts/build-vector-index.js --local
-node ai-lab/scripts/vector-search.js "Build PC gaming khoang 15 trieu"
-node ai-lab/scripts/chat.js "Build PC gaming khoang 15 trieu"
-node ai-lab/scripts/evaluate.js --gemini
+cd ai-lab
+npm run sync
+node scripts/vector-search.js "Build PC gaming khoang 15 trieu"
+node scripts/chat.js "Build PC gaming khoang 15 trieu"
+npm run eval
 ```
 
 ## Chay nhu API service rieng
 
+Chay dev foreground:
+
 ```powershell
-node ai-lab/scripts/chat-service.js
+cd ai-lab
+npm start
 ```
 
 Endpoints:
@@ -30,6 +33,42 @@ Vi du chat:
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4001/chat -ContentType application/json -Body '{"message":"Build PC gaming khoang 15 trieu"}'
 ```
 
+`POST /chat` chi dung local RAG. Service khong goi dich vu AI ben ngoai.
+
+## Dong bo catalog sau khi admin sua san pham
+
+Chay lenh nay sau khi them/sua/xoa san pham, danh muc, thong so, ton kho hoac ma giam gia:
+
+```powershell
+cd ai-lab
+npm run sync
+```
+
+Lenh nay can MySQL dang chay. No se export lai `knowledge-base`, build lai vector index bang local embedding va reload service `4001` neu service dang chay.
+
+Neu chi muon cap nhat file, khong reload service:
+
+```powershell
+node scripts/sync-knowledge-base.js --skip-reload
+```
+
+## Chay on dinh bang PM2
+
+```powershell
+cd ai-lab
+npm run pm2:start
+npx pm2 status
+npm run pm2:logs
+```
+
+Khi muon dung service:
+
+```powershell
+npm run pm2:stop
+```
+
+PM2 hien la co che van hanh tam thoi cho lab noi bo. Service chay noi bo tai `127.0.0.1:4001`; khong de frontend production goi truc tiep endpoint nay.
+
 ## UI test rieng
 
 Chay UI test rieng sau khi service `4001` dang chay:
@@ -43,7 +82,7 @@ Sau do mo `http://127.0.0.1:4002`. UI nay chi goi API lab, chua tich hop vao fro
 Cham diem qua service:
 
 ```powershell
-node ai-lab/scripts/evaluate-service.js --gemini
+npm run eval:service
 ```
 
 ## Train/tune retrieval
@@ -51,38 +90,36 @@ node ai-lab/scripts/evaluate-service.js --gemini
 Buoc nay khong fine-tune model. No sinh dataset tu catalog, hoc them alias/guard/rule retrieval, roi cham diem lai.
 
 ```powershell
-node ai-lab/scripts/generate-training-examples.js
-node ai-lab/scripts/tune-retrieval.js
-node ai-lab/scripts/evaluate-training.js
-node ai-lab/scripts/evaluate-training.js --gemini
+node scripts/generate-training-examples.js
+node scripts/tune-retrieval.js
+npm run eval:training
 ```
 
 ## Review chat quality
 
 ```powershell
-node ai-lab/scripts/analyze-chat-logs.js
-node ai-lab/scripts/generate-html-report.js
+node scripts/analyze-chat-logs.js
+node scripts/generate-html-report.js
 ```
 
 ## Pre-integration hardening
 
 ```powershell
-node ai-lab/scripts/export-finetune-dataset.js
-node ai-lab/scripts/load-test-service.js
-node ai-lab/scripts/preintegration-check.js
+node scripts/export-finetune-dataset.js
+node scripts/load-test-service.js
+npm run precheck
 ```
 
-Neu Gemini Embedding API con quota, co the build index bang embedding that:
+Vector index luon duoc build bang local hash embedding, khong can API key ngoai.
 
-```powershell
-node ai-lab/scripts/build-vector-index.js
-```
+## Ghi chu van hanh
 
-Neu khong muon goi Gemini khi cham diem:
-
-```powershell
-node ai-lab/scripts/evaluate.js
-```
+- Du lieu chatbot la snapshot tu MySQL, khong realtime. Sau khi admin cap nhat catalog, chay `npm run sync`.
+- Chatbot chi dung local RAG va local embedding.
+- Backend web hien goi service AI Lab qua `/api/chatbot/message`; khong con fallback rule-based cu.
+- Neu service `127.0.0.1:4001` dung, chatbox web se tra loi loi ket noi thay vi tu xu ly bang chatbot cu.
+- Chatbox web gui context ngan trong phien hien tai: toi da 6 tin gan nhat va cac product cards lien quan. Context nay khong luu DB.
+- Khong dua `debug` ra frontend production neu khong can.
 
 ## Dau ra
 
@@ -105,4 +142,4 @@ node ai-lab/scripts/evaluate.js
 
 ## Huong phat trien tiep
 
-Ban thu nghiem hien tai la RAG prototype: retrieve san pham lien quan truoc, sau do dua context cho Gemini tra loi. Buoc nang cap tiep theo la thay scoring local bang embedding + vector database nhu ChromaDB, Qdrant hoac FAISS.
+Ban thu nghiem hien tai la local RAG prototype: retrieve san pham lien quan roi tra loi bang logic noi bo. Buoc nang cap tiep theo la cai thien history resolver, bo eval hoi thoai nhieu luot, hoac thay scoring local bang vector database nhu ChromaDB, Qdrant hoac FAISS.

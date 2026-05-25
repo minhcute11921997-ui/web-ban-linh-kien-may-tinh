@@ -13,7 +13,7 @@ if (!message) {
   process.exit(1);
 }
 
-answerQuestion({ message, useGemini: true })
+answerQuestion({ message })
   .then((result) => {
     console.log(JSON.stringify(result, null, 2));
   })

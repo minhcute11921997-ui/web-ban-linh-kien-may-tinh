@@ -6,14 +6,11 @@ const dotenv = require(path.join(rootDir, "be", "node_modules", "dotenv"));
 dotenv.config({ path: path.join(rootDir, "be", ".env"), quiet: true });
 
 const {
-  EMBEDDING_DIMENSIONS,
-  EMBEDDING_MODEL,
   LOCAL_EMBEDDING_DIMENSIONS,
   LOCAL_EMBEDDING_MODEL,
   VECTOR_INDEX_PATH,
   buildDocumentText,
   embedLocalText,
-  embedText,
   loadKnowledgeBase,
 } = require("./embedding-core");
 
@@ -21,9 +18,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const main = async () => {
   const kb = loadKnowledgeBase();
-  const useLocal = process.argv.includes("--local") || process.env.LOCAL_EMBEDDING === "1";
-  const model = useLocal ? LOCAL_EMBEDDING_MODEL : EMBEDDING_MODEL;
-  const dimensions = useLocal ? LOCAL_EMBEDDING_DIMENSIONS : EMBEDDING_DIMENSIONS;
+  const model = LOCAL_EMBEDDING_MODEL;
+  const dimensions = LOCAL_EMBEDDING_DIMENSIONS;
   const existing = fs.existsSync(VECTOR_INDEX_PATH)
     ? JSON.parse(fs.readFileSync(VECTOR_INDEX_PATH, "utf8"))
     : null;
@@ -46,9 +42,7 @@ const main = async () => {
       continue;
     }
 
-    const embedding = useLocal
-      ? embedLocalText({ text: documentText, dimensions })
-      : await embedText({ text: documentText });
+    const embedding = embedLocalText({ text: documentText, dimensions });
     items.push({
       id: product.id,
       name: product.name,
@@ -75,7 +69,7 @@ const main = async () => {
   const payload = {
     generated_at: new Date().toISOString(),
     source_generated_at: kb.generated_at,
-    provider: useLocal ? "local" : "gemini",
+    provider: "local",
     model,
     dimensions,
     count: items.length,

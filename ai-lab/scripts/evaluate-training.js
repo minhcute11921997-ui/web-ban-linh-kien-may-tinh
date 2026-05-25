@@ -33,7 +33,6 @@ const main = async () => {
   for (const example of examples) {
     const result = await answerQuestion({
       message: example.question,
-      useGemini: process.argv.includes("--gemini"),
       limit: 8,
     });
 

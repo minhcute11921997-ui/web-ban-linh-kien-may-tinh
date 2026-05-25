@@ -6,6 +6,8 @@ Base URL:
 http://127.0.0.1:4001
 ```
 
+Service nay dang tach biet voi backend/frontend web chinh.
+
 ## GET /health
 
 Kiem tra service, knowledge base va vector index.
@@ -36,11 +38,23 @@ Request:
 
 ```json
 {
-  "message": "Build PC gaming khoảng 15 triệu",
-  "useGemini": true,
+  "message": "Build PC gaming khoang 15 trieu",
+  "history": [
+    {
+      "role": "assistant",
+      "text": "Minh goi y mot so VGA...",
+      "products": []
+    }
+  ],
   "limit": 8
 }
 ```
+
+Fields:
+
+- `message`: cau hoi cua nguoi dung, bat buoc.
+- `history`: tuy chon, toi da vai tin gan nhat trong phien chat hien tai. Service dung de hieu cau noi tiep nhu "cai thu 2", "re hon", "so voi con dau"; khong luu DB.
+- `limit`: tuy chon, gioi han so san pham tra ve, mac dinh `8`.
 
 Response 200:
 
@@ -48,13 +62,13 @@ Response 200:
 {
   "success": true,
   "latencyMs": 123,
-  "question": "Build PC gaming khoảng 15 triệu",
-  "source": "gemini_rag",
-  "reply": "Nội dung tư vấn...",
+  "question": "Build PC gaming khoang 15 trieu",
+  "source": "local_rag",
+  "reply": "Noi dung tu van...",
   "products": [
     {
       "id": 31,
-      "name": "Card màn hình ...",
+      "name": "Card man hinh ...",
       "category_name": "VGA",
       "brand": "Inno3d",
       "price": 6090000,
@@ -99,7 +113,11 @@ Response 200:
 
 ## Integration Notes
 
-- Web backend sau nay chi can map request hien tai `{ message }` sang `POST /chat`.
+- Hien tai service tach biet, khong sua backend/frontend web chinh.
+- Web backend sau nay co the map request hien tai `{ message }` sang `POST /chat`.
 - Frontend hien tai co the dung tiep shape `{ reply, products }`.
 - Khong dua `debug` ra frontend production neu khong can.
-- Neu AI service loi, backend web nen fallback ve chatbot rule-based hien tai.
+- Backend web hien dung AI Lab lam nguon chatbot duy nhat; khong con fallback rule-based cu.
+- Neu AI service loi, backend web tra loi loi ket noi ro rang cho frontend.
+- Khong de frontend production goi truc tiep `http://127.0.0.1:4001`; hay di qua backend adapter neu tich hop.
+- Du lieu la snapshot tu MySQL. Sau khi admin cap nhat catalog, chay `npm run sync` trong thu muc `ai-lab`.

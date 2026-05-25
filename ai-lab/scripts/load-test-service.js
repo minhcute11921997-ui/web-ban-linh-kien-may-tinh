@@ -20,7 +20,7 @@ const callChat = async (message) => {
   const response = await fetch(`${SERVICE_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, useGemini: false, limit: 8 }),
+    body: JSON.stringify({ message, limit: 8 }),
   });
   const data = await response.json();
   return {

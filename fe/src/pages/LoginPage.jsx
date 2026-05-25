@@ -40,6 +40,11 @@ const LoginPage = () => {
       navigate(getRedirectPath(res.data.user.role));
     } catch (err) {
       const msg = err.response?.data?.message || 'Đăng nhập thất bại!';
+      if (err.response?.data?.requiresVerification) {
+        const email = err.response.data.email || form.login;
+        navigate(`/verify-email?email=${encodeURIComponent(email)}`);
+        return;
+      }
       if (msg.toLowerCase().includes('password')) setErrors({ password: msg });
       else setErrors({ login: msg });
     } finally {

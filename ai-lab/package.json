@@ -1,0 +1,21 @@
+{
+  "name": "pc-shop-ai-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node scripts/chat-service.js",
+    "sync": "node scripts/sync-knowledge-base.js",
+    "eval": "node scripts/evaluate.js",
+    "eval:service": "node scripts/evaluate-service.js",
+    "eval:training": "node scripts/evaluate-training.js",
+    "eval:service-training": "node scripts/evaluate-service.js --training",
+    "precheck": "node scripts/preintegration-check.js",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop pc-shop-ai-lab",
+    "pm2:logs": "pm2 logs pc-shop-ai-lab"
+  },
+  "devDependencies": {
+    "pm2": "^6.0.14"
+  }
+}

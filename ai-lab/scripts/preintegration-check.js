@@ -50,7 +50,6 @@ const checkService = async () => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       message: "Gợi ý CPU Intel dưới 5 triệu",
-      useGemini: false,
       limit: 5,
     }),
   });

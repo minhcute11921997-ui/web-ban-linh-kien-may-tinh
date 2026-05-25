@@ -437,12 +437,6 @@
           <label for="limit">Số sản phẩm</label>
           <input id="limit" class="input" type="number" min="1" max="20" value="8" />
         </div>
-
-        <label class="toggle">
-          <span>Dùng Gemini</span>
-          <input id="useGemini" type="checkbox" checked />
-        </label>
-
         <div class="field">
           <div class="group-title">Câu test nhanh</div>
           <div id="samples" class="sample-list"></div>
@@ -518,7 +512,6 @@
       const els = {
         apiUrl: document.querySelector("#apiUrl"),
         limit: document.querySelector("#limit"),
-        useGemini: document.querySelector("#useGemini"),
         samples: document.querySelector("#samples"),
         status: document.querySelector("#status"),
         subtitle: document.querySelector("#subtitle"),
@@ -653,7 +646,6 @@
             method: "POST",
             body: JSON.stringify({
               message: text,
-              useGemini: els.useGemini.checked,
               limit: Number(els.limit.value || 8),
             }),
           });

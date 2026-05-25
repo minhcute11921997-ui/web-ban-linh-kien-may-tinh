@@ -160,6 +160,6 @@ const main = async () => {
 };
 
 main().catch((error) => {
-  console.error(error.message);
+  console.error(error.message || error.code || String(error));
   process.exit(1);
 });

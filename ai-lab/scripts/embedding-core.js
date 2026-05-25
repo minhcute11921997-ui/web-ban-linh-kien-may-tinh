@@ -6,11 +6,8 @@ const DATA_DIR = path.join(ROOT_DIR, "data");
 const KB_PATH = path.join(DATA_DIR, "knowledge-base.json");
 const VECTOR_INDEX_PATH = path.join(DATA_DIR, "vector-index.json");
 
-const EMBEDDING_MODEL = process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2";
-const EMBEDDING_DIMENSIONS = Number(process.env.GEMINI_EMBEDDING_DIMENSIONS || 768);
 const LOCAL_EMBEDDING_MODEL = "local-hash-embedding-v1";
 const LOCAL_EMBEDDING_DIMENSIONS = Number(process.env.LOCAL_EMBEDDING_DIMENSIONS || 512);
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 const normalizeText = (value = "") =>
   value
@@ -106,43 +103,7 @@ const embedLocalText = ({ text, dimensions = LOCAL_EMBEDDING_DIMENSIONS }) => {
 };
 
 const embedText = async ({ text }) => {
-  if (process.env.LOCAL_EMBEDDING === "1") {
-    return embedLocalText({ text });
-  }
-
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("Missing GEMINI_API_KEY in be/.env");
-  }
-
-  const response = await fetch(
-    `${GEMINI_ENDPOINT}/${encodeURIComponent(EMBEDDING_MODEL)}:embedContent`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": process.env.GEMINI_API_KEY,
-      },
-      body: JSON.stringify({
-        content: {
-          parts: [{ text }],
-        },
-        output_dimensionality: EMBEDDING_DIMENSIONS,
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Embedding API error ${response.status}: ${errorText}`);
-  }
-
-  const data = await response.json();
-  const values = data.embedding?.values || data.embeddings?.[0]?.values;
-  if (!Array.isArray(values) || values.length === 0) {
-    throw new Error("Embedding API returned no vector values");
-  }
-
-  return normalizeVector(values.map(Number));
+  return embedLocalText({ text });
 };
 
 const searchVectorIndex = async ({ message, limit = 12 }) => {
@@ -168,8 +129,6 @@ const searchVectorIndex = async ({ message, limit = 12 }) => {
 };
 
 module.exports = {
-  EMBEDDING_DIMENSIONS,
-  EMBEDDING_MODEL,
   LOCAL_EMBEDDING_DIMENSIONS,
   LOCAL_EMBEDDING_MODEL,
   VECTOR_INDEX_PATH,

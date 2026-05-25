@@ -36,6 +36,12 @@ const containsAll = (text, terms) => {
   return terms.every((term) => normalized.includes(normalize(term)));
 };
 
+const containsForbidden = (text, terms) => {
+  if (!terms || terms.length === 0) return false;
+  const normalized = normalize(text);
+  return terms.some((term) => normalized.includes(normalize(term)));
+};
+
 const callChat = async (question) => {
   const response = await fetch(`${SERVICE_URL}/chat`, {
     method: "POST",
@@ -44,7 +50,6 @@ const callChat = async (question) => {
     },
     body: JSON.stringify({
       message: question,
-      useGemini: process.argv.includes("--gemini"),
     }),
   });
   const data = await response.json();
@@ -80,6 +85,7 @@ const main = async () => {
       );
     const noProductsOk = !testCase.must_return_products || result.products.length > 0;
     const emptyProductsOk = testCase.must_return_products !== false || result.products.length === 0;
+    const forbiddenTermsOk = !containsForbidden(`${result.reply}\n${productText}`, testCase.forbidden_terms);
     const maxPriceOk =
       !testCase.max_price ||
       result.products.every((product) => Number(product.sale_price || product.price || 0) <= Number(testCase.max_price));
@@ -108,6 +114,7 @@ const main = async () => {
         allProductsCategoryOk &&
         noProductsOk &&
         emptyProductsOk &&
+        forbiddenTermsOk &&
         maxPriceOk &&
         requiredBuildCategoriesOk &&
         expectedCountOk &&
@@ -127,6 +134,7 @@ const main = async () => {
         allProductsCategoryOk,
         noProductsOk,
         emptyProductsOk,
+        forbiddenTermsOk,
         maxPriceOk,
         requiredBuildCategoriesOk,
         expectedCountOk,

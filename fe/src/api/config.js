@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_URL = `${API_BASE.replace(/\/$/, '')}/api`;
+
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: API_URL,
 });
 
 // Gắn token vào mọi request
@@ -60,7 +63,7 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post('/api/auth/refresh', { refreshToken });
+        const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
         const newToken        = res.data.token;
         const newRefreshToken = res.data.refreshToken;
 

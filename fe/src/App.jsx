@@ -6,6 +6,7 @@ import { useAuthInit } from "./hooks/useAuthInit";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
@@ -62,6 +63,7 @@ function App() {
         <Route path="/" element={<CustomerLayout><HomePage /></CustomerLayout>} />
         <Route path="/login" element={<CustomerLayout><LoginPage /></CustomerLayout>} />
         <Route path="/register" element={<CustomerLayout><RegisterPage /></CustomerLayout>} />
+        <Route path="/verify-email" element={<CustomerLayout><VerifyEmailPage /></CustomerLayout>} />
         <Route path="/products/:id" element={<CustomerLayout><ProductDetail /></CustomerLayout>} />
         <Route path="/cart" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CartPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/checkout" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CheckoutPage /></PrivateRoute></CustomerLayout>} />

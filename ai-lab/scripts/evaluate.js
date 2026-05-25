@@ -19,6 +19,12 @@ const containsAny = (text, terms) => {
   return terms.some((term) => normalized.includes(normalize(term)));
 };
 
+const containsForbidden = (text, terms) => {
+  if (!terms || terms.length === 0) return false;
+  const normalized = normalize(text);
+  return terms.some((term) => normalized.includes(normalize(term)));
+};
+
 const main = async () => {
   fs.mkdirSync(outputsDir, { recursive: true });
   const cases = JSON.parse(fs.readFileSync(testCasesPath, "utf8"));
@@ -27,7 +33,6 @@ const main = async () => {
   for (const testCase of cases) {
     const result = await answerQuestion({
       message: testCase.question,
-      useGemini: process.argv.includes("--gemini"),
       limit: 8,
     });
 
@@ -48,7 +53,32 @@ const main = async () => {
         (product) => normalize(product.category_name) === normalize(testCase.expected_category)
       );
     const noProductsOk = !testCase.must_return_products || result.products.length > 0;
-    const pass = Boolean(replyOk && expectedMentionOk && categoryOk && allProductsCategoryOk && noProductsOk);
+    const forbiddenTermsOk = !containsForbidden(`${result.reply}\n${productText}`, testCase.forbidden_terms);
+    const maxPriceOk =
+      !testCase.max_price ||
+      result.products.every((product) => Number(product.sale_price || product.price || 0) <= Number(testCase.max_price));
+    const requiredBuildCategoriesOk =
+      !testCase.build_required_categories ||
+      testCase.build_required_categories.every((category) =>
+        result.products.some((product) => normalize(product.category_name) === normalize(category))
+      );
+    const totalPrice = result.products.reduce(
+      (sum, product) => sum + Number(product.sale_price || product.price || 0),
+      0
+    );
+    const totalBudgetOk =
+      !testCase.max_total_price || totalPrice <= Number(testCase.max_total_price);
+    const pass = Boolean(
+      replyOk &&
+        expectedMentionOk &&
+        categoryOk &&
+        allProductsCategoryOk &&
+        noProductsOk &&
+        forbiddenTermsOk &&
+        maxPriceOk &&
+        requiredBuildCategoriesOk &&
+        totalBudgetOk
+    );
 
     results.push({
       id: testCase.id,
@@ -60,6 +90,10 @@ const main = async () => {
         categoryOk,
         allProductsCategoryOk,
         noProductsOk,
+        forbiddenTermsOk,
+        maxPriceOk,
+        requiredBuildCategoriesOk,
+        totalBudgetOk,
       },
       source: result.source,
       reply: result.reply,
@@ -71,6 +105,7 @@ const main = async () => {
         stock: product.stock,
       })),
       debug: result.debug,
+      totalPrice,
     });
   }
 

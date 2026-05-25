@@ -4,8 +4,10 @@ const Joi = require("joi");
 const crypto = require("crypto");
 const { OAuth2Client } = require("google-auth-library");
 const db = require("../config/db");
+const { sendVerificationEmail } = require("../utils/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const OTP_TTL_MINUTES = 10;
 
 const updateProfileSchema = Joi.object({
   full_name: Joi.string().max(100).allow("", null),
@@ -25,6 +27,32 @@ function validate(schema, data, res) {
   }
   return true;
 }
+
+const hashVerificationCode = (email, code) =>
+  crypto
+    .createHash("sha256")
+    .update(`${String(email).toLowerCase()}:${code}:${process.env.JWT_SECRET}`)
+    .digest("hex");
+
+const generateVerificationCode = () =>
+  String(crypto.randomInt(100000, 1000000));
+
+const createAndSendVerificationCode = async (user) => {
+  const code = generateVerificationCode();
+  const email = String(user.email).toLowerCase();
+  const codeHash = hashVerificationCode(email, code);
+
+  await db.query(
+    "UPDATE email_verifications SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL",
+    [user.id]
+  );
+  await db.query(
+    `INSERT INTO email_verifications (user_id, email, code_hash, expires_at)
+     VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`,
+    [user.id, email, codeHash, OTP_TTL_MINUTES]
+  );
+  await sendVerificationEmail({ to: email, code });
+};
 
 const issueAuthTokens = async (user) => {
   const token = jwt.sign(
@@ -96,10 +124,10 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.query(
-      "INSERT INTO users (username, email, password, full_name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users (username, email, password, full_name, phone, address, role, email_verified_at) VALUES (?, ?, ?, ?, ?, ?, ?, NULL)",
       [
         username,
-        email,
+        email.toLowerCase(),
         hashedPassword,
         full_name || null,
         phone || null,
@@ -108,10 +136,17 @@ exports.register = async (req, res) => {
       ]
     );
 
+    await createAndSendVerificationCode({
+      id: result.insertId,
+      email: email.toLowerCase(),
+    });
+
     res.status(201).json({
       success: true,
-      message: "Dang ky thanh cong!",
+      message: "Dang ky thanh cong! Vui long kiem tra email de lay ma xac minh.",
       userId: result.insertId,
+      email: email.toLowerCase(),
+      requiresVerification: true,
     });
   } catch (error) {
     console.error("[register]", error);
@@ -141,6 +176,15 @@ exports.login = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Username hoac password khong dung",
+      });
+    }
+
+    if (!user.email_verified_at) {
+      return res.status(403).json({
+        success: false,
+        message: "Vui long xac minh email truoc khi dang nhap",
+        requiresVerification: true,
+        email: user.email,
       });
     }
 
@@ -202,7 +246,7 @@ exports.googleLogin = async (req, res) => {
         10
       );
       const [result] = await db.query(
-        "INSERT INTO users (username, email, password, full_name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (username, email, password, full_name, phone, address, role, email_verified_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
         [
           username,
           email,
@@ -220,6 +264,13 @@ exports.googleLogin = async (req, res) => {
       user = users[0];
     }
 
+    if (!user.email_verified_at) {
+      await db.query("UPDATE users SET email_verified_at = NOW() WHERE id = ?", [
+        user.id,
+      ]);
+      user.email_verified_at = new Date();
+    }
+
     const { token, refreshToken } = await issueAuthTokens(user);
     res.json({
       success: true,
@@ -231,6 +282,88 @@ exports.googleLogin = async (req, res) => {
   } catch (error) {
     console.error("[googleLogin]", error);
     res.status(401).json({ success: false, message: "Dang nhap Google that bai" });
+  }
+};
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const code = String(req.body.code || "").trim();
+
+    if (!email || !/^\d{6}$/.test(code)) {
+      return res.status(400).json({
+        success: false,
+        message: "Email hoac ma xac minh khong hop le",
+      });
+    }
+
+    const [users] = await db.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: "Email khong ton tai" });
+    }
+
+    const user = users[0];
+    if (user.email_verified_at) {
+      return res.json({ success: true, message: "Email da duoc xac minh" });
+    }
+
+    const codeHash = hashVerificationCode(email, code);
+    const [rows] = await db.query(
+      `SELECT id FROM email_verifications
+       WHERE user_id = ? AND email = ? AND code_hash = ?
+         AND used_at IS NULL AND expires_at > NOW()
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [user.id, email, codeHash]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Ma xac minh khong dung hoac da het han",
+      });
+    }
+
+    await db.query("UPDATE users SET email_verified_at = NOW() WHERE id = ?", [
+      user.id,
+    ]);
+    await db.query("UPDATE email_verifications SET used_at = NOW() WHERE id = ?", [
+      rows[0].id,
+    ]);
+
+    res.json({ success: true, message: "Xac minh email thanh cong" });
+  } catch (error) {
+    console.error("[verifyEmail]", error);
+    res.status(500).json({ success: false, message: "Loi server" });
+  }
+};
+
+exports.resendVerification = async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Thieu email" });
+    }
+
+    const [users] = await db.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: "Email khong ton tai" });
+    }
+
+    const user = users[0];
+    if (user.email_verified_at) {
+      return res.json({ success: true, message: "Email da duoc xac minh" });
+    }
+
+    await createAndSendVerificationCode(user);
+    res.json({ success: true, message: "Da gui lai ma xac minh" });
+  } catch (error) {
+    console.error("[resendVerification]", error);
+    res.status(500).json({ success: false, message: "Khong the gui email xac minh" });
   }
 };
 

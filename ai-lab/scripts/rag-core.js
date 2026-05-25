@@ -496,18 +496,30 @@ const loadKnowledgeBase = () => {
 
 const scoreDocument = ({ doc, tokens, budget, categories }) => {
   const searchable = normalize(doc.search_text || doc.text || "");
+  const category = normalize(doc.category_name || "");
+  const isGamingIntent = tokens.some((token) =>
+    ["game", "gaming", "choi", "fps", "full", "hd", "2k", "4k", "aaa", "esport"].includes(token)
+  );
+  const price = Number(doc.sale_price || doc.price || 0);
   let score = 0;
 
   for (const token of tokens) {
     if (searchable.includes(token)) score += token.length >= 4 ? 3 : 1;
   }
 
-  const category = normalize(doc.category_name || "");
   if (categories.includes(category)) score += 10;
-  if (budget && Number(doc.sale_price || doc.price) <= budget) score += 5;
+  if (budget && price <= budget) score += 5;
+  if (budget && price > budget) score -= Math.min(12, Math.ceil((price - budget) / Math.max(budget, 1) * 10));
   if (Number(doc.stock || 0) > 0) score += 2;
   if (Number(doc.total_sold || 0) > 0) score += Math.min(4, Number(doc.total_sold));
   if (Number(doc.discount_percent || 0) > 0) score += 1;
+  if (isGamingIntent && category === "vga") {
+    if (/(geforce|gaming|rtx 30|rtx 40|rtx 50|gtx)/.test(searchable) && !/(rtx pro|workstation)/.test(searchable)) {
+      score += 12;
+    }
+    if (/(rtx pro|workstation|quadro|leadtek nvidia rtx pro)/.test(searchable)) score -= 18;
+    if (price > 50000000) score -= 10;
+  }
 
   return score;
 };
@@ -620,7 +632,7 @@ const getWorkloadProfile = (message) => {
       name: "gaming_aaa",
       priorityCategories: ["VGA", "CPU", "RAM", "SSD", "Mainboard"],
       guidance:
-        "Voi game AAA/2K/4K, uu tien VGA va VRAM manh nhat trong ngan sach, sau do CPU du keo VGA, RAM 16GB tro len va SSD de tai game nhanh.",
+        "Với game AAA/2K/4K, ưu tiên VGA và VRAM mạnh nhất trong ngân sách, sau đó CPU đủ kéo VGA, RAM 16GB trở lên và SSD để tải game nhanh.",
     };
   }
   if (/(esport|e-sport|fps|valorant|cs2|lol|lien minh|fo4|pubg)/.test(text)) {
@@ -628,7 +640,7 @@ const getWorkloadProfile = (message) => {
       name: "gaming_esports",
       priorityCategories: ["CPU", "VGA", "RAM", "SSD", "Mainboard"],
       guidance:
-        "Voi game eSports/FPS, uu tien CPU on dinh xung cao de giu FPS, VGA vua du muc man hinh, RAM toi thieu 16GB va SSD de vao tran nhanh.",
+        "Với game eSports/FPS, ưu tiên CPU ổn định xung cao để giữ FPS, VGA vừa đủ mức màn hình, RAM tối thiểu 16GB và SSD để vào trận nhanh.",
     };
   }
   if (/(choi game|gaming|full hd|fps|aaa|esport)/.test(text)) {
@@ -636,7 +648,7 @@ const getWorkloadProfile = (message) => {
       name: "gaming",
       priorityCategories: ["VGA", "CPU", "RAM", "SSD", "Mainboard"],
       guidance:
-        "Voi nhu cau choi game, nen uu tien VGA manh nhat trong ngan sach truoc, sau do chon CPU du keo VGA, RAM toi thieu 16GB va SSD de tai game nhanh.",
+        "Với nhu cầu chơi game, nên ưu tiên VGA mạnh nhất trong ngân sách trước, sau đó chọn CPU đủ kéo VGA, RAM tối thiểu 16GB và SSD để tải game nhanh.",
     };
   }
   if (/(edit video|video edit|render|dung phim|premiere|after effect|do hoa|autocad)/.test(text)) {
@@ -644,7 +656,7 @@ const getWorkloadProfile = (message) => {
       name: "creator",
       priorityCategories: ["CPU", "RAM", "VGA", "SSD", "Mainboard"],
       guidance:
-        "Voi render/edit/do hoa, nen uu tien CPU nhieu nhan, RAM dung luong cao, SSD nhanh; VGA quan trong neu phan mem tan dung GPU.",
+        "Với render/edit/đồ họa, nên ưu tiên CPU nhiều nhân, RAM dung lượng cao, SSD nhanh; VGA quan trọng nếu phần mềm tận dụng GPU.",
     };
   }
   if (/(machine learning|\bai\b|deep learning|train model|hoc ai)/.test(text)) {
@@ -652,7 +664,7 @@ const getWorkloadProfile = (message) => {
       name: "ai",
       priorityCategories: ["VGA", "RAM", "CPU", "SSD", "Mainboard"],
       guidance:
-        "Voi AI/machine learning, nen uu tien VGA manh va VRAM lon, sau do RAM he thong, CPU on dinh va SSD du nhanh de doc du lieu.",
+        "Với AI/machine learning, nên ưu tiên VGA mạnh và VRAM lớn, sau đó RAM hệ thống, CPU ổn định và SSD đủ nhanh để đọc dữ liệu.",
     };
   }
   if (/(livestream|stream)/.test(text)) {
@@ -660,7 +672,7 @@ const getWorkloadProfile = (message) => {
       name: "stream",
       priorityCategories: ["CPU", "VGA", "RAM", "SSD", "Mainboard"],
       guidance:
-        "Voi livestream, nen uu tien CPU/VGA du khoe de vua choi vua encode, RAM toi thieu 16GB va SSD de he thong phan hoi muot.",
+        "Với livestream, nên ưu tiên CPU/VGA đủ khỏe để vừa chơi vừa encode, RAM tối thiểu 16GB và SSD để hệ thống phản hồi mượt.",
     };
   }
   if (/(lap trinh|code|dev|developer|visual studio|android studio)/.test(text)) {
@@ -676,7 +688,7 @@ const getWorkloadProfile = (message) => {
       name: "office",
       priorityCategories: ["CPU", "SSD", "RAM", "Mainboard"],
       guidance:
-        "Voi van phong/hoc tap, nen uu tien cau hinh on dinh, CPU tiet kiem, SSD cho toc do mo may/ung dung va RAM du dung; VGA roi thuong chua can.",
+        "Với văn phòng/học tập, nên ưu tiên cấu hình ổn định, CPU tiết kiệm, SSD cho tốc độ mở máy/ứng dụng và RAM đủ dùng; VGA rời thường chưa cần.",
     };
   }
   return null;
@@ -699,10 +711,9 @@ const selectBuildCandidatesFromCatalog = ({ message, budget }) => {
   if (!isBuildQuestion(message)) return [];
 
   const kb = loadKnowledgeBase();
-  const shares = getTuningConfig().budget_share || {};
-  const selected = [];
   const categories = getBuildCategoriesForMessage(message);
   const workload = getWorkloadProfile(message);
+  const priority = workload?.priorityCategories || categories;
   const byCategory = (category) =>
     kb.products
       .filter(
@@ -711,57 +722,82 @@ const selectBuildCandidatesFromCatalog = ({ message, budget }) => {
           Number(product.stock || 0) > 0
       )
       .sort((a, b) => Number(a.sale_price || a.price || 0) - Number(b.sale_price || b.price || 0));
-  const pickWithCap = (category, items) => {
-    const cap = budget && shares[category] ? budget * Number(shares[category]) : null;
-    const underCap = cap ? items.filter((product) => Number(product.sale_price || product.price || 0) <= cap) : [];
-    const pool = underCap.length ? underCap : items;
-    if (workload?.priorityCategories?.slice(0, 2).includes(category) && (!cap || underCap.length)) {
-      return [...pool].sort((a, b) => Number(b.sale_price || b.price || 0) - Number(a.sale_price || a.price || 0))[0];
+
+  const candidateMap = Object.fromEntries(
+    categories.map((category) => [category, byCategory(category).slice(0, 8)])
+  );
+  const requiredCategories = categories.filter((category) => candidateMap[category]?.length);
+  if (!requiredCategories.length) return [];
+
+  const isCompatibleCombo = (items) => {
+    const cpu = items.find((product) => normalize(product.category_name || "") === "cpu");
+    const ram = items.find((product) => normalize(product.category_name || "") === "ram");
+    const mainboard = items.find((product) => normalize(product.category_name || "") === "mainboard");
+    if (cpu && mainboard) {
+      const cpuSocket = getCpuSocket(cpu);
+      const mainSocket = getMainboardSocket(mainboard);
+      if (cpuSocket && mainSocket && cpuSocket !== mainSocket) return false;
     }
-    return pool[0];
+    if (ram && mainboard) {
+      const ramStandard = getRamStandard(ram);
+      const mainRam = getMainboardRamStandard(mainboard);
+      if (ramStandard && mainRam && ramStandard !== mainRam) return false;
+    }
+    return true;
   };
 
-  const cpu = categories.includes("CPU") ? pickWithCap("CPU", byCategory("CPU")) : null;
-  if (cpu) selected.push(cpu);
-
-  const vga = categories.includes("VGA") ? pickWithCap("VGA", byCategory("VGA")) : null;
-  if (vga) selected.push(vga);
-
-  const ram = categories.includes("RAM") ? pickWithCap("RAM", byCategory("RAM")) : null;
-  if (ram) selected.push(ram);
-
-  if (categories.includes("Mainboard")) {
-    const cpuSocket = getCpuSocket(cpu);
-    const ramStandard = getRamStandard(ram);
-    let mainboards = byCategory("Mainboard");
-    if (cpuSocket) mainboards = mainboards.filter((product) => getMainboardSocket(product) === cpuSocket);
-    if (ramStandard) mainboards = mainboards.filter((product) => getMainboardRamStandard(product) === ramStandard);
-    if (!mainboards.length && cpuSocket) {
-      mainboards = byCategory("Mainboard").filter((product) => getMainboardSocket(product) === cpuSocket);
+  const productValueScore = (product) => {
+    const text = normalize(`${product.name || ""} ${specText(product)}`);
+    const category = product.category_name;
+    let score = 0;
+    if (priority[0] === category) score += 8;
+    if (priority[1] === category) score += 4;
+    if (category === "VGA" && /(geforce|gaming|rtx 30|rtx 40|rtx 50|gtx)/.test(text) && !/(rtx pro|workstation)/.test(text)) {
+      score += 8;
     }
-    const mainboard = pickWithCap("Mainboard", mainboards.length ? mainboards : byCategory("Mainboard"));
-    if (mainboard) {
-      const mainRam = getMainboardRamStandard(mainboard);
-      if (ram && mainRam && getRamStandard(ram) !== mainRam) {
-        const compatibleRam = pickWithCap(
-          "RAM",
-          byCategory("RAM").filter((product) => getRamStandard(product) === mainRam)
-        );
-        if (compatibleRam) {
-          const ramIndex = selected.findIndex((product) => normalize(product.category_name || "") === "ram");
-          if (ramIndex >= 0) selected[ramIndex] = compatibleRam;
+    if (category === "VGA" && /(rtx pro|workstation|quadro)/.test(text)) score -= 12;
+    if (category === "RAM" && /(16gb|1 x 16gb|2 x 8gb)/.test(text)) score += 4;
+    if (category === "SSD" && /(nvme|m\.2|pcie)/.test(text)) score += 3;
+    return score + Math.min(3, Number(product.total_sold || 0));
+  };
+
+  const combos = [];
+  const walk = (index, current) => {
+    if (index === requiredCategories.length) {
+      if (isCompatibleCombo(current)) combos.push([...current]);
+      return;
+    }
+    const category = requiredCategories[index];
+    for (const product of candidateMap[category]) {
+      current.push(product);
+      walk(index + 1, current);
+      current.pop();
+    }
+  };
+  walk(0, []);
+
+  if (combos.length) {
+    const priced = combos
+      .map((items) => {
+        const total = items.reduce((sum, product) => sum + Number(product.sale_price || product.price || 0), 0);
+        const value = items.reduce((sum, product) => sum + productValueScore(product), 0);
+        return { items, total, value };
+      })
+      .sort((a, b) => {
+        if (budget) {
+          const aUnder = a.total <= budget;
+          const bUnder = b.total <= budget;
+          if (aUnder !== bUnder) return aUnder ? -1 : 1;
+          if (!aUnder && a.total !== b.total) return a.total - b.total;
+          if (aUnder && b.value !== a.value) return b.value - a.value;
+          return b.total - a.total;
         }
-      }
-      selected.push(mainboard);
-    }
+        return b.value - a.value || a.total - b.total;
+      });
+    return priced[0].items;
   }
 
-  if (categories.includes("SSD")) {
-    const ssd = pickWithCap("SSD", byCategory("SSD"));
-    if (ssd) selected.push(ssd);
-  }
-
-  if (selected.length) return selected;
+  const selected = [];
 
   for (const category of categories) {
     const items = kb.products
@@ -773,10 +809,7 @@ const selectBuildCandidatesFromCatalog = ({ message, budget }) => {
       .sort((a, b) => Number(a.sale_price || a.price || 0) - Number(b.sale_price || b.price || 0));
 
     if (!items.length) continue;
-
-    const cap = budget && shares[category] ? budget * Number(shares[category]) : null;
-    const underCap = cap ? items.filter((product) => Number(product.sale_price || product.price || 0) <= cap) : [];
-    selected.push((underCap.length ? underCap : items)[0]);
+    selected.push(items[0]);
   }
 
   return selected;
@@ -822,7 +855,11 @@ const retrieveHybridProducts = async ({ message, limit = 8, perCategory = false 
       budget: vector.budget,
       categories: vector.categories,
     });
-    const selected = perCategory ? selectPerBuildCategory(reranked, message) : reranked.slice(0, Math.max(limit, 20));
+    const selected = perCategory && buildCandidates.length
+      ? buildCandidates
+      : perCategory
+        ? selectPerBuildCategory(reranked, message)
+        : reranked.slice(0, Math.max(limit, 20));
     return {
       products: selected.length ? selected : reranked.slice(0, limit),
       budget: vector.budget,
@@ -1125,13 +1162,36 @@ const inferCheapBudget = ({ message, categories }) => {
   return category ? caps[category] || null : null;
 };
 
-const getResponseProducts = ({ message, products, budget, tokens }) => {
+const inferUseCaseBudget = ({ message, categories }) => {
+  const text = normalize(message);
+  if (!categories?.includes("vga")) return null;
+  if (/(full hd|1080p|esport|e-sport|valorant|cs2|lol|lien minh|fo4)/.test(text)) return 20000000;
+  if (/(choi game|gaming|fps)/.test(text)) return 25000000;
+  if (/(2k|qhd)/.test(text)) return 35000000;
+  if (/(4k|aaa|game nang)/.test(text)) return 65000000;
+  return null;
+};
+
+const getResponseProducts = ({ message, products, budget, tokens, limit = 8 }) => {
   const categories = detectCategory(message);
-  const effectiveBudget = budget || inferCheapBudget({ message, categories });
-  const categoryFiltered =
+  const effectiveBudget =
+    budget ||
+    inferCheapBudget({ message, categories }) ||
+    inferUseCaseBudget({ message, categories });
+  let categoryFiltered =
     categories.length > 0 && !isBuildQuestion(message)
       ? products.filter((product) => categories.includes(normalize(product.category_name || "")))
       : products;
+  if (
+    categories.includes("vga") &&
+    /(gaming|choi game|full hd|fps|esport|aaa|2k|4k)/.test(normalize(message))
+  ) {
+    const gamingCards = categoryFiltered.filter((product) => {
+      const text = normalize(`${product.name || ""} ${specText(product)}`);
+      return !/(rtx pro|workstation|quadro)/.test(text);
+    });
+    if (gamingCards.length) categoryFiltered = gamingCards;
+  }
 
   let hardTokens = getHardTokens(tokens);
   if (categories.length === 1 && categories[0] === "mainboard" && /(can main|co main|main .*nao|mainboard cho|main cho)/.test(normalize(message))) {
@@ -1143,13 +1203,13 @@ const getResponseProducts = ({ message, products, budget, tokens }) => {
   }
 
   if (!effectiveBudget) {
-    if (!hardTokens.length) return categoryFiltered;
+    if (!hardTokens.length) return categoryFiltered.slice(0, limit);
     const strictProducts = categoryFiltered.filter((product) => productMatchesHardTokens({ product, hardTokens }));
-    return strictProducts.length ? strictProducts : categoryFiltered;
+    return (strictProducts.length ? strictProducts : categoryFiltered).slice(0, limit);
   }
 
   const affordable = categoryFiltered.filter((product) => Number(product.sale_price || product.price || 0) <= effectiveBudget);
-  if (hardTokens.length === 0) return affordable;
+  if (hardTokens.length === 0) return affordable.slice(0, limit);
 
   const strict = affordable.filter((product) => productMatchesHardTokens({ product, hardTokens }));
 
@@ -1160,7 +1220,7 @@ const getResponseProducts = ({ message, products, budget, tokens }) => {
     /^[a-z]\d{3,4}$/.test(token) ||
     /^\d{4}$/.test(token)
   );
-  if (strict.length || !mustKeepHardTokens) return strict.length ? strict : affordable;
+  if (strict.length || !mustKeepHardTokens) return (strict.length ? strict : affordable).slice(0, limit);
 
   if (categories.length > 0) {
     return loadKnowledgeBase()
@@ -1170,10 +1230,10 @@ const getResponseProducts = ({ message, products, budget, tokens }) => {
           Number(product.sale_price || product.price || 0) <= effectiveBudget &&
           productMatchesHardTokens({ product, hardTokens })
       )
-      .slice(0, 20);
+      .slice(0, limit);
   }
 
-  return strict;
+  return strict.slice(0, limit);
 };
 
 const fallbackAnswer = ({ message, products, budget }) => {
@@ -1193,10 +1253,10 @@ const fallbackAnswer = ({ message, products, budget }) => {
     const budgetNote = budget
       ? total <= budget
         ? `Tổng tạm tính ${formatMoney(total)}, nằm trong ngân sách ${formatMoney(budget)}.`
-        : `Tổng tạm tính ${formatMoney(total)}, đang vượt ngân sách ${formatMoney(budget)}.`
+        : `Tổng tạm tính ${formatMoney(total)}, đang vượt ngân sách ${formatMoney(budget)}; đây là combo gần ngân sách nhất mình tìm được trong catalog hiện tại.`
       : `Tổng tạm tính ${formatMoney(total)}.`;
     const compatibility = compatibilitySummary(products);
-    const priorityNote = workload ? `\nUu tien theo muc dich: ${workload.guidance}` : "";
+    const priorityNote = workload ? `\nƯu tiên theo mục đích: ${workload.guidance}` : "";
     return `Mình lọc được combo tham khảo từ dữ liệu shop:${priorityNote}\n${lines}\n${budgetNote} Kiểm tra tương thích: ${compatibility.notes.join(" ")}`;
   }
 
@@ -1212,6 +1272,120 @@ const findExactProductMention = (message) => {
     const name = normalize(product.name || "");
     return name.length > minLength && text.includes(name);
   });
+};
+
+const normalizeHistoryProduct = (product) => ({
+  id: product.id,
+  name: product.name,
+  category_name: product.category_name,
+  brand: product.brand,
+  price: product.price,
+  sale_price: product.sale_price,
+  discount_percent: product.discount_percent,
+  stock: product.stock,
+  image_url: product.image_url,
+});
+
+const historyProducts = (history = []) => {
+  const products = [];
+  for (const item of history) {
+    if (item?.role !== "assistant" || !Array.isArray(item.products)) continue;
+    for (const product of item.products) {
+      if (!product?.id || products.some((existing) => existing.id === product.id)) continue;
+      products.push(normalizeHistoryProduct(product));
+    }
+  }
+  return products;
+};
+
+const referencedHistoryProduct = ({ message, history }) => {
+  const products = historyProducts(history);
+  if (!products.length) return null;
+
+  const text = normalize(message);
+  const rawText = String(message || "").toLowerCase();
+  const digitMatch = rawText.match(/(?:^|[^\d])([1-5])(?:[^\d]|$)/);
+  if (digitMatch && /(c|m|th|s|con|cai|mau|thu|so)/i.test(rawText)) {
+    return products[Number(digitMatch[1]) - 1] || null;
+  }
+
+  const ordinalWords = [
+    ["dau tien", "thu nhat", "so 1", "cai 1", "con 1", "mau 1"],
+    ["thu 2", "thu hai", "so 2", "cai 2", "con 2", "mau 2"],
+    ["thu 3", "thu ba", "so 3", "cai 3", "con 3", "mau 3"],
+    ["thu 4", "thu tu", "so 4", "cai 4", "con 4", "mau 4"],
+    ["thu 5", "thu nam", "so 5", "cai 5", "con 5", "mau 5"],
+  ];
+
+  for (let index = 0; index < ordinalWords.length; index += 1) {
+    if (ordinalWords[index].some((term) => text.includes(term))) {
+      return products[index] || null;
+    }
+  }
+
+  if (/(cai nay|con nay|mau nay|san pham nay|cai do|con do|mau do|san pham do|no)\b/.test(text)) {
+    return products[0];
+  }
+
+  return null;
+};
+
+const historyPriceSelection = ({ message, history, limit }) => {
+  const products = historyProducts(history);
+  if (!products.length) return null;
+  const text = normalize(message);
+  const asksCheaper = /(re hon|gia re|tiet kiem|mem hon|thap hon|r\? hon)/.test(text);
+  const asksMoreExpensive = /(dat hon|cao hon|manh hon|tot hon|xin hon)/.test(text);
+  if (!asksCheaper && !asksMoreExpensive) return null;
+
+  const sorted = [...products].sort((a, b) => {
+    const priceA = Number(a.sale_price || a.price || 0);
+    const priceB = Number(b.sale_price || b.price || 0);
+    return asksCheaper ? priceA - priceB : priceB - priceA;
+  });
+
+  const selected = sorted.slice(0, Math.min(limit, 3));
+  if (!selected.length) return null;
+
+  const label = asksCheaper ? "rẻ hơn" : "cao hơn/mạnh hơn";
+  return {
+    question: message,
+    source: "history_price_filter",
+    reply: `Trong các gợi ý trước, mình lọc ${selected.length} mẫu ${label}. Mẫu nổi bật là ${selected[0].name}, giá ${formatMoney(selected[0].sale_price || selected[0].price)}. Bạn có thể bấm thẻ sản phẩm để xem chi tiết.`,
+    products: selected,
+    debug: {
+      budget: parseBudget(message),
+      tokens: tokenize(message),
+      categories: [...new Set(selected.map((product) => normalize(product.category_name || "")).filter(Boolean))],
+      retrievalSource: "history_price_filter",
+    },
+  };
+};
+
+const shouldUseHistoryContext = (message, history = []) => {
+  if (!history.length) return false;
+  const text = normalize(message);
+  return /(cai|con|mau|san pham (nay|do)|do|nay|no|tren|truoc|vua|so voi|re hon|dat hon|tot hon|doi sang|thay bang|cau hinh tren|combo tren)/.test(text);
+};
+
+const buildHistoryContext = (history = []) => {
+  const lines = [];
+  for (const item of history.slice(-6)) {
+    const role = item.role === "assistant" ? "assistant" : "user";
+    const text = String(item.text || "").replace(/\s+/g, " ").slice(0, 500);
+    if (text) lines.push(`${role}: ${text}`);
+    if (item.role === "assistant" && Array.isArray(item.products) && item.products.length) {
+      const productText = item.products
+        .slice(0, 5)
+        .map((product, index) => {
+          const price = formatMoney(product.sale_price || product.price || 0);
+          return `${index + 1}. ${product.name} (${product.category_name || ""}, ${price})`;
+        })
+        .join("; ");
+      lines.push(`assistant_products: ${productText}`);
+    }
+  }
+  return lines.join("\n");
 };
 
 const selectCompatibilityProducts = ({ message, limit }) => {
@@ -1248,70 +1422,35 @@ const selectCompatibilityProducts = ({ message, limit }) => {
   return selected.slice(0, limit);
 };
 
-const callGemini = async ({ message, products, budget }) => {
-  if (!process.env.GEMINI_API_KEY) return null;
-  if (!products.length) return null;
-
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
-
-  const prompt = `
-Bạn là trợ lý tư vấn linh kiện máy tính cho website thương mại điện tử.
-Chỉ dùng dữ liệu shop bên dưới. Không bịa sản phẩm, giá, tồn kho, mã giảm giá.
-Trả lời tiếng Việt, ngắn gọn, có lý do chọn sản phẩm. Nếu build PC, nhắc cần kiểm tra socket/chipset khi dữ liệu chưa đủ.
-
-Câu hỏi: ${message}
-Ngân sách nhận diện được: ${budget ? formatMoney(budget) : "không rõ"}
-
-Dữ liệu shop:
-${JSON.stringify(buildContext(products), null, 2)}
-
-Yêu cầu:
-- Không quá 180 từ.
-- Không cần nêu tồn kho nếu sản phẩm còn hàng; chỉ báo rõ khi hết hàng.
-- Neu nguoi dung neu muc dich su dung, phai noi ro thu tu uu tien linh kien theo muc dich truoc khi chot san pham: gaming uu tien VGA, CPU, RAM, SSD; render/edit uu tien CPU, RAM, SSD, VGA; AI uu tien VGA/VRAM, RAM, CPU, SSD; van phong uu tien CPU tiet kiem, SSD, RAM.
-- Nếu thiếu dữ liệu, hỏi lại thay vì đoán.
-- Cuối câu nhắc người dùng bấm thẻ sản phẩm để xem chi tiết nếu có sản phẩm phù hợp.
-`;
-
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.25,
-            topP: 0.9,
-            maxOutputTokens: 1024,
-            thinkingConfig: { thinkingBudget: 0 },
-          },
-        }),
-        signal: controller.signal,
-      }
-    );
-
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || "")
-      .join("")
-      .trim();
-  } catch (_) {
-    return null;
-  } finally {
-    clearTimeout(timeout);
-  }
-};
-
-const answerQuestion = async ({ message, useGemini = true, limit = 8 }) => {
+const answerQuestion = async ({ message, history = [], limit = 8 }) => {
   const kb = loadKnowledgeBase();
+  const originalMessage = message;
+  const historyProduct = referencedHistoryProduct({ message, history });
+
+  if (historyProduct) {
+    return {
+      question: originalMessage,
+      source: "history_reference",
+      reply: `${historyProduct.name}, giá ${formatMoney(historyProduct.sale_price || historyProduct.price)}.${availabilityNote(historyProduct) ? ` ${availabilityNote(historyProduct).replace(" - ", "")}.` : ""} Bạn có thể bấm thẻ sản phẩm để xem chi tiết.`,
+      products: [historyProduct],
+      debug: {
+        budget: parseBudget(originalMessage),
+        tokens: tokenize(originalMessage),
+        categories: [normalize(historyProduct.category_name || "")].filter(Boolean),
+        retrievalSource: "history_reference",
+      },
+    };
+  }
+
+  const priceSelection = historyPriceSelection({ message, history, limit });
+  if (priceSelection) return priceSelection;
+
+  if (shouldUseHistoryContext(message, history)) {
+    const historyContext = buildHistoryContext(history);
+    if (historyContext) {
+      message = `${historyContext}\nCâu hỏi hiện tại: ${message}`;
+    }
+  }
 
   if (isPolicyQuestion(message)) {
     const policy = getChatbotSkills().policy_guard;
@@ -1427,7 +1566,7 @@ const answerQuestion = async ({ message, useGemini = true, limit = 8 }) => {
     return {
       question: message,
       source: "exact_match",
-      reply: `${exactProduct.name}, gi? ${formatMoney(exactProduct.sale_price)}.${availabilityNote(exactProduct) ? ` ${availabilityNote(exactProduct).replace(" - ", "")}.` : ""} B?n c? th? b?m th? s?n ph?m ?? xem chi ti?t.`,
+      reply: `${exactProduct.name}, giá ${formatMoney(exactProduct.sale_price)}.${availabilityNote(exactProduct) ? ` ${availabilityNote(exactProduct).replace(" - ", "")}.` : ""} Bạn có thể bấm thẻ sản phẩm để xem chi tiết.`,
       products: [
         {
           id: exactProduct.id,
@@ -1523,25 +1662,16 @@ const answerQuestion = async ({ message, useGemini = true, limit = 8 }) => {
     products: retrieval.products,
     budget: retrieval.budget,
     tokens: retrieval.tokens,
+    limit,
   });
-  const geminiAnswer = useGemini
-    ? await callGemini({
-        message,
-        products: retrieval.products,
-        budget: retrieval.budget,
-      })
-    : null;
-
   return {
     question: message,
-    source: geminiAnswer ? "gemini_rag" : "local_rag",
-    reply:
-      geminiAnswer ||
-      fallbackAnswer({
-        message,
-        products: responseProducts,
-        budget: retrieval.budget,
-      }),
+    source: "local_rag",
+    reply: fallbackAnswer({
+      message,
+      products: responseProducts,
+      budget: retrieval.budget,
+    }),
     products: responseProducts.map((product) => ({
       id: product.id,
       name: product.name,

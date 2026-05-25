@@ -5,8 +5,6 @@ import { toast } from "react-toastify";
 import AddressSelector from "../components/AddressSelector";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 
-const INVALID_NAME_PATTERN = /[\d\p{P}\p{S}_]/u;
-
 const RegisterPage = () => {
   const [form, setForm] = useState({
     username: "",
@@ -18,7 +16,6 @@ const RegisterPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [isComposing, setIsComposing] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
@@ -28,8 +25,8 @@ const RegisterPage = () => {
       newErrors.username = "Vui lòng nhập tên đăng nhập";
 
     if (!form.full_name.trim()) newErrors.full_name = "Vui lòng nhập họ tên";
-    else if (/[0-9]/.test(form.full_name))
-      newErrors.full_name = "Họ tên không được chứa số";
+    else if (/[\d\p{P}\p{S}_]/u.test(form.full_name))
+      newErrors.full_name = "Họ tên không được chứa số hoặc ký tự đặc biệt";
 
     if (!form.email.trim()) newErrors.email = "Vui lòng nhập email";
     else if (!/\S+@\S+\.\S+/.test(form.email))
@@ -69,24 +66,6 @@ const RegisterPage = () => {
     setErrors({ ...errors, address: "" });
   };
 
-  const handleFullNameChange = (e) => {
-    const value = e.target.value;
-    if (isComposing) {
-      setForm({ ...form, full_name: value });
-      setErrors({ ...errors, full_name: "" });
-      return;
-    }
-    if (INVALID_NAME_PATTERN.test(value)) {
-      setErrors({
-        ...errors,
-        full_name: "Họ tên không được chứa số hoặc kí tự đặc biệt",
-      });
-      return;
-    }
-    setForm({ ...form, full_name: value });
-    setErrors({ ...errors, full_name: "" });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
@@ -96,9 +75,10 @@ const RegisterPage = () => {
     }
     setLoading(true);
     try {
-      await register(form);
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
-      navigate("/login");
+      const res = await register(form);
+      toast.success("Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh.");
+      const verifyEmail = res.data.email || form.email;
+      navigate(`/verify-email?email=${encodeURIComponent(verifyEmail)}`);
     } catch (err) {
       const msg = err.response?.data?.message || "Đăng ký thất bại!";
       if (msg.toLowerCase().includes("email")) setErrors({ email: msg });
@@ -148,21 +128,7 @@ const RegisterPage = () => {
               type="text"
               placeholder="Nguyễn Văn A"
               value={form.full_name}
-              onCompositionStart={() => setIsComposing(true)}
-              onCompositionEnd={(e) => {
-                setIsComposing(false);
-                const value = e.target.value;
-                if (INVALID_NAME_PATTERN.test(value)) {
-                  setErrors({
-                    ...errors,
-                    full_name: "Họ tên không được chứa số hoặc ký tự đặc biệt",
-                  });
-                } else {
-                  setForm({ ...form, full_name: value });
-                  setErrors({ ...errors, full_name: "" });
-                }
-              }}
-              onChange={handleFullNameChange}
+              onChange={handleChange("full_name")}
               className={inputClass("full_name")}
             />
             {errors.full_name && (
