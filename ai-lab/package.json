@@ -5,15 +5,20 @@
   "type": "commonjs",
   "scripts": {
     "start": "node scripts/chat-service.js",
+    "start:rag": "set GEMINI_ENABLED=0&& node scripts/chat-service.js",
     "sync": "node scripts/sync-knowledge-base.js",
-    "eval": "node scripts/evaluate.js",
-    "eval:service": "node scripts/evaluate-service.js",
-    "eval:training": "node scripts/evaluate-training.js",
-    "eval:service-training": "node scripts/evaluate-service.js --training",
-    "precheck": "node scripts/preintegration-check.js",
+    "eval": "node scripts/dev-tools/evaluate.js",
+    "eval:contract": "node scripts/dev-tools/evaluate-contract.js",
+    "eval:service": "node scripts/dev-tools/evaluate-service.js",
+    "eval:training": "node scripts/dev-tools/evaluate-training.js",
+    "eval:service-training": "node scripts/dev-tools/evaluate-service.js --training",
+    "precheck": "node scripts/dev-tools/preintegration-check.js",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop pc-shop-ai-lab",
     "pm2:logs": "pm2 logs pc-shop-ai-lab"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1"
   },
   "devDependencies": {
     "pm2": "^6.0.14"

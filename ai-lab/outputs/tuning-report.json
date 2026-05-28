@@ -1,8 +1,8 @@
 {
   "ok": true,
-  "trained_at": "2026-05-25T08:26:10.665Z",
-  "examples": 502,
-  "config": "E:\\hk2\\web\\btl\\web\\ai-lab\\data\\tuning-config.json",
+  "trained_at": "2026-05-25T19:19:54.984Z",
+  "examples": 506,
+  "config": "E:\\hk2\\thuong mai dien tu\\btl\\ai-lab\\data\\tuning-config.json",
   "learned": {
     "category_aliases": {
       "mainboard": [

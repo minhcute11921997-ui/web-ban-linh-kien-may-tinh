@@ -7,6 +7,7 @@ import useCartStore from "../store/cartStore";
 import { addressApi } from "../api/addressApi";
 import { validateDiscount, getAvailableDiscounts } from "../api/discountApi";
 import AddressSelector from "../components/AddressSelector";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 import {
   CreditCard, ShoppingBag, Truck, Tag, User, Phone, MapPin,
@@ -216,9 +217,12 @@ const CheckoutPage = () => {
                       <div key={item.id} className="flex gap-4 border-b pb-4 items-start">
                         <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                           <img
-                            src={item.image_url || "https://via.placeholder.com/100"}
+                            src={resolveImageUrl(item.image_url, "https://via.placeholder.com/100")}
                             alt={item.product_name || item.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://via.placeholder.com/100";
+                            }}
                           />
                         </div>
                         <div className="flex-1 flex justify-between">

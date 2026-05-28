@@ -1,0 +1,533 @@
+{
+  "createdAt": "2026-05-25T19:04:51.013Z",
+  "backupPath": "E:\\hk2\\thuong mai dien tu\\btl\\be\\uploads\\backups\\product-image-url-backup-2026-05-25T19-04-41-605Z.json",
+  "ok": 75,
+  "failed": 0,
+  "results": [
+    {
+      "id": 1,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/gXmnEQczfRnPUrkBgZYN4QIZc1TBlyBUNNDh3P_zyPPcTal3BiNLBrrgF9EVyuO8kg6Uw9mVgGqyTWyewu0eca-hpyrJYzny",
+      "newUrl": "/uploads/products/product-1-bo-vi-xu-ly-cpu-intel-core-i3-13100-tray-khong-box.jpg",
+      "bytes": 74264
+    },
+    {
+      "id": 2,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/R9jI49lejTc9SfMqfyCwcLrT-YBtwKrCGF0SG8Lsp-P2WCGvHgRJBf7OaVdGMMqIc7788H9m26Mh4N3u_t0Ofw4nphzw8oIX",
+      "newUrl": "/uploads/products/product-2-bo-vi-xu-ly-cpu-intel-core-i5-14400-tray-khong-box.jpg",
+      "bytes": 75924
+    },
+    {
+      "id": 3,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/AVBpWeJBZTLUkvDzdIPcCX202M_Y6rQCUuxpqV4Cvf8mnOx-lkMqDjaiUDihQ2h1J9IOcHVAKLBsyPp633QXoTbY0A3i8Va7",
+      "newUrl": "/uploads/products/product-3-bo-vi-xu-ly-cpu-intel-core-i7-14700-tray-khong-box.jpg",
+      "bytes": 62229
+    },
+    {
+      "id": 4,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/9QAZhv3GC6_AsAvZtmRE_SJ2Kt4IqR08nXTto7F8ZWy-SaqJf0HYnq5XY0CyGFfhCqxpZt5ramqgsLifTjLdqvy_8oziMd_B",
+      "newUrl": "/uploads/products/product-4-bo-vi-xu-ly-cpu-intel-core-i5-14600k-tray-khong-box.jpg",
+      "bytes": 56360
+    },
+    {
+      "id": 5,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/NuqyPqXyDLOsJMMi1QCuJbrxLJk7fn3CHEKkY5O-UBCC4S5NQygj7MiCKniMhoZeSp06LvVzaw_GhyEe9Z_M3q7B_TiZktiK",
+      "newUrl": "/uploads/products/product-5-bo-vi-xu-ly-cpu-intel-core-i5-12400f-tray-khong-box.jpg",
+      "bytes": 66919
+    },
+    {
+      "id": 6,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/iv-C8IgnMM3Ud3lo1EC6qagAJT_zMg5apf9tuQw1lUY8OGSPiRyM1AkTI_YtrLz-igwAIGeZ_0pjyMePdBeXJk8PmewsnnVdJw",
+      "newUrl": "/uploads/products/product-6-bo-vi-xu-ly-cpu-intel-core-i3-14100-tray-khong-box.jpg",
+      "bytes": 55133
+    },
+    {
+      "id": 7,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/QbDDT4FkqwTxy9A7ApiLVfVzx9LMZvyu4ribrw-RzRIehCknocjbKbyjpkMt6hU9wfEgfrYxf21HftDBEqYpO6VhPRxyzqNB",
+      "newUrl": "/uploads/products/product-7-bo-vi-xu-ly-cpu-intel-core-i7-12700-tray-khong-box.jpg",
+      "bytes": 31260
+    },
+    {
+      "id": 8,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/InwR_56RNFeS_O0Q_y7CS9essNjg4hCVLjHxCVSnMLlOqkBIVu0dKlV9TbndGcEX3lbJYD15_RafdWt973sWqiV-9sU1TRo",
+      "newUrl": "/uploads/products/product-8-bo-vi-xu-ly-cpu-amd-ryzen-5-7500f-mpk-6c-12t-38mb-cache-upto.jpg",
+      "bytes": 30146
+    },
+    {
+      "id": 9,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/x5wjOd3mQ6XkeFJialWzitHqN5YBeox3DcsTzmh7k8bp3X_p_gSEOAmNiaY-60Nwf6QlcDbBwssJMsTxmJ2Y3ZgLTqdSZKk",
+      "newUrl": "/uploads/products/product-9-cpu-amd-ryzen-9-9950x3d-16c-32t-up-to-5-7ghz-144mb-radeon-gr.jpg",
+      "bytes": 40348
+    },
+    {
+      "id": 10,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/1-bkq4gHJT29TgRbZouqnXuFR44fnWkAnfpc3PHP6C2cYlV-7mnxAwptzPEilaSspJmY7rDotIFO_88rjMO1Q5HCn07GEYA",
+      "newUrl": "/uploads/products/product-10-cpu-intel-core-ultra-5-225-10-nhan-10-luong-boost-toi-a-4-9-.jpg",
+      "bytes": 34407
+    },
+    {
+      "id": 11,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/FzpTYh5PuKnHhYsi4ZcTeP1gxIkw4VWD5YRCnWfdevHVeUrqfYoeCp_0IDgxy_ahtX5DQjh03EUjOmYZPJBmImdO9hEZi_O1",
+      "newUrl": "/uploads/products/product-11-cpu-intel-core-ultra-5-225f-10-nhan-10-luong-boost-toi-a-4-9.jpg",
+      "bytes": 34407
+    },
+    {
+      "id": 12,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/g25xHRxNELbFPfpEpziXr6AzYCLu--ssZcIetSgOW-7nAc5ulLnhO8IgiIOFdwJlo4oKshmb_dp8ZlpdDcxkkez4sJilV57C",
+      "newUrl": "/uploads/products/product-12-cpu-intel-core-ultra-7-265-20-nhan-20-luong-boost-toi-a-5-3-.jpg",
+      "bytes": 28286
+    },
+    {
+      "id": 13,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/64tmRD_sagy1ULbzfRl-mg6b_Rw313Vyw7W35o6FGK2lkaGzPnWn7azny6N-FGS4zUuNKQX7ARrD67vZ3NF-ZHFpBdtNegc0Iw",
+      "newUrl": "/uploads/products/product-13-cpu-amd-ryzen-7-9800x3d-8-nhan-16-luong-boost-to-5-2-ghz-104.jpg",
+      "bytes": 40328
+    },
+    {
+      "id": 14,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/3IuRxUMW4P9r6r03867h3Dss1OhGpSbU65gH16gZhLq6_Zrh--EfA6Dwi-9jZY3NdhdKJC7eqEmUQzjyUIi3oXsI6DdbjE0",
+      "newUrl": "/uploads/products/product-14-cpu-intel-core-ultra-5-245kf-14-nhan-14-luong-turbo-boost-to.jpg",
+      "bytes": 34407
+    },
+    {
+      "id": 15,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/b3PSGTJMFzes5ZvQNmgmWuAcm4nKOUEPFJvghedGg7jEbXzFPIOA_MwEtX4YfpTDEkzAkLp4XJ83j2fjXIZ00vgalUODrE0",
+      "newUrl": "/uploads/products/product-15-cpu-intel-core-ultra-9-285k-24-nhan-24-luong-turbo-boost-to-.jpg",
+      "bytes": 38621
+    },
+    {
+      "id": 16,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/2nlNfaIqPYsBsnnXOoJqJ_Jyr1sndo7X_pMSN72RdtJ7V46cBpvjvWBBVBx1qrLS72yY87KhaZd-J4wUsQroBV4PHEpWmvfW",
+      "newUrl": "/uploads/products/product-16-ram-desktop-kingston-fury-beast-rgb-expo-32gb-1-x-32gb-ddr5-.jpg",
+      "bytes": 21983
+    },
+    {
+      "id": 17,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/d0p4klVq9CaIWi0OsVxJZLIsJRnurf7zEJ81TjgdztRXeHeYE5lKB70rrmzW2m6iZ6Y33cQTqnc5VKCcME1EYHaQCU9STiPU",
+      "newUrl": "/uploads/products/product-17-ram-desktop-g-skill-trident-z5-rgb-1-x-32gb-ddr5-6000mhz-f5-.jpg",
+      "bytes": 18662
+    },
+    {
+      "id": 18,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/EmEU31ggJxKpOtA1pGpGIAD1Ie5VT-1SfEpOU7XStDXHafGRLcRcZTF31QpcB2mkMSpBU3J5bEoGIagrk_HRgaG9HEIEBlvR",
+      "newUrl": "/uploads/products/product-18-ram-desktop-kingston-1-x-16gb-ddr4-3200mhz-kvr32n22d8-16wp.jpg",
+      "bytes": 27726
+    },
+    {
+      "id": 19,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/l59JiSrURPTokcP-wAUE6pqhjfJj9veZkSfLTnP4-VoUmuMZFFpxmp2FY2jFk-PwGc1KdNgaZpk9BpiaPAVtDxAHaTDfHbeU",
+      "newUrl": "/uploads/products/product-19-ram-desktop-kingston-1-x-8gb-ddr4-3200mhz-kvr32n22s8-8wp.jpg",
+      "bytes": 27726
+    },
+    {
+      "id": 20,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/X2kZIkjW2h20-tOYNWXOcL4i3mBNM0nbF9i6NVOMIzx0hwf4nS6XKcHtLnbx3IcETaD01h88yEqV6DNTD68B7wG1ZnF7Ylf8",
+      "newUrl": "/uploads/products/product-20-ram-desktop-patriot-viper-elite-5-rgb-1-x-16gb-ddr5-6000mhz-.jpg",
+      "bytes": 22555
+    },
+    {
+      "id": 21,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/yI_IRnmUbLkZYpteF-DtzNwopG29obI8LnRFp9Xq7536KJgNmZxErmc-wc_iKXbZajDP0CEpoaflCzLhKa6zIuFlraBuaxQ",
+      "newUrl": "/uploads/products/product-21-patriot-1-x-16gb-ddr4-3200mhz-psp416g3200h1.jpg",
+      "bytes": 16297
+    },
+    {
+      "id": 22,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/GSz2Yj4JykPBvngCCaTVwBER3YkLLlRZUd5dBywEYYAwKYnSnrJgudd-gdA0CaarkjaiXlzNgV--zuVaBgcbMU9Z811fUsKq",
+      "newUrl": "/uploads/products/product-22-ram-desktop-kingston-fury-beast-1-x-8gb-ddr4-3200mhz-kf432c1.jpg",
+      "bytes": 16395
+    },
+    {
+      "id": 23,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/wButLxkuiSDBAYRQz93A0dNwFYJxs-5awn_STxet6PkOwPrBD0-3FrMcLhgk22eM7g4rwSsbRP2dI4FeAdChuxDXpXTRPDs",
+      "newUrl": "/uploads/products/product-23-ram-desktop-kingston-fury-beast-1-x-16gb-ddr4-3200mhz-kf432c.jpg",
+      "bytes": 18897
+    },
+    {
+      "id": 24,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/xjnV2GdiwqlLrN6cgJMtIOt1DwuospoxacAaZwCtyLWut7F6E4eaIHcWdrS9tabtF1zJzycbPyrJ20JUDb47hggZZb63QPfy",
+      "newUrl": "/uploads/products/product-24-ram-desktop-teamgroup-delta-rgb-1-x-16gb-ddr5-6000mhz-ff3d51.jpg",
+      "bytes": 33953
+    },
+    {
+      "id": 25,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/QWXTLtmkxBaexLfxiOYFcL8NwOT91Gs5V7wlfYwEwI-aOFfUSA2jE9O0ksdGefZ7Y3LBCpy3kAh_KzcXzaX3ugpbAslDKCge",
+      "newUrl": "/uploads/products/product-25-ram-desktop-corsair-vengeance-rgb-2-x-32gb-ddr5-6000mhz-cmh6.jpg",
+      "bytes": 30698
+    },
+    {
+      "id": 26,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/v8l1pnuoBMvb-F4FBashK7056UUQ1IarOmjgkNxN1C7kKb8H-Lvi_2PHBAi5ATQJFIk5OVOKnrr0kesdQCkuTh4o7Ore-2M",
+      "newUrl": "/uploads/products/product-26-ram-desktop-corsair-vengeance-rgb-2-x-64gb-ddr5-6400mhz-cmh1.jpg",
+      "bytes": 27288
+    },
+    {
+      "id": 27,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/JAG3qAXTD1EFwQgeTrzf5pZz_AAlF8iplU1KD82hWYh52rHBjSTaLiy3VZ-NkR3wJp0nKXZRwKTBvI-0hA9f5cjlpZhMq0s",
+      "newUrl": "/uploads/products/product-27-ram-desktop-corsair-vengeance-1-x-16gb-ddr5-6000mhz-cmh16gx5.jpg",
+      "bytes": 24527
+    },
+    {
+      "id": 28,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/gItvnnuOCgy6vUdoI0ysfnGAztEJ50QxpH0cEN131BWfo6depXqoBqSSjG5P7Rva0YNcmU3Bggvw4zwIaxzdr4c-_5Oq8WL2UA",
+      "newUrl": "/uploads/products/product-28-ram-desktop-sp-xpower-zenith-1-x-16gb-ddr5-6000mhz-sp016gxlw.jpg",
+      "bytes": 17630
+    },
+    {
+      "id": 29,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/WCPksQsonWtcMB5RE2Z00rV64PhZE1G-ruIbPKtzWebYj24yuurFWpIZxyVEB5vX5cMyEs2e68KbeFu82jvvJThFdj-nFWk",
+      "newUrl": "/uploads/products/product-29-ram-desktop-sp-xpower-zenith-rgb-1-x-16gb-ddr4-3200mhz-sp016.jpg",
+      "bytes": 16582
+    },
+    {
+      "id": 30,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/5KKuTL7NKZTqTSGyvSb17IZnQPSYV2pjnb1k36OFkD58v6MA0NAGWB1gM008NVF5t2F9oicOZef9WaH-mfxBvN75XJpjh5V6",
+      "newUrl": "/uploads/products/product-30-ram-desktop-sp-xpower-zenith-rgb-1-x-32gb-ddr5-6000mhz-sp032.jpg",
+      "bytes": 17706
+    },
+    {
+      "id": 31,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/Silgf9qRDl2PmIp61UZsV0xcNGM-2vuaV80ZFVxKHk_vu47eZkhk5de3q6hPDu3TXmW8SBpk0pRVKpcKDqoHiRX_2HKClvo",
+      "newUrl": "/uploads/products/product-31-card-man-hinh-inno3d-geforce-rtx-3050-6gb-twin-x2-v2-6gb-gdd.jpg",
+      "bytes": 52968
+    },
+    {
+      "id": 32,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/egwl1sYhwoaEJE41Szp1llkhIbGWS5nW4CBbBGoLcVjhYfJt1vtJSQMiQLZ9SzyiLtlEMv7Wwz61_sXrXhWbTnCH36LmvHWi",
+      "newUrl": "/uploads/products/product-32-card-man-hinh-palit-rtx-5060-ti-infinity-3-16gb-gddr6.jpg",
+      "bytes": 57498
+    },
+    {
+      "id": 33,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/91U6aeCoyy3i1fvEO5PGXArT1TjGBIR47PoFXIOEKDph0f-gjDjy0SsMZ1J3jEOCgk0l1lNu_LXowycVHkIkoo7bfXHtPxZG",
+      "newUrl": "/uploads/products/product-33-card-man-hinh-pny-geforce-rtx-4060-ti-verto-dual-fan-16gb-gd.jpg",
+      "bytes": 34408
+    },
+    {
+      "id": 34,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/u3gI7oMf8VU70dLKyN9zo7fXEkIjaJtljD9tzlClt966AM9TuA7Wv4zQeGvvHmfsN3jb0VqVbnmmmaEKTP_FmF1HpJdYF8cC",
+      "newUrl": "/uploads/products/product-34-card-man-hinh-pny-geforce-rtx-4070-super-verto-overclocked-d.jpg",
+      "bytes": 44206
+    },
+    {
+      "id": 35,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/ENR1fi6DrYG4BymA3enRtQa6zHivqzjfySE4lJnnNyh_futrWHUZtnVeKOfqA1GAHlIZhgQU8y6mvnKrQWKr-Y4Ue2pEgILquQ",
+      "newUrl": "/uploads/products/product-35-card-man-hinh-inno3d-geforce-rtx-5060-twin-x2-8gb-8gb-gddr7-.jpg",
+      "bytes": 40848
+    },
+    {
+      "id": 36,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/e0X_86bwJxa9-qy2157W2ARmpXHHE0tKcfyfIM7R6YQfDux0OGxogwop5DucRWl76e2APu8OFAlbK5nvHiZXyJ_XEZ7CjwBm2A",
+      "newUrl": "/uploads/products/product-36-card-man-hinh-colorful-geforce-rtx-5060-gaming-duo-8gb-v-8gb.jpg",
+      "bytes": 42731
+    },
+    {
+      "id": 37,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/gUDt4T7KKDtXUw4O0FSpMwdyMW2jETjzZvz6B6Ngv_e_9VuG5jCz14LmRwldgHL8z0gHHBWKkyTavjYP_PKbFCD91NZljB-s",
+      "newUrl": "/uploads/products/product-37-card-man-hinh-leadtek-nvidia-rtx-pro-6000-96g-max-q-96gb-gdd.jpg",
+      "bytes": 26027
+    },
+    {
+      "id": 38,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/Kbh89AWpQEBnwOzElEJBZ5owfwgBg9_C_-ilwSvVW9UktWTP0S-YRy_jqvwKKT2RMAs4gXN7YcfA281v4I5wz4-QnFN5JtHs",
+      "newUrl": "/uploads/products/product-38-card-man-hinh-leadtek-nvidia-rtx-pro-6000-96g-workstation-96.jpg",
+      "bytes": 27510
+    },
+    {
+      "id": 39,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/48OcfRYC-GDHbymQ7g48wr7541Ah34A1x-4sI-cuXCTiAMCH9eLhMCzvcb4zXWWo0qLhPNzMVUuuPti80wsjwnzb_7C5tzc",
+      "newUrl": "/uploads/products/product-39-card-man-hinh-leadtek-nvidia-rtx-4000-ada-20g.jpg",
+      "bytes": 18310
+    },
+    {
+      "id": 40,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/YnBQXkrgMfz7F3vFjq09Nwz50dZkCRrSNp4u9JlK51g1i8rrDrM_xP0OD7-hScl2dc0iI7BYUwL-DzKHootmMkYZ1ZK6dnRcNQ",
+      "newUrl": "/uploads/products/product-40-card-man-hinh-leadtek-nvidia-rtx-pro-2000-16gb-gddr7.jpg",
+      "bytes": 18365
+    },
+    {
+      "id": 41,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/W9DYURz-hLlgD48YkHurQmgNloLBmpUDRsxRCqyvo7hpKVCE4BYP7dR12mVK3H1H14QPUMPuKB8GzmqDZmu99FoCj3CZvag",
+      "newUrl": "/uploads/products/product-41-card-man-hinh-leadtek-nvidia-rtx-pro-4000-sff-24g-24gb-gddr7.jpg",
+      "bytes": 17933
+    },
+    {
+      "id": 42,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/yjRqOhOlpBCxKVrx5JAV_l0xvB_JGkNBv12foS-lpZbtegiO-3sfDYgVw5QFNduUxw9GoQPb-QRAMm_muMA_Zn0kyw6vQqs",
+      "newUrl": "/uploads/products/product-42-card-man-hinh-leadtek-nvidia-rtx-pro-4000-24g-24gb-gddr7.jpg",
+      "bytes": 16799
+    },
+    {
+      "id": 43,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/BqLP5Gwt4YT5ESBTRn26hHYUI7jxRbmQHjO53wqiIbrgleke1Dl69WtdAs8Jt3aqN1cylhRwh5Umytiqt_F3xsyTZjLKkI7d",
+      "newUrl": "/uploads/products/product-43-card-man-hinh-leadtek-nvidia-rtx-pro-5000-48g-gddr7.jpg",
+      "bytes": 20257
+    },
+    {
+      "id": 44,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/9VUu8JNmC39_4NVcC4jU_A3oF_p6m6FgvbACgF0MB4TaRmipNEh73DmQaRbJABCttNJQBtArDpyVicws94v4XyNLOMUtDPNn",
+      "newUrl": "/uploads/products/product-44-card-man-hinh-asus-rog-astral-geforce-rtx-5080-16gb-gddr7-oc.jpg",
+      "bytes": 78942
+    },
+    {
+      "id": 45,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/sgqvOocqzB5KIGrlPgjwsuvShRgLIh4x3FYkANiDUCAwN6KJnELiPKuBFQz9yjlNZ2PtwZQoURsCX_5vIXAoVDsPHWimbGge",
+      "newUrl": "/uploads/products/product-45-card-man-hinh-inno3d-geforce-rtx-5060-ti-16gb-twin-x2-oc-gdd.jpg",
+      "bytes": 41528
+    },
+    {
+      "id": 46,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/jdKbp9rL74sArcohaFIiOJ2FBWblwSUN07BdPr83erK8cqE1FkKS0JRhtMge4sVaoMhSu9heARGhXHohKHX7ShIeDho0FEk",
+      "newUrl": "/uploads/products/product-46-o-cung-gan-trong-ssd-kioxia-exceria-basic-1tb-gen4x4-r7200-w.jpg",
+      "bytes": 31630
+    },
+    {
+      "id": 47,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/fVrHGMYO9O7MO0A7WsAzAem5S_33QSzAG5oFapXTbXzOG1S9M9iQwIxkxVB4tuFihu_QgkgqeRAhgvGM9WAsVXpFTMTk_9Q",
+      "newUrl": "/uploads/products/product-47-o-cung-gan-trong-ssd-patriot-p320-512gb-nvme-m-2-pcie-p320p5.jpg",
+      "bytes": 30443
+    },
+    {
+      "id": 48,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/s_EhFRYGUJkz46i4KFBAF05pWHxoSADZmMALMgs1EHliWqMSpWskI5oo548-NJE7efCGFZBI7MJ0OKg0slQTB53QP-K4lMyA",
+      "newUrl": "/uploads/products/product-48-o-cung-gan-ngoai-ssd-crucial-1tb-x9-usb-c-3-2-gen-2-10gb-s-1.jpg",
+      "bytes": 15417
+    },
+    {
+      "id": 49,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/52tG-vu2QfVb749grYkB5TjQi8RbLV_H1BXII1xg-yltEIsJZm13sZvMXnPNs3FurlzzQwcXyPlL0qlTJ2TaEdb4N8YM8_Ok",
+      "newUrl": "/uploads/products/product-49-o-cung-gan-trong-patriot-ssd-p400-1tb-v4-m-2-2280-pcie-gen4-.jpg",
+      "bytes": 21451
+    },
+    {
+      "id": 50,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/AiwiC0xfcVtVwGO3ho7xRaUuQXqsHhANcvEFXU2Qmpz_f-aJ8sRG13e6KkSBewah-PLRe3uGPGzoRvGvNAn2ENlBVl2UbhfL",
+      "newUrl": "/uploads/products/product-50-o-cung-gan-trong-ssd-patriot-p210-512gb-2-5-sata3-p210s512g2.jpg",
+      "bytes": 60603
+    },
+    {
+      "id": 51,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/JhmJUrQpWwNEtZwwgIYpSOTlLKCevte5Nm1Rj9HvNRGT2CPyTKy5gdkK9W4japhUxY_KoGqI1xT1c6Umyrw2Qh87N0YbbCc",
+      "newUrl": "/uploads/products/product-51-o-cung-gan-trong-patriot-ssd-p300-512gb-nvme-m-2-pcie-p300p5.jpg",
+      "bytes": 27732
+    },
+    {
+      "id": 52,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/YYG2VgECgy4ESQBC2EI8olNIFahvrJtmLCkLVp_bFTRd2WryNIZXJRHaDrRDWqo0XqMZFMyQK7fufb-9rraUwoiMKMR6smOU",
+      "newUrl": "/uploads/products/product-52-o-cung-di-ong-ssd-sandisk-snoopy-portable-limited-edition-e6.jpg",
+      "bytes": 31934
+    },
+    {
+      "id": 53,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/ZY3x7YyIgXwjgPCjACV0NDVOzpIq0wYiaVa2ZyHmLed-E8dvaPbccSGVBdNmDvzZrjaL0_zZ1hHxmZS-8uqkJLCQu-wX7toY",
+      "newUrl": "/uploads/products/product-53-o-cung-gan-trong-ssd-wd-sn3000-1tb-nvme-gen4x4-green-wds100t.jpg",
+      "bytes": 23872
+    },
+    {
+      "id": 54,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/uxIXebpsavxeZjX1rTD6RLg79QX8m3lHiuaXCtYIV4hFZnn9kA21qzsejIDMRsMq9Yyg4uNOOzjOTSnZZEFqUsC3eNtbyzOs",
+      "newUrl": "/uploads/products/product-54-o-cung-gan-trong-ssd-adata-2-5-su650-sata-iii-256g-asu650ss-.jpg",
+      "bytes": 57886
+    },
+    {
+      "id": 55,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/wbLpfNMdMpmyztJMPBSUUaNz4BKre8K8f44-lsZR0kZ-Qfjz1mtObMUle1ko9GbnEg7nA3fr-tf9hLq8gonh9jhzda3pjSo",
+      "newUrl": "/uploads/products/product-55-o-cung-gan-trong-ssd-adata-legend-860-nvme-pcie-gen4-x4-m-2-.jpg",
+      "bytes": 24923
+    },
+    {
+      "id": 56,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/4io52vifafPS4P7lpwS1NLowaiJnxH59waXN2ctjz3qtwYHPrGQzWd_Ucx5g-2dS2HJou1KXvq3eOLqPf4a9ojOBf4ySpdE",
+      "newUrl": "/uploads/products/product-56-o-cung-di-ong-ssd-transcend-2tb-esd420-2000mb-s-type-c-magsa.jpg",
+      "bytes": 28226
+    },
+    {
+      "id": 57,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/eQcXKB8IQv0diOf-gkZW7r3bcHPn3RskTr01qSKeJanZU5bcHvH2fMkcDIqazyj7pAD5MVGKZTbMtNg54DmNSqhyusu9owQL",
+      "newUrl": "/uploads/products/product-57-o-cung-di-ong-ssd-sandisk-creator-desk-drive-4tb-1000mb-s-ty.jpg",
+      "bytes": 23857
+    },
+    {
+      "id": 58,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/HCJzt4bPb5TrBv4qHEL2bpFMzSXWNKGO1Clk_Cg53VbPCpHVxkP7IjaxHpJnCGo5VATjG2UiQ8Ng2bWu6c4SxbwgKiK40LE7",
+      "newUrl": "/uploads/products/product-58-o-cung-gan-trong-ssd-teamgroup-cx2-1tb-sata-iii-2-5-t253x600.jpg",
+      "bytes": 31193
+    },
+    {
+      "id": 59,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/jtxvCRqG-pImv99rbQQ3_9-x4-ZjN4CXb7MCgR_DPI1oaAwFXaSvkQHX7EmF17taRBXQUQkk8ENOXfVHENrvd6mYJPf7n9I2CQ",
+      "newUrl": "/uploads/products/product-59-o-cung-gan-ngoai-kingston-ssd-1tb-xs1000-boc-external-en-sxs.jpg",
+      "bytes": 22995
+    },
+    {
+      "id": 60,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/KfYFMZMQKGUbYgIRoiI7aRmXYkpAph5sJXL3D8p2CFlxmj_zREU4T8VB_rU1VJ1q-jiUgUELrKewNTlccjyMD_KFeqoitZSL",
+      "newUrl": "/uploads/products/product-60-o-cung-gan-ngoai-kingston-ssd-4tb-xs2000-boc-external-bac-sx.jpg",
+      "bytes": 36290
+    },
+    {
+      "id": 61,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/qxbdWQdn-CHAPX2e-aHUgmZ1EpbAJVWESiuJmgZ8Lb9n7Txg7DPS-LcaRX5oXeDVOMwOl7woP3Hp8smLyXKL7u7cZ88lhZBiCg",
+      "newUrl": "/uploads/products/product-61-mainboard-msi-mag-x870e-tomahawk-wifi-ddr5.jpg",
+      "bytes": 54501
+    },
+    {
+      "id": 62,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/atZbeL3UYAugolsvz2cMHCjoM5p7xMbWMpqbwWY-6ZjDv_gBWab-ovRz4tKEpBRxWZZ4LJsSm6H2wnRSNsWPXZEw9co6Gho",
+      "newUrl": "/uploads/products/product-62-mainboard-msi-a520m-a-pro-ddr4.jpg",
+      "bytes": 53824
+    },
+    {
+      "id": 63,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/CZwK4UDy8dNYkGJWl9qL4N8PJA94jmDRu6sBU9WAt-B4jvENqKrS48rHbpKETVnTTZk7mwjpASyGDvU0Wp4C-AHMawog95M",
+      "newUrl": "/uploads/products/product-63-mainboard-msi-pro-x870e-p-wifi-ddr5.jpg",
+      "bytes": 52526
+    },
+    {
+      "id": 64,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/o2JyWweZNpHVch4--QuNt0KdCZFon-FBEVH8GBC209cSOh6Z9nLdNCwF5phv0VUxCsmDt73AHuJhrKsNCuUr7CXkT7Gb21NH",
+      "newUrl": "/uploads/products/product-64-mainboard-msi-pro-b840m-p-wifi6e.jpg",
+      "bytes": 52138
+    },
+    {
+      "id": 65,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/LnbAnJah1XVV2dShmYLypQYV6pFfDL4IZTQPW8gVPijUtCHojVBO20-2Gt-TnLOwNXNyO-bNZ1LWnD1tn8_skw8B6z4nB8Fb",
+      "newUrl": "/uploads/products/product-65-mainboard-asus-h610m-k.jpg",
+      "bytes": 47811
+    },
+    {
+      "id": 66,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/BQuTpOHO4p_nU5K2XFAN0MjiDWWLAevdtJsk0q6SwFMNdkWmSe02L8dmG5Q21clg133Ol4ZqIdpo1Mtbn1I-wbw4PMpMaJze",
+      "newUrl": "/uploads/products/product-66-mainboard-asus-b840m-max-gaming-ax-csm-ddr5.jpg",
+      "bytes": 38310
+    },
+    {
+      "id": 67,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/IMmxqLPmeJnb6RSQSnQnEYv3f5sbTWgrzQ6CLlhtH5IMdp6gbdKg-yqzd3zoyZ-UO2NDMzteNpVlcJjpffUZJyjKqKqUQavA4w",
+      "newUrl": "/uploads/products/product-67-mainboard-msi-pro-h610m-e-ddr5.jpg",
+      "bytes": 48432
+    },
+    {
+      "id": 68,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/gZh2N8JCt0Ob0-HiRFUTGp10hw0n-z26gSOd97jXd1n6FNDRC0Upf3BcsqS6TWxWligEjVpFyPwg2qtt0Vsf-8UqhVhBzX-R",
+      "newUrl": "/uploads/products/product-68-mainboard-asus-prime-b760m-f-wifi-ddr5.jpg",
+      "bytes": 39319
+    },
+    {
+      "id": 69,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/1znV8eqZEgWxrtbBiS7QdQkMpNVMMZRRSAwPhsuvwn2vwZrp69LbugJ1Hy5P_XS-2q6W48je_UzVQyVFZFNhp6OWNeFY91Th",
+      "newUrl": "/uploads/products/product-69-mainboard-msi-x870e-gaming-plus-wf.jpg",
+      "bytes": 60916
+    },
+    {
+      "id": 70,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/nf_HcDI1esLJY_ZETJteoJpd3OjtTp7dpCRlwleG52GkOppJQUxu8a87pe1oMNJLTaVk3HTfzwrul91HvoXmrAxPLfq16hQ_",
+      "newUrl": "/uploads/products/product-70-mainboard-asus-b760m-ayw-wifi-ddr5.jpg",
+      "bytes": 70530
+    },
+    {
+      "id": 71,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/LhVxsbvM4uNM1wyLLYAMkZ6XFiKqzHyjRSjh2a9tsbYYH_1KQ6_yGkP4OmLSoP9RRVZDtJflsWL7ahkoB-D8NZ2ecVUILO_B",
+      "newUrl": "/uploads/products/product-71-mainboard-msi-b760m-gaming-wf-ddr5.jpg",
+      "bytes": 58838
+    },
+    {
+      "id": 72,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/Iaj5QgLpj_cvfVtgWkENyZwm9cHoP4iR9P05Zn5m2sy39bX1Lq4CQ-STHg1fTdzW2yhWabww7UuZrRhqa0r3JTg1c-PJEiDm",
+      "newUrl": "/uploads/products/product-72-mainboard-msi-pro-z790-p-wifi-ddr5.jpg",
+      "bytes": 51579
+    },
+    {
+      "id": 73,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/Hu5fjmDEppy2yZgX_thDBx7TkM6oGQDaGptjxKs2iGInut1AkzcxP-cCzFlQkIcDOA6-r9aVD3TagKRqq2ipUXmql8IFLYwoNQ",
+      "newUrl": "/uploads/products/product-73-mainboard-msi-b860m-gaming-plus-wifi.jpg",
+      "bytes": 45313
+    },
+    {
+      "id": 74,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/t_1LiHKC2fUp6_mWzi9uthOrBldS4eqLFHOWFSKtm5aaN8m6OmhImZuxTYDJcwHSwQ9VUD1TJuWECY-QJmLP4ti4H48A_kRsgQ",
+      "newUrl": "/uploads/products/product-74-mainboard-asus-prime-prime-z890-p-csm-ddr5-wifi-7.jpg",
+      "bytes": 42849
+    },
+    {
+      "id": 75,
+      "ok": true,
+      "oldUrl": "https://lh3.googleusercontent.com/ActGQswE__Iy-0mAkHdgYCMPrcLwzT4pWofZNTWhaXInbzINHTwGPLx44l3nezZBvEPRdlUzY6JJ2HVFQqvJFZor5n6oC6Hj",
+      "newUrl": "/uploads/products/product-75-mainboard-msi-pro-pro-z890-s-ddr5-wifi-7.jpg",
+      "bytes": 50056
+    }
+  ]
+}

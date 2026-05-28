@@ -10,6 +10,13 @@ fe/.env
 # Logs
 *.log
 ai-lab/.pm2/
+ai-lab/outputs/
+
+# AI Lab generated eval/training data
+ai-lab/data/test-cases.json
+ai-lab/data/training-examples.json
+ai-lab/data/training-examples.jsonl
+ai-lab/data/finetune-chat-dataset.jsonl
 
 # Docker data
 mysql_data/

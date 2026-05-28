@@ -1,0 +1,35 @@
+[
+  {
+    "id": "cpu-intel-under-5m",
+    "input": "CPU Intel duoi 5 trieu",
+    "expected": {
+      "mustReturnProducts": true,
+      "categories": ["CPU"],
+      "maxPrice": 5000000
+    }
+  },
+  {
+    "id": "vga-under-7m",
+    "input": "VGA con hang duoi 7 trieu",
+    "expected": {
+      "mustReturnProducts": true,
+      "categories": ["VGA"],
+      "maxPrice": 7000000
+    }
+  },
+  {
+    "id": "unsupported-laptop",
+    "input": "Shop co laptop van phong khong?",
+    "expected": {
+      "mustReturnProducts": false,
+      "sourceIncludes": "guard"
+    }
+  },
+  {
+    "id": "sale-without-active-discount",
+    "input": "San pham nao dang sale?",
+    "expected": {
+      "allowEmptyProducts": true
+    }
+  }
+]

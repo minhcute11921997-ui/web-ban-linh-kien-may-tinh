@@ -6,11 +6,9 @@ Base URL:
 http://127.0.0.1:4001
 ```
 
-Service nay dang tach biet voi backend/frontend web chinh.
+Service nay dung kien truc RAG + Gemini. Frontend production khong goi truc tiep service nay; backend web goi qua adapter `/api/chatbot/message`.
 
 ## GET /health
-
-Kiem tra service, knowledge base va vector index.
 
 Response 200:
 
@@ -18,6 +16,12 @@ Response 200:
 {
   "ok": true,
   "service": "ai-lab-chat-service",
+  "architecture": "rag_with_gemini",
+  "llm": {
+    "enabled": true,
+    "provider": "gemini",
+    "model": "gemini-2.0-flash"
+  },
   "knowledgeBase": {
     "products": 74,
     "categories": 5,
@@ -53,8 +57,8 @@ Request:
 Fields:
 
 - `message`: cau hoi cua nguoi dung, bat buoc.
-- `history`: tuy chon, toi da vai tin gan nhat trong phien chat hien tai. Service dung de hieu cau noi tiep nhu "cai thu 2", "re hon", "so voi con dau"; khong luu DB.
-- `limit`: tuy chon, gioi han so san pham tra ve, mac dinh `8`.
+- `history`: tuy chon, toi da 6 tin gan nhat trong phien chat hien tai.
+- `limit`: tuy chon, gioi han so san pham tra ve, mac dinh `8`, toi da `20`.
 
 Response 200:
 
@@ -63,7 +67,7 @@ Response 200:
   "success": true,
   "latencyMs": 123,
   "question": "Build PC gaming khoang 15 trieu",
-  "source": "local_rag",
+  "source": "gemini_rag",
   "reply": "Noi dung tu van...",
   "products": [
     {
@@ -83,7 +87,13 @@ Response 200:
     "tokens": ["build", "pc", "gaming"],
     "categories": ["cpu", "ram", "ssd", "vga", "mainboard"],
     "retrievalSource": "hybrid",
-    "vectorModel": "local-hash-embedding-v1"
+    "vectorModel": "local-hash-embedding-v1",
+    "llm": {
+      "enabled": true,
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "replyProvider": "gemini"
+    }
   }
 }
 ```
@@ -110,14 +120,3 @@ Response 200:
   "health": {}
 }
 ```
-
-## Integration Notes
-
-- Hien tai service tach biet, khong sua backend/frontend web chinh.
-- Web backend sau nay co the map request hien tai `{ message }` sang `POST /chat`.
-- Frontend hien tai co the dung tiep shape `{ reply, products }`.
-- Khong dua `debug` ra frontend production neu khong can.
-- Backend web hien dung AI Lab lam nguon chatbot duy nhat; khong con fallback rule-based cu.
-- Neu AI service loi, backend web tra loi loi ket noi ro rang cho frontend.
-- Khong de frontend production goi truc tiep `http://127.0.0.1:4001`; hay di qua backend adapter neu tich hop.
-- Du lieu la snapshot tu MySQL. Sau khi admin cap nhat catalog, chay `npm run sync` trong thu muc `ai-lab`.

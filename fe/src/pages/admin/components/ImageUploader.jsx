@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link, Upload, ImageUp, Loader2, X } from "lucide-react";
+import { resolveImageUrl } from "../../../utils/imageUrl";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -40,9 +41,8 @@ const ImageUploader = ({ value, onChange }) => {
         }
       );
       if (res.data.success) {
-        const fullUrl = `${API_BASE}${res.data.imageUrl}`;
-        setPreview(fullUrl);
-        onChange(fullUrl);
+        setPreview(res.data.imageUrl);
+        onChange(res.data.imageUrl);
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Upload ảnh thất bại!");
@@ -126,7 +126,7 @@ const ImageUploader = ({ value, onChange }) => {
       {preview && (
         <div className="mt-3 relative w-24 h-24">
           <img
-            src={preview}
+            src={resolveImageUrl(preview)}
             alt="Preview"
             className="w-24 h-24 object-cover rounded-xl border border-gray-200"
             onError={(e) => { e.target.style.display = "none"; }}

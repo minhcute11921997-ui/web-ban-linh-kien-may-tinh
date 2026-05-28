@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { sendChatMessage } from "../api/chatbotApi";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 const INITIAL_MESSAGES = [
   {
@@ -31,12 +32,6 @@ const CHAT_SUGGESTIONS_KEY = "pc_shop_chatbot_suggestions";
 
 const formatPrice = (value) =>
   `${Math.round(Number(value || 0)).toLocaleString("vi-VN")}đ`;
-
-const resolveImage = (imageUrl) => {
-  if (!imageUrl) return "https://placehold.co/120x120?text=No+Image";
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-  return imageUrl;
-};
 
 const safeReadJson = (key, fallback) => {
   try {
@@ -224,7 +219,7 @@ export default function ChatbotWidget() {
                           onClick={() => setOpen(false)}
                         >
                           <img
-                            src={resolveImage(product.image_url)}
+                            src={resolveImageUrl(product.image_url, "https://placehold.co/120x120?text=No+Image")}
                             alt={product.name}
                             className="w-14 h-14 object-contain bg-gray-100 rounded-md flex-shrink-0"
                           />

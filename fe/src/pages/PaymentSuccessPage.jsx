@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 
 import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const STATUS_LABEL = {
     pending: 'Chờ xử lý',
@@ -156,9 +157,12 @@ const PaymentSuccessPage = () => {
                                         {order.items.map(item => (
                                             <div key={item.id} className="flex items-center gap-4">
                                                 <img
-                                                    src={item.image_url || 'https://via.placeholder.com/56'}
+                                                    src={resolveImageUrl(item.image_url, 'https://via.placeholder.com/56')}
                                                     alt={item.product_name}
                                                     className="w-16 h-16 object-cover rounded-xl bg-gray-100 border border-gray-200"
+                                                    onError={(e) => {
+                                                        e.currentTarget.src = 'https://via.placeholder.com/56';
+                                                    }}
                                                 />
                                                 <div className="flex-1">
                                                     <p className="font-semibold text-gray-800">{item.product_name}</p>

@@ -13,6 +13,8 @@ module.exports = {
         AI_LAB_HOST: "127.0.0.1",
         AI_LAB_PORT: "4001",
         LOCAL_EMBEDDING: "1",
+        GEMINI_ENABLED: "1",
+        GEMINI_MODEL: "gemini-2.0-flash",
       },
     },
   ],

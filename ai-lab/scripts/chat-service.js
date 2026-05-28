@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require("fs");
 const http = require("http");
 const path = require("path");
@@ -7,8 +9,8 @@ const rootDir = path.resolve(__dirname, "..", "..");
 const dotenv = require(path.join(rootDir, "be", "node_modules", "dotenv"));
 dotenv.config({ path: path.join(rootDir, "be", ".env"), quiet: true });
 
-const { answerQuestion } = require("./rag-core");
 const { loadKnowledgeBase, loadVectorIndex } = require("./embedding-core");
+const { llmHealth, runChatPipeline } = require("./rag-llm-pipeline");
 
 const PORT = Number(process.env.AI_LAB_PORT || 4001);
 const HOST = process.env.AI_LAB_HOST || "127.0.0.1";
@@ -82,18 +84,30 @@ const readJsonBody = (req) =>
       if (!raw.trim()) return resolve({});
       try {
         resolve(JSON.parse(raw));
-      } catch (error) {
+      } catch (_) {
         reject(new Error("Invalid JSON body"));
       }
     });
     req.on("error", reject);
   });
 
+const toBase64 = (value) => Buffer.from(String(value || ""), "utf8").toString("base64");
+
 const appendLog = (entry) => {
   fs.appendFileSync(LOG_PATH, `${JSON.stringify(entry)}\n`, "utf8");
 };
 
-const toBase64 = (value) => Buffer.from(String(value || ""), "utf8").toString("base64");
+const normalizeProduct = (product) => ({
+  id: product.id,
+  name: product.name,
+  brand: product.brand,
+  category_name: product.category_name,
+  price: product.price,
+  sale_price: product.sale_price,
+  discount_percent: product.discount_percent,
+  stock: product.stock,
+  image_url: product.image_url,
+});
 
 const normalizeHistory = (history) => {
   if (!Array.isArray(history)) return [];
@@ -103,25 +117,15 @@ const normalizeHistory = (history) => {
     .map((item) => ({
       role: item.role,
       text: String(item.text).slice(0, 1000),
-      products: Array.isArray(item.products)
-        ? item.products.slice(0, 8).map((product) => ({
-            id: product.id,
-            name: product.name,
-            brand: product.brand,
-            category_name: product.category_name,
-            price: product.price,
-            sale_price: product.sale_price,
-            discount_percent: product.discount_percent,
-            stock: product.stock,
-            image_url: product.image_url,
-          }))
-        : [],
+      products: Array.isArray(item.products) ? item.products.slice(0, 8).map(normalizeProduct) : [],
     }));
 };
 
 const healthPayload = () => ({
-  ok: Boolean(state.knowledgeBase),
+  ok: Boolean(state.knowledgeBase && state.vectorIndex),
   service: "ai-lab-chat-service",
+  architecture: "rag_with_gemini",
+  llm: llmHealth(),
   startedAt: state.startedAt,
   lastReloadAt: state.lastReloadAt,
   reloadCount: state.reloadCount,
@@ -152,6 +156,7 @@ const healthPayload = () => ({
 const handleChat = async (req, res) => {
   const started = Date.now();
   let body;
+
   try {
     body = await readJsonBody(req);
   } catch (error) {
@@ -170,18 +175,12 @@ const handleChat = async (req, res) => {
   const history = normalizeHistory(body.history);
 
   try {
-    const result = await answerQuestion({ message, history, limit });
-    const latencyMs = Date.now() - started;
-    const payload = {
-      success: true,
-      latencyMs,
-      ...result,
-    };
+    const payload = await runChatPipeline({ message, history, limit });
 
     appendLog({
       ts: new Date().toISOString(),
       route: "/chat",
-      latencyMs,
+      latencyMs: payload.latencyMs,
       request: {
         message,
         messageBase64: toBase64(message),
@@ -189,11 +188,11 @@ const handleChat = async (req, res) => {
         historyCount: history.length,
       },
       response: {
-        source: result.source,
-        reply: result.reply,
-        replyBase64: toBase64(result.reply),
-        productIds: result.products.map((product) => product.id),
-        debug: result.debug,
+        source: payload.source,
+        reply: payload.reply,
+        replyBase64: toBase64(payload.reply),
+        productIds: payload.products.map((product) => product.id),
+        debug: payload.debug,
       },
     });
 
@@ -246,6 +245,21 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
+server.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`AI lab chat service cannot start because http://${HOST}:${PORT} is already in use.`);
+    console.error("Stop the existing service or start this one with another port, for example:");
+    console.error("$env:AI_LAB_PORT='4003'; npm start");
+    process.exit(1);
+  }
+
+  console.error("AI lab chat service failed to start:", error.message);
+  process.exit(1);
+});
+
 server.listen(PORT, HOST, () => {
+  const llm = llmHealth();
   console.log(`AI lab chat service running at http://${HOST}:${PORT}`);
+  console.log(`Architecture: RAG + ${llm.provider}`);
+  console.log(`LLM: ${llm.enabled ? llm.model : "disabled or missing API key; using RAG fallback"}`);
 });

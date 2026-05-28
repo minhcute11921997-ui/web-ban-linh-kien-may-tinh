@@ -1,0 +1,382 @@
+{
+  "createdAt": "2026-05-25T19:04:41.605Z",
+  "totalProducts": 75,
+  "remoteProducts": 75,
+  "products": [
+    {
+      "id": 1,
+      "name": "Bộ vi xử lý/ CPU Intel Core i3-13100 TRAY (không box)",
+      "image_url": "https://lh3.googleusercontent.com/gXmnEQczfRnPUrkBgZYN4QIZc1TBlyBUNNDh3P_zyPPcTal3BiNLBrrgF9EVyuO8kg6Uw9mVgGqyTWyewu0eca-hpyrJYzny"
+    },
+    {
+      "id": 2,
+      "name": "Bộ vi xử lý/ CPU Intel Core i5-14400 TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/R9jI49lejTc9SfMqfyCwcLrT-YBtwKrCGF0SG8Lsp-P2WCGvHgRJBf7OaVdGMMqIc7788H9m26Mh4N3u_t0Ofw4nphzw8oIX"
+    },
+    {
+      "id": 3,
+      "name": "Bộ vi xử lý/ CPU Intel Core i7-14700 TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/AVBpWeJBZTLUkvDzdIPcCX202M_Y6rQCUuxpqV4Cvf8mnOx-lkMqDjaiUDihQ2h1J9IOcHVAKLBsyPp633QXoTbY0A3i8Va7"
+    },
+    {
+      "id": 4,
+      "name": "Bộ vi xử lý/ CPU Intel Core i5-14600K TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/9QAZhv3GC6_AsAvZtmRE_SJ2Kt4IqR08nXTto7F8ZWy-SaqJf0HYnq5XY0CyGFfhCqxpZt5ramqgsLifTjLdqvy_8oziMd_B"
+    },
+    {
+      "id": 5,
+      "name": "Bộ vi xử lý/ CPU Intel Core i5-12400F TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/NuqyPqXyDLOsJMMi1QCuJbrxLJk7fn3CHEKkY5O-UBCC4S5NQygj7MiCKniMhoZeSp06LvVzaw_GhyEe9Z_M3q7B_TiZktiK"
+    },
+    {
+      "id": 6,
+      "name": "Bộ vi xử lý/ CPU Intel Core i3-14100 TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/iv-C8IgnMM3Ud3lo1EC6qagAJT_zMg5apf9tuQw1lUY8OGSPiRyM1AkTI_YtrLz-igwAIGeZ_0pjyMePdBeXJk8PmewsnnVdJw"
+    },
+    {
+      "id": 7,
+      "name": "Bộ vi xử lý/ CPU Intel Core i7-12700 TRAY (Không box)",
+      "image_url": "https://lh3.googleusercontent.com/QbDDT4FkqwTxy9A7ApiLVfVzx9LMZvyu4ribrw-RzRIehCknocjbKbyjpkMt6hU9wfEgfrYxf21HftDBEqYpO6VhPRxyzqNB"
+    },
+    {
+      "id": 8,
+      "name": "Bộ vi xử lý/ CPU AMD Ryzen 5 7500F MPK (6C - 12T | 38MB Cache | Upto 5.0GHz | Wraith Stealth | No iGPU | AM5) - Hàng không box",
+      "image_url": "https://lh3.googleusercontent.com/InwR_56RNFeS_O0Q_y7CS9essNjg4hCVLjHxCVSnMLlOqkBIVu0dKlV9TbndGcEX3lbJYD15_RafdWt973sWqiV-9sU1TRo"
+    },
+    {
+      "id": 9,
+      "name": "CPU AMD Ryzen 9 9950X3D (16C-32T | Up to 5.7GHz | 144MB | Radeon Graphics 2CUs - RDNA 2.0 | No Cooler | AM5)",
+      "image_url": "https://lh3.googleusercontent.com/x5wjOd3mQ6XkeFJialWzitHqN5YBeox3DcsTzmh7k8bp3X_p_gSEOAmNiaY-60Nwf6QlcDbBwssJMsTxmJ2Y3ZgLTqdSZKk"
+    },
+    {
+      "id": 10,
+      "name": "CPU Intel Core Ultra 5-225 (10 nhân 10 luồng - Boost tối đa 4.9 GHz - 20MB - 1851)",
+      "image_url": "https://lh3.googleusercontent.com/1-bkq4gHJT29TgRbZouqnXuFR44fnWkAnfpc3PHP6C2cYlV-7mnxAwptzPEilaSspJmY7rDotIFO_88rjMO1Q5HCn07GEYA"
+    },
+    {
+      "id": 11,
+      "name": "CPU Intel Core Ultra 5-225F (10 nhân 10 luồng - Boost tối đa 4.9 GHz - 20MB - 1851)",
+      "image_url": "https://lh3.googleusercontent.com/FzpTYh5PuKnHhYsi4ZcTeP1gxIkw4VWD5YRCnWfdevHVeUrqfYoeCp_0IDgxy_ahtX5DQjh03EUjOmYZPJBmImdO9hEZi_O1"
+    },
+    {
+      "id": 12,
+      "name": "CPU Intel Core Ultra 7-265 (20 nhân 20 luồng - Boost tối đa 5.3 GHz - 30MB - 1851)",
+      "image_url": "https://lh3.googleusercontent.com/g25xHRxNELbFPfpEpziXr6AzYCLu--ssZcIetSgOW-7nAc5ulLnhO8IgiIOFdwJlo4oKshmb_dp8ZlpdDcxkkez4sJilV57C"
+    },
+    {
+      "id": 13,
+      "name": "CPU AMD Ryzen 7 9800X3D (8 nhân 16 luồng - Boost to 5.2 GHz - 104MB - AM5)",
+      "image_url": "https://lh3.googleusercontent.com/64tmRD_sagy1ULbzfRl-mg6b_Rw313Vyw7W35o6FGK2lkaGzPnWn7azny6N-FGS4zUuNKQX7ARrD67vZ3NF-ZHFpBdtNegc0Iw"
+    },
+    {
+      "id": 14,
+      "name": "CPU Intel® Core™ Ultra 5-245KF (14 nhân 14 luồng - Turbo Boost to 5.2 GHz - 24MB - 1851)",
+      "image_url": "https://lh3.googleusercontent.com/3IuRxUMW4P9r6r03867h3Dss1OhGpSbU65gH16gZhLq6_Zrh--EfA6Dwi-9jZY3NdhdKJC7eqEmUQzjyUIi3oXsI6DdbjE0"
+    },
+    {
+      "id": 15,
+      "name": "CPU Intel Core Ultra 9-285K (24 nhân 24 luồng - Turbo boost to 5.7 GHz - 36MB - LGA 1851)",
+      "image_url": "https://lh3.googleusercontent.com/b3PSGTJMFzes5ZvQNmgmWuAcm4nKOUEPFJvghedGg7jEbXzFPIOA_MwEtX4YfpTDEkzAkLp4XJ83j2fjXIZ00vgalUODrE0"
+    },
+    {
+      "id": 16,
+      "name": "RAM desktop Kingston FURY Beast RGB EXPO 32GB (1 x 32GB) DDR5 6000MHz (KF560C36BBE2A-32)",
+      "image_url": "https://lh3.googleusercontent.com/2nlNfaIqPYsBsnnXOoJqJ_Jyr1sndo7X_pMSN72RdtJ7V46cBpvjvWBBVBx1qrLS72yY87KhaZd-J4wUsQroBV4PHEpWmvfW"
+    },
+    {
+      "id": 17,
+      "name": "RAM desktop G.skill Trident Z5 RGB (1 x 32GB) DDR5 6000MHz (F5-6000J3636F32GX1-TZ5RK)",
+      "image_url": "https://lh3.googleusercontent.com/d0p4klVq9CaIWi0OsVxJZLIsJRnurf7zEJ81TjgdztRXeHeYE5lKB70rrmzW2m6iZ6Y33cQTqnc5VKCcME1EYHaQCU9STiPU"
+    },
+    {
+      "id": 18,
+      "name": "RAM desktop Kingston (1 x 16GB) DDR4 3200MHz (KVR32N22D8/16WP)",
+      "image_url": "https://lh3.googleusercontent.com/EmEU31ggJxKpOtA1pGpGIAD1Ie5VT-1SfEpOU7XStDXHafGRLcRcZTF31QpcB2mkMSpBU3J5bEoGIagrk_HRgaG9HEIEBlvR"
+    },
+    {
+      "id": 19,
+      "name": "RAM desktop Kingston (1 x 8GB) DDR4 3200MHz (KVR32N22S8/8WP)",
+      "image_url": "https://lh3.googleusercontent.com/l59JiSrURPTokcP-wAUE6pqhjfJj9veZkSfLTnP4-VoUmuMZFFpxmp2FY2jFk-PwGc1KdNgaZpk9BpiaPAVtDxAHaTDfHbeU"
+    },
+    {
+      "id": 20,
+      "name": "RAM desktop Patriot VIPER ELITE 5 RGB (1 x 16GB) DDR5 6000MHz (PVER516G60C30W)",
+      "image_url": "https://lh3.googleusercontent.com/X2kZIkjW2h20-tOYNWXOcL4i3mBNM0nbF9i6NVOMIzx0hwf4nS6XKcHtLnbx3IcETaD01h88yEqV6DNTD68B7wG1ZnF7Ylf8"
+    },
+    {
+      "id": 21,
+      "name": "Patriot (1 x 16GB) DDR4 3200MHz (PSP416G3200H1)",
+      "image_url": "https://lh3.googleusercontent.com/yI_IRnmUbLkZYpteF-DtzNwopG29obI8LnRFp9Xq7536KJgNmZxErmc-wc_iKXbZajDP0CEpoaflCzLhKa6zIuFlraBuaxQ"
+    },
+    {
+      "id": 22,
+      "name": "RAM desktop Kingston FURY Beast (1 x 8GB) DDR4 3200MHz (KF432C16BB/8WP)",
+      "image_url": "https://lh3.googleusercontent.com/GSz2Yj4JykPBvngCCaTVwBER3YkLLlRZUd5dBywEYYAwKYnSnrJgudd-gdA0CaarkjaiXlzNgV--zuVaBgcbMU9Z811fUsKq"
+    },
+    {
+      "id": 23,
+      "name": "RAM desktop Kingston FURY Beast (1 x 16GB) DDR4 3200MHz (KF432C16BB1/16WP)",
+      "image_url": "https://lh3.googleusercontent.com/wButLxkuiSDBAYRQz93A0dNwFYJxs-5awn_STxet6PkOwPrBD0-3FrMcLhgk22eM7g4rwSsbRP2dI4FeAdChuxDXpXTRPDs"
+    },
+    {
+      "id": 24,
+      "name": "RAM desktop TeamGroup Delta RGB (1 x 16GB) DDR5 6000MHz (FF3D516G6000HC38J01)",
+      "image_url": "https://lh3.googleusercontent.com/xjnV2GdiwqlLrN6cgJMtIOt1DwuospoxacAaZwCtyLWut7F6E4eaIHcWdrS9tabtF1zJzycbPyrJ20JUDb47hggZZb63QPfy"
+    },
+    {
+      "id": 25,
+      "name": "RAM desktop Corsair Vengeance RGB (2 x 32GB) DDR5 6000MHz (CMH64GX5M2D6000C40)",
+      "image_url": "https://lh3.googleusercontent.com/QWXTLtmkxBaexLfxiOYFcL8NwOT91Gs5V7wlfYwEwI-aOFfUSA2jE9O0ksdGefZ7Y3LBCpy3kAh_KzcXzaX3ugpbAslDKCge"
+    },
+    {
+      "id": 26,
+      "name": "RAM desktop Corsair Vengeance RGB (2 x 64GB) DDR5 6400MHz (CMH128GX5M2B6400C42)",
+      "image_url": "https://lh3.googleusercontent.com/v8l1pnuoBMvb-F4FBashK7056UUQ1IarOmjgkNxN1C7kKb8H-Lvi_2PHBAi5ATQJFIk5OVOKnrr0kesdQCkuTh4o7Ore-2M"
+    },
+    {
+      "id": 27,
+      "name": "RAM desktop Corsair Vengeance (1 x 16GB) DDR5 6000MHz (CMH16GX5M1E6000Z36)",
+      "image_url": "https://lh3.googleusercontent.com/JAG3qAXTD1EFwQgeTrzf5pZz_AAlF8iplU1KD82hWYh52rHBjSTaLiy3VZ-NkR3wJp0nKXZRwKTBvI-0hA9f5cjlpZhMq0s"
+    },
+    {
+      "id": 28,
+      "name": "RAM desktop SP XPOWER Zenith (1 x 16GB) DDR5 6000MHz (SP016GXLWU60CFSE)",
+      "image_url": "https://lh3.googleusercontent.com/gItvnnuOCgy6vUdoI0ysfnGAztEJ50QxpH0cEN131BWfo6depXqoBqSSjG5P7Rva0YNcmU3Bggvw4zwIaxzdr4c-_5Oq8WL2UA"
+    },
+    {
+      "id": 29,
+      "name": "RAM desktop SP XPOWER Zenith RGB (1 x 16GB) DDR4 3200MHz (SP016GXLZU320BSHK0)",
+      "image_url": "https://lh3.googleusercontent.com/WCPksQsonWtcMB5RE2Z00rV64PhZE1G-ruIbPKtzWebYj24yuurFWpIZxyVEB5vX5cMyEs2e68KbeFu82jvvJThFdj-nFWk"
+    },
+    {
+      "id": 30,
+      "name": "RAM desktop SP XPOWER Zenith RGB (1 x 32GB) DDR5 6000MHz (SP032GXLWU60BFSH)",
+      "image_url": "https://lh3.googleusercontent.com/5KKuTL7NKZTqTSGyvSb17IZnQPSYV2pjnb1k36OFkD58v6MA0NAGWB1gM008NVF5t2F9oicOZef9WaH-mfxBvN75XJpjh5V6"
+    },
+    {
+      "id": 31,
+      "name": "Card màn hình Inno3d GeForce RTX 3050 6GB Twin X2 V2 6GB GDDR6 ",
+      "image_url": "https://lh3.googleusercontent.com/Silgf9qRDl2PmIp61UZsV0xcNGM-2vuaV80ZFVxKHk_vu47eZkhk5de3q6hPDu3TXmW8SBpk0pRVKpcKDqoHiRX_2HKClvo"
+    },
+    {
+      "id": 32,
+      "name": "Card màn hình Palit RTX 5060 Ti INFINITY 3 16GB GDDR6 ",
+      "image_url": "https://lh3.googleusercontent.com/egwl1sYhwoaEJE41Szp1llkhIbGWS5nW4CBbBGoLcVjhYfJt1vtJSQMiQLZ9SzyiLtlEMv7Wwz61_sXrXhWbTnCH36LmvHWi"
+    },
+    {
+      "id": 33,
+      "name": "Card màn hình PNY GeForce RTX 4060 Ti VERTO Dual Fan 16GB GDDR6 (VCG4060T16DFXPB1)",
+      "image_url": "https://lh3.googleusercontent.com/91U6aeCoyy3i1fvEO5PGXArT1TjGBIR47PoFXIOEKDph0f-gjDjy0SsMZ1J3jEOCgk0l1lNu_LXowycVHkIkoo7bfXHtPxZG"
+    },
+    {
+      "id": 34,
+      "name": "Card màn hình PNY GeForce RTX 4070 SUPER VERTO Overclocked Dual Fan 12GB GDDR6X (VCG4070S12DFXPB1-O)",
+      "image_url": "https://lh3.googleusercontent.com/u3gI7oMf8VU70dLKyN9zo7fXEkIjaJtljD9tzlClt966AM9TuA7Wv4zQeGvvHmfsN3jb0VqVbnmmmaEKTP_FmF1HpJdYF8cC"
+    },
+    {
+      "id": 35,
+      "name": "Card màn hình Inno3d GEFORCE RTX 5060 TWIN X2 8GB 8GB GDDR7 (N50602-08D7-195071N)",
+      "image_url": "https://lh3.googleusercontent.com/ENR1fi6DrYG4BymA3enRtQa6zHivqzjfySE4lJnnNyh_futrWHUZtnVeKOfqA1GAHlIZhgQU8y6mvnKrQWKr-Y4Ue2pEgILquQ"
+    },
+    {
+      "id": 36,
+      "name": "Card màn hình Colorful GeForce RTX 5060 Gaming DUO 8GB-V (8GB GDDR7)",
+      "image_url": "https://lh3.googleusercontent.com/e0X_86bwJxa9-qy2157W2ARmpXHHE0tKcfyfIM7R6YQfDux0OGxogwop5DucRWl76e2APu8OFAlbK5nvHiZXyJ_XEZ7CjwBm2A"
+    },
+    {
+      "id": 37,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 6000 96G MAX-Q (96GB GDDR7)",
+      "image_url": "https://lh3.googleusercontent.com/gUDt4T7KKDtXUw4O0FSpMwdyMW2jETjzZvz6B6Ngv_e_9VuG5jCz14LmRwldgHL8z0gHHBWKkyTavjYP_PKbFCD91NZljB-s"
+    },
+    {
+      "id": 38,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 6000 96G WORKSTATION (96GB GDDR7)",
+      "image_url": "https://lh3.googleusercontent.com/Kbh89AWpQEBnwOzElEJBZ5owfwgBg9_C_-ilwSvVW9UktWTP0S-YRy_jqvwKKT2RMAs4gXN7YcfA281v4I5wz4-QnFN5JtHs"
+    },
+    {
+      "id": 39,
+      "name": "Card màn hình LEADTEK NVIDIA RTX 4000 ADA 20G",
+      "image_url": "https://lh3.googleusercontent.com/48OcfRYC-GDHbymQ7g48wr7541Ah34A1x-4sI-cuXCTiAMCH9eLhMCzvcb4zXWWo0qLhPNzMVUuuPti80wsjwnzb_7C5tzc"
+    },
+    {
+      "id": 40,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 2000 16GB GDDR7",
+      "image_url": "https://lh3.googleusercontent.com/YnBQXkrgMfz7F3vFjq09Nwz50dZkCRrSNp4u9JlK51g1i8rrDrM_xP0OD7-hScl2dc0iI7BYUwL-DzKHootmMkYZ1ZK6dnRcNQ"
+    },
+    {
+      "id": 41,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 4000 SFF 24G (24GB GDDR7)",
+      "image_url": "https://lh3.googleusercontent.com/W9DYURz-hLlgD48YkHurQmgNloLBmpUDRsxRCqyvo7hpKVCE4BYP7dR12mVK3H1H14QPUMPuKB8GzmqDZmu99FoCj3CZvag"
+    },
+    {
+      "id": 42,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 4000 24G (24GB GDDR7)",
+      "image_url": "https://lh3.googleusercontent.com/yjRqOhOlpBCxKVrx5JAV_l0xvB_JGkNBv12foS-lpZbtegiO-3sfDYgVw5QFNduUxw9GoQPb-QRAMm_muMA_Zn0kyw6vQqs"
+    },
+    {
+      "id": 43,
+      "name": "Card màn hình LEADTEK NVIDIA RTX PRO 5000 48G GDDR7",
+      "image_url": "https://lh3.googleusercontent.com/BqLP5Gwt4YT5ESBTRn26hHYUI7jxRbmQHjO53wqiIbrgleke1Dl69WtdAs8Jt3aqN1cylhRwh5Umytiqt_F3xsyTZjLKkI7d"
+    },
+    {
+      "id": 44,
+      "name": "Card màn hình ASUS ROG Astral GeForce RTX 5080 16GB GDDR7 OC HATSUNE MIKU EDITION",
+      "image_url": "https://lh3.googleusercontent.com/9VUu8JNmC39_4NVcC4jU_A3oF_p6m6FgvbACgF0MB4TaRmipNEh73DmQaRbJABCttNJQBtArDpyVicws94v4XyNLOMUtDPNn"
+    },
+    {
+      "id": 45,
+      "name": "Card màn hình INNO3D GEFORCE RTX 5060 Ti 16GB TWIN X2 OC GDDR7 (N506T2-16D7X-191073N)",
+      "image_url": "https://lh3.googleusercontent.com/sgqvOocqzB5KIGrlPgjwsuvShRgLIh4x3FYkANiDUCAwN6KJnELiPKuBFQz9yjlNZ2PtwZQoURsCX_5vIXAoVDsPHWimbGge"
+    },
+    {
+      "id": 46,
+      "name": "Ổ cứng gắn trong/ SSD KIOXIA EXCERIA BASIC 1TB Gen4x4 R7200 W6500 NVMe LSF10Z001TG8",
+      "image_url": "https://lh3.googleusercontent.com/jdKbp9rL74sArcohaFIiOJ2FBWblwSUN07BdPr83erK8cqE1FkKS0JRhtMge4sVaoMhSu9heARGhXHohKHX7ShIeDho0FEk"
+    },
+    {
+      "id": 47,
+      "name": "Ổ cứng gắn trong/ SSD PATRIOT P320 512GB NVMe M.2 PCIe P320P512GM28",
+      "image_url": "https://lh3.googleusercontent.com/fVrHGMYO9O7MO0A7WsAzAem5S_33QSzAG5oFapXTbXzOG1S9M9iQwIxkxVB4tuFihu_QgkgqeRAhgvGM9WAsVXpFTMTk_9Q"
+    },
+    {
+      "id": 48,
+      "name": "Ổ cứng gắn ngoài SSD Crucial 1TB X9, USB-C 3.2 Gen 2 (10Gb/s), 1050/1050MB/s, Đen (CT1000X9SSD9)",
+      "image_url": "https://lh3.googleusercontent.com/s_EhFRYGUJkz46i4KFBAF05pWHxoSADZmMALMgs1EHliWqMSpWskI5oo548-NJE7efCGFZBI7MJ0OKg0slQTB53QP-K4lMyA"
+    },
+    {
+      "id": 49,
+      "name": "Ổ cứng gắn trong/ PATRIOT SSD P400 1TB V4 M.2 2280 PCIe Gen4 x4 P400VP1TBM28H",
+      "image_url": "https://lh3.googleusercontent.com/52tG-vu2QfVb749grYkB5TjQi8RbLV_H1BXII1xg-yltEIsJZm13sZvMXnPNs3FurlzzQwcXyPlL0qlTJ2TaEdb4N8YM8_Ok"
+    },
+    {
+      "id": 50,
+      "name": "Ổ cứng gắn trong/ SSD PATRIOT P210 512GB 2.5'' SATA3 P210S512G25",
+      "image_url": "https://lh3.googleusercontent.com/AiwiC0xfcVtVwGO3ho7xRaUuQXqsHhANcvEFXU2Qmpz_f-aJ8sRG13e6KkSBewah-PLRe3uGPGzoRvGvNAn2ENlBVl2UbhfL"
+    },
+    {
+      "id": 51,
+      "name": "Ổ cứng gắn trong/ PATRIOT SSD P300 512GB NVMe M.2 PCIe P300P512GM28",
+      "image_url": "https://lh3.googleusercontent.com/JhmJUrQpWwNEtZwwgIYpSOTlLKCevte5Nm1Rj9HvNRGT2CPyTKy5gdkK9W4japhUxY_KoGqI1xT1c6Umyrw2Qh87N0YbbCc"
+    },
+    {
+      "id": 52,
+      "name": "Ổ cứng di động SSD SanDisk Snoopy Portable Limited Edition E61 1TB 1000/1050MB/s (SDSSDE61-1T00-AP)",
+      "image_url": "https://lh3.googleusercontent.com/YYG2VgECgy4ESQBC2EI8olNIFahvrJtmLCkLVp_bFTRd2WryNIZXJRHaDrRDWqo0XqMZFMyQK7fufb-9rraUwoiMKMR6smOU"
+    },
+    {
+      "id": 53,
+      "name": "Ổ cứng gắn trong/ SSD WD SN3000 1TB NVMe Gen4x4 - Green (WDS100T5G0E)",
+      "image_url": "https://lh3.googleusercontent.com/ZY3x7YyIgXwjgPCjACV0NDVOzpIq0wYiaVa2ZyHmLed-E8dvaPbccSGVBdNmDvzZrjaL0_zZ1hHxmZS-8uqkJLCQu-wX7toY"
+    },
+    {
+      "id": 54,
+      "name": "Ổ cứng gắn trong/ SSD ADATA 2.5\" SU650 SATA III 256G (ASU650SS-256GT-R)",
+      "image_url": "https://lh3.googleusercontent.com/uxIXebpsavxeZjX1rTD6RLg79QX8m3lHiuaXCtYIV4hFZnn9kA21qzsejIDMRsMq9Yyg4uNOOzjOTSnZZEFqUsC3eNtbyzOs"
+    },
+    {
+      "id": 55,
+      "name": "Ổ cứng gắn trong/ SSD ADATA LEGEND 860 NVMe PCIe Gen4 x4 M.2 2280 2TB (SLEG-860-2000GCS)",
+      "image_url": "https://lh3.googleusercontent.com/wbLpfNMdMpmyztJMPBSUUaNz4BKre8K8f44-lsZR0kZ-Qfjz1mtObMUle1ko9GbnEg7nA3fr-tf9hLq8gonh9jhzda3pjSo"
+    },
+    {
+      "id": 56,
+      "name": "Ổ cứng di động SSD Transcend 2TB ESD420 2000MB/s, Type-C, MagSafe (TS2TESD420G) (Vàng)",
+      "image_url": "https://lh3.googleusercontent.com/4io52vifafPS4P7lpwS1NLowaiJnxH59waXN2ctjz3qtwYHPrGQzWd_Ucx5g-2dS2HJou1KXvq3eOLqPf4a9ojOBf4ySpdE"
+    },
+    {
+      "id": 57,
+      "name": "Ổ cứng di động SSD SanDisk Creator Desk Drive 4TB 1000MB/s, Type-C, USB 3.2 ( SDSSDT40C-4T00-A25)",
+      "image_url": "https://lh3.googleusercontent.com/eQcXKB8IQv0diOf-gkZW7r3bcHPn3RskTr01qSKeJanZU5bcHvH2fMkcDIqazyj7pAD5MVGKZTbMtNg54DmNSqhyusu9owQL"
+    },
+    {
+      "id": 58,
+      "name": "Ổ cứng  gắn trong/ SSD Teamgroup CX2 1TB Sata III 2.5\" (T253X6001T0C101)",
+      "image_url": "https://lh3.googleusercontent.com/HCJzt4bPb5TrBv4qHEL2bpFMzSXWNKGO1Clk_Cg53VbPCpHVxkP7IjaxHpJnCGo5VATjG2UiQ8Ng2bWu6c4SxbwgKiK40LE7"
+    },
+    {
+      "id": 59,
+      "name": "Ổ cứng gắn ngoài Kingston SSD 1TB XS1000 BOC External, Đen (SXS1000/1000GA)",
+      "image_url": "https://lh3.googleusercontent.com/jtxvCRqG-pImv99rbQQ3_9-x4-ZjN4CXb7MCgR_DPI1oaAwFXaSvkQHX7EmF17taRBXQUQkk8ENOXfVHENrvd6mYJPf7n9I2CQ"
+    },
+    {
+      "id": 60,
+      "name": "Ổ cứng gắn ngoài Kingston SSD 4TB XS2000 BOC External, Bạc (SXS2000/4000GA)",
+      "image_url": "https://lh3.googleusercontent.com/KfYFMZMQKGUbYgIRoiI7aRmXYkpAph5sJXL3D8p2CFlxmj_zREU4T8VB_rU1VJ1q-jiUgUELrKewNTlccjyMD_KFeqoitZSL"
+    },
+    {
+      "id": 61,
+      "name": "Mainboard Msi MAG X870E TOMAHAWK WIFI DDR5",
+      "image_url": "https://lh3.googleusercontent.com/qxbdWQdn-CHAPX2e-aHUgmZ1EpbAJVWESiuJmgZ8Lb9n7Txg7DPS-LcaRX5oXeDVOMwOl7woP3Hp8smLyXKL7u7cZ88lhZBiCg"
+    },
+    {
+      "id": 62,
+      "name": "Mainboard Msi A520M-A PRO DDR4",
+      "image_url": "https://lh3.googleusercontent.com/atZbeL3UYAugolsvz2cMHCjoM5p7xMbWMpqbwWY-6ZjDv_gBWab-ovRz4tKEpBRxWZZ4LJsSm6H2wnRSNsWPXZEw9co6Gho"
+    },
+    {
+      "id": 63,
+      "name": "Mainboard Msi PRO X870E-P WIFI DDR5",
+      "image_url": "https://lh3.googleusercontent.com/CZwK4UDy8dNYkGJWl9qL4N8PJA94jmDRu6sBU9WAt-B4jvENqKrS48rHbpKETVnTTZk7mwjpASyGDvU0Wp4C-AHMawog95M"
+    },
+    {
+      "id": 64,
+      "name": "Mainboard Msi PRO B840M-P WIFI6E",
+      "image_url": "https://lh3.googleusercontent.com/o2JyWweZNpHVch4--QuNt0KdCZFon-FBEVH8GBC209cSOh6Z9nLdNCwF5phv0VUxCsmDt73AHuJhrKsNCuUr7CXkT7Gb21NH"
+    },
+    {
+      "id": 65,
+      "name": "Mainboard Asus H610M-K",
+      "image_url": "https://lh3.googleusercontent.com/LnbAnJah1XVV2dShmYLypQYV6pFfDL4IZTQPW8gVPijUtCHojVBO20-2Gt-TnLOwNXNyO-bNZ1LWnD1tn8_skw8B6z4nB8Fb"
+    },
+    {
+      "id": 66,
+      "name": "Mainboard Asus B840M MAX GAMING AX-CSM DDR5",
+      "image_url": "https://lh3.googleusercontent.com/BQuTpOHO4p_nU5K2XFAN0MjiDWWLAevdtJsk0q6SwFMNdkWmSe02L8dmG5Q21clg133Ol4ZqIdpo1Mtbn1I-wbw4PMpMaJze"
+    },
+    {
+      "id": 67,
+      "name": "Mainboard Msi PRO H610M-E DDR5",
+      "image_url": "https://lh3.googleusercontent.com/IMmxqLPmeJnb6RSQSnQnEYv3f5sbTWgrzQ6CLlhtH5IMdp6gbdKg-yqzd3zoyZ-UO2NDMzteNpVlcJjpffUZJyjKqKqUQavA4w"
+    },
+    {
+      "id": 68,
+      "name": "Mainboard Asus PRIME B760M-F WIFI DDR5",
+      "image_url": "https://lh3.googleusercontent.com/gZh2N8JCt0Ob0-HiRFUTGp10hw0n-z26gSOd97jXd1n6FNDRC0Upf3BcsqS6TWxWligEjVpFyPwg2qtt0Vsf-8UqhVhBzX-R"
+    },
+    {
+      "id": 69,
+      "name": "Mainboard Msi X870E GAMING PLUS WF",
+      "image_url": "https://lh3.googleusercontent.com/1znV8eqZEgWxrtbBiS7QdQkMpNVMMZRRSAwPhsuvwn2vwZrp69LbugJ1Hy5P_XS-2q6W48je_UzVQyVFZFNhp6OWNeFY91Th"
+    },
+    {
+      "id": 70,
+      "name": "Mainboard Asus B760M-AYW WIFI DDR5",
+      "image_url": "https://lh3.googleusercontent.com/nf_HcDI1esLJY_ZETJteoJpd3OjtTp7dpCRlwleG52GkOppJQUxu8a87pe1oMNJLTaVk3HTfzwrul91HvoXmrAxPLfq16hQ_"
+    },
+    {
+      "id": 71,
+      "name": "Mainboard Msi B760M Gaming WF DDR5",
+      "image_url": "https://lh3.googleusercontent.com/LhVxsbvM4uNM1wyLLYAMkZ6XFiKqzHyjRSjh2a9tsbYYH_1KQ6_yGkP4OmLSoP9RRVZDtJflsWL7ahkoB-D8NZ2ecVUILO_B"
+    },
+    {
+      "id": 72,
+      "name": "Mainboard Msi PRO Z790-P WIFI DDR5",
+      "image_url": "https://lh3.googleusercontent.com/Iaj5QgLpj_cvfVtgWkENyZwm9cHoP4iR9P05Zn5m2sy39bX1Lq4CQ-STHg1fTdzW2yhWabww7UuZrRhqa0r3JTg1c-PJEiDm"
+    },
+    {
+      "id": 73,
+      "name": "Mainboard Msi B860M GAMING PLUS WIFI",
+      "image_url": "https://lh3.googleusercontent.com/Hu5fjmDEppy2yZgX_thDBx7TkM6oGQDaGptjxKs2iGInut1AkzcxP-cCzFlQkIcDOA6-r9aVD3TagKRqq2ipUXmql8IFLYwoNQ"
+    },
+    {
+      "id": 74,
+      "name": "Mainboard ASUS Prime PRIME Z890-P-CSM | DDR5 - Wifi 7",
+      "image_url": "https://lh3.googleusercontent.com/t_1LiHKC2fUp6_mWzi9uthOrBldS4eqLFHOWFSKtm5aaN8m6OmhImZuxTYDJcwHSwQ9VUD1TJuWECY-QJmLP4ti4H48A_kRsgQ"
+    },
+    {
+      "id": 75,
+      "name": "Mainboard MSI PRO PRO Z890 S | DDR5 - Wifi 7",
+      "image_url": "https://lh3.googleusercontent.com/ActGQswE__Iy-0mAkHdgYCMPrcLwzT4pWofZNTWhaXInbzINHTwGPLx44l3nezZBvEPRdlUzY6JJ2HVFQqvJFZor5n6oC6Hj"
+    }
+  ]
+}

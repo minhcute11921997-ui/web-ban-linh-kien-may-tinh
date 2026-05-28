@@ -1,6 +1,6 @@
 {
-  "ok": true,
-  "generated_at": "2026-05-25T08:30:14.834Z",
+  "ok": false,
+  "generated_at": "2026-05-26T18:04:31.980Z",
   "serviceUrl": "http://127.0.0.1:4001",
   "files": [
     {
@@ -53,23 +53,23 @@
     },
     {
       "path": "PRE_INTEGRATION_CHECKLIST.md",
-      "ok": true
+      "ok": false
     }
   ],
   "reports": {
     "smoke": {
-      "ok": true,
-      "passed": 8,
-      "total": 8,
-      "failed": 0,
-      "passRate": 1
+      "ok": false,
+      "passed": 79,
+      "total": 94,
+      "failed": 15,
+      "passRate": 0.84
     },
     "training": {
-      "ok": true,
-      "passed": 502,
-      "total": 502,
-      "failed": 0,
-      "passRate": 1
+      "ok": false,
+      "passed": 507,
+      "total": 515,
+      "failed": 8,
+      "passRate": 0.984
     },
     "serviceSmoke": {
       "ok": true,
@@ -100,8 +100,14 @@
     "health": {
       "ok": true,
       "service": "ai-lab-chat-service",
-      "startedAt": "2026-05-25T08:27:39.676Z",
-      "lastReloadAt": "2026-05-25T08:27:39.706Z",
+      "architecture": "rag_with_gemini",
+      "llm": {
+        "enabled": true,
+        "provider": "gemini",
+        "model": "gemini-2.0-flash"
+      },
+      "startedAt": "2026-05-26T17:53:41.121Z",
+      "lastReloadAt": "2026-05-26T17:53:41.144Z",
       "reloadCount": 1,
       "knowledgeBase": {
         "generatedAt": "2026-05-23T19:35:57.906Z",
@@ -127,7 +133,7 @@
       "success": true,
       "source": "local_rag",
       "products": 3,
-      "latencyMs": 114
+      "latencyMs": 464
     }
   }
 }

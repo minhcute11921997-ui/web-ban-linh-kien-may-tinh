@@ -12,6 +12,7 @@ import {
   Loader2,
   PackageOpen,
 } from 'lucide-react';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const CartPage = () => {
   const {
@@ -113,7 +114,7 @@ const CartPage = () => {
                     {/* Image */}
                     <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate(`/products/${item.product_id}`)}>
                       <img
-                        src={item.image_url || 'https://placehold.co/100x100?text=No+Image'}
+                        src={resolveImageUrl(item.image_url, 'https://placehold.co/100x100?text=No+Image')}
                         alt={item.name}
                         className="w-24 h-24 object-cover rounded-lg bg-white hover:opacity-80 transition"
                         onError={(e) => (e.target.src = 'https://placehold.co/100x100?text=No+Image')}

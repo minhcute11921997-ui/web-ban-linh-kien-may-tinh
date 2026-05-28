@@ -1,5 +1,5 @@
-const AI_LAB_URL = process.env.AI_LAB_URL || "http://127.0.0.1:4001";
 const AI_LAB_TIMEOUT_MS = Number(process.env.AI_LAB_TIMEOUT_MS || 15000);
+const { runChatPipeline } = require("../ai-lab/scripts/rag-llm-pipeline");
 
 const normalizeProduct = (product) => ({
   id: product.id,
@@ -27,6 +27,15 @@ const normalizeHistory = (history) => {
     }));
 };
 
+const withTimeout = (promise, timeoutMs) => {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error("AI_LAB_TIMEOUT")), timeoutMs);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+};
+
 exports.chat = async (req, res) => {
   const message = String(req.body.message || "").trim();
   if (!message) {
@@ -36,28 +45,15 @@ exports.chat = async (req, res) => {
     });
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), AI_LAB_TIMEOUT_MS);
-
   try {
-    const response = await fetch(`${AI_LAB_URL}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const data = await withTimeout(
+      runChatPipeline({
         message,
         history: normalizeHistory(req.body.history),
         limit: Number(req.body.limit || 8),
       }),
-      signal: controller.signal,
-    });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || data.success === false) {
-      return res.status(response.status >= 400 && response.status < 500 ? response.status : 502).json({
-        success: false,
-        message: data.message || "AI lab chat service khong phan hoi hop le",
-      });
-    }
+      AI_LAB_TIMEOUT_MS
+    );
 
     return res.json({
       success: true,
@@ -68,14 +64,12 @@ exports.chat = async (req, res) => {
       latencyMs: data.latencyMs,
     });
   } catch (error) {
-    const isTimeout = error.name === "AbortError";
+    const isTimeout = error.message === "AI_LAB_TIMEOUT";
     return res.status(502).json({
       success: false,
       message: isTimeout
-        ? "AI lab chat service phan hoi qua lau"
-        : "Khong ket noi duoc AI lab chat service",
+        ? "AI lab chatbot phan hoi qua lau"
+        : "Khong chay duoc AI lab chatbot noi bo",
     });
-  } finally {
-    clearTimeout(timeout);
   }
 };

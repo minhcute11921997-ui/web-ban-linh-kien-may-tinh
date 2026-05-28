@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAllOrders, updateOrderStatus, deleteOrder, getAdminOrderById } from '../../api/orderApi';
 import useAuthStore from '../../store/authStore';
+import { resolveImageUrl } from '../../utils/imageUrl';
 import {
   ClipboardList, Trash2, Loader2, InboxIcon, AlertTriangle,
   X, ShoppingBag, Clock, Cog, Truck, CheckCircle, XCircle,
@@ -226,7 +227,7 @@ const AdminOrders = () => {
                           <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                             {item.image_url ? (
                               <img
-                                src={item.image_url}
+                                src={resolveImageUrl(item.image_url)}
                                 alt={item.name}
                                 className="w-full h-full object-cover"
                                 onError={e => { e.target.style.display = 'none'; }}

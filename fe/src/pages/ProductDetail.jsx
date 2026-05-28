@@ -5,6 +5,7 @@ import sanitizeHtml from "sanitize-html";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 import reviewApi from "../api/reviewApi";
+import { PRODUCT_IMAGE_PLACEHOLDER, resolveImageUrl } from "../utils/imageUrl";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -255,15 +256,11 @@ const ProductDetail = () => {
         {/* Ảnh */}
         <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square">
           <img
-            src={
-              product.image_url?.startsWith("http")
-                ? product.image_url
-                : `/images/${product.image_url}`
-            }
+            src={resolveImageUrl(product.image_url, "https://placehold.co/400x400?text=No+Image")}
             alt={product.name}
             className="w-full h-full object-cover"
             onError={(e) =>
-              (e.target.src = "https://placehold.co/400x400?text=No+Image")
+              (e.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER)
             }
           />
         </div>

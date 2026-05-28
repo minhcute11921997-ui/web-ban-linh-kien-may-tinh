@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
+import { PRODUCT_IMAGE_PLACEHOLDER, resolveImageUrl } from "../utils/imageUrl";
 
 // Hàm strip HTML tags khỏi description
 const ProductCard = ({ product }) => {
@@ -30,11 +31,12 @@ const ProductCard = ({ product }) => {
       <Link to={`/products/${product.id}`} className="block p-4 flex-1">
         <div className="w-full aspect-square bg-gray-50 rounded-xl mb-3 overflow-hidden">
           <img
-            src={
-              product.image_url || "https://placehold.co/300x300?text=No+Image"
-            }
+            src={resolveImageUrl(product.image_url)}
             alt={product.name}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              e.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER;
+            }}
           />
         </div>
 

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import useCartStore from "../store/cartStore";
 import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { PRODUCT_IMAGE_PLACEHOLDER, resolveImageUrl } from "../utils/imageUrl";
 
 const FeaturedProductCard = ({ product }) => {
   const { addItem } = useCartStore();
@@ -29,11 +30,12 @@ const FeaturedProductCard = ({ product }) => {
       <Link to={`/products/${product.id}`} className="block">
         <div className="w-full aspect-square bg-gray-50 rounded-t-xl overflow-hidden">
           <img
-            src={
-              product.image_url || "https://placehold.co/200x200?text=No+Image"
-            }
+            src={resolveImageUrl(product.image_url)}
             alt={product.name}
             className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              e.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER;
+            }}
           />
         </div>
       </Link>

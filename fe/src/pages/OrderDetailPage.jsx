@@ -4,6 +4,7 @@ import axios from 'axios';
 import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
+import { resolveImageUrl } from '../utils/imageUrl';
 import {
   ArrowLeft,
   ClipboardList,
@@ -246,8 +247,14 @@ const OrderDetailPage = () => {
               <div className="space-y-4">
                 {order.items.map(item => (
                   <div key={item.id} className="flex items-center gap-4">
-                    <img src={item.image_url || 'https://via.placeholder.com/56'} alt={item.product_name}
-                      className="w-16 h-16 object-cover rounded-xl bg-gray-100 border border-gray-200" />
+                    <img
+                      src={resolveImageUrl(item.image_url, 'https://via.placeholder.com/56')}
+                      alt={item.product_name}
+                      className="w-16 h-16 object-cover rounded-xl bg-gray-100 border border-gray-200"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/56';
+                      }}
+                    />
                     <div className="flex-1">
                       <p className="font-semibold text-gray-800">{item.product_name}</p>
                       <p className="text-gray-400 text-sm mt-0.5">
