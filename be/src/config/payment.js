@@ -19,7 +19,7 @@ const vnpay = new VNPay({
 });
 
 const createVNPayUrl = (orderData) => {
-    const { orderId, amount, orderDescription, clientIp } = orderData;
+    const { orderId, amount, orderDescription, clientIp, returnUrl } = orderData;
 
     const paymentUrl = vnpay.buildPaymentUrl({
         vnp_Amount: amount,
@@ -27,7 +27,7 @@ const createVNPayUrl = (orderData) => {
         vnp_TxnRef: String(orderId),
         vnp_OrderInfo: orderDescription || `Thanh toan don hang ${orderId}`,
         vnp_OrderType: ProductCode.Other,
-        vnp_ReturnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:3000/api/payments/vnpay-callback',
+        vnp_ReturnUrl: returnUrl || process.env.VNPAY_RETURN_URL || 'http://localhost:3000/api/payments/vnpay-callback',
         vnp_Locale: VnpLocale.VN,
         vnp_CreateDate: formatVNPayDate()
     });

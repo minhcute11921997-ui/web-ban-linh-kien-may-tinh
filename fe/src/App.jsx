@@ -10,6 +10,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import VNPayCallbackRedirect from "./pages/VNPayCallbackRedirect";
 import OrdersPage from "./pages/OrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetail from "./pages/ProductDetail";
@@ -67,6 +68,7 @@ function App() {
         <Route path="/products/:id" element={<CustomerLayout><ProductDetail /></CustomerLayout>} />
         <Route path="/cart" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CartPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/checkout" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><CheckoutPage /></PrivateRoute></CustomerLayout>} />
+        <Route path="/api/payments/vnpay-callback" element={<VNPayCallbackRedirect />} />
         <Route path="/payment-success" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/payment-callback" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><PaymentSuccessPage /></PrivateRoute></CustomerLayout>} />
         <Route path="/orders" element={<CustomerLayout><PrivateRoute allowedRoles={customerRoles}><OrdersPage /></PrivateRoute></CustomerLayout>} />

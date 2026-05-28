@@ -4,6 +4,24 @@ const { incrementUsedCount, getValidDiscount } = require('./discountController')
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+const buildVNPayReturnUrl = (req) => {
+    if (process.env.VNPAY_RETURN_URL) {
+        return process.env.VNPAY_RETURN_URL;
+    }
+
+    return `${req.protocol}://${req.get('host')}/api/payments/vnpay-callback`;
+};
+
+const buildFrontendPaymentUrl = (params = {}) => {
+    const url = new URL('/payment-success', FRONTEND_URL);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.set(key, String(value));
+        }
+    });
+    return url.toString();
+};
+
 
 const getClientIp = (req) => {
     return (
@@ -181,7 +199,8 @@ exports.createOrder = async (req, res) => {
                 orderId: `${orderId}`,
                 amount: totalPrice,
                 orderDescription: `Thanh toan don hang ${orderId}`, 
-                clientIp
+                clientIp,
+                returnUrl: buildVNPayReturnUrl(req)
             });
 
 
@@ -298,7 +317,8 @@ exports.retryVNPayPayment = async (req, res) => {
             orderId: `${orderId}`,
             amount: order.total_price,
             orderDescription: `Thanh toan don hang ${orderId}`,
-            clientIp: getClientIp(req)
+            clientIp: getClientIp(req),
+            returnUrl: buildVNPayReturnUrl(req)
         });
 
         return res.json({
@@ -327,7 +347,12 @@ exports.vnpayCallback = async (req, res) => {
         const verifyResult = verifyVNPayResponse(req.query);
 
         if (!verifyResult.isValid) {
-            return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&reason=invalid_signature`);
+            return res.redirect(buildFrontendPaymentUrl({
+                status: 'failed',
+                reason: 'invalid_signature',
+                orderId: verifyResult.orderId,
+                method: 'vnpay'
+            }));
         }
 
         if (verifyResult.responseCode !== '00') {
@@ -336,7 +361,11 @@ exports.vnpayCallback = async (req, res) => {
                 [verifyResult.orderId]
             );
             if (['failed', 'completed'].includes(orderStatus?.payment_status)) {
-                return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&orderId=${verifyResult.orderId}&method=vnpay`);
+                return res.redirect(buildFrontendPaymentUrl({
+                    status: 'failed',
+                    orderId: verifyResult.orderId,
+                    method: 'vnpay'
+                }));
             }
             // Hoàn lại tồn kho khi thanh toán thất bại
             const [orderItems] = await db.query(
@@ -358,7 +387,11 @@ exports.vnpayCallback = async (req, res) => {
                 `UPDATE orders SET payment_status = 'failed', transaction_id = ? WHERE id = ?`,
                 [verifyResult.transactionNo, verifyResult.orderId]
             );
-            return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&orderId=${verifyResult.orderId}&method=vnpay`);
+            return res.redirect(buildFrontendPaymentUrl({
+                status: 'failed',
+                orderId: verifyResult.orderId,
+                method: 'vnpay'
+            }));
         }
 
         const [paymentUpdate] = await db.query(
@@ -378,11 +411,19 @@ exports.vnpayCallback = async (req, res) => {
             );
         }
 
-        return res.redirect(`${FRONTEND_URL}/payment-success?orderId=${verifyResult.orderId}&method=vnpay`);
+        return res.redirect(buildFrontendPaymentUrl({
+            orderId: verifyResult.orderId,
+            method: 'vnpay'
+        }));
 
     } catch (error) {
         console.error('Lỗi callback VNPay:', error);
-        return res.redirect(`${FRONTEND_URL}/payment-success?status=failed&reason=server_error`);
+        return res.redirect(buildFrontendPaymentUrl({
+            status: 'failed',
+            reason: 'server_error',
+            orderId: req.query.vnp_TxnRef,
+            method: 'vnpay'
+        }));
     }
 };
 

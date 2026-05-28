@@ -4,6 +4,8 @@ require('dotenv').config();
 const db = require('./src/config/db');
 const app = express();
 
+app.set('trust proxy', 1);
+
 // Middleware
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')

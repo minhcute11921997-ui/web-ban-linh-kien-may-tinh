@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import axiosInstance from '../api/config';
 import useAuthStore from '../store/authStore';
 import { toast } from 'react-toastify';
@@ -80,7 +79,7 @@ const OrderDetailPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    axios.get(`/api/payments/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+    axiosInstance.get(`/payments/${id}`)
       .then(res => { if (res.data.success) setOrder(res.data.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -89,7 +88,7 @@ const OrderDetailPage = () => {
   const handleCancel = async () => {
     setCancelling(true); setShowConfirm(false);
     try {
-      await axios.put(`/api/orders/${id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axiosInstance.put(`/orders/${id}/cancel`);
       toast.success('Hủy đơn hàng thành công');
       setOrder(prev => ({ ...prev, orderStatus: 'cancelled' }));
     } catch (error) {
