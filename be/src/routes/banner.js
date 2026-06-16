@@ -54,6 +54,13 @@ const uploadBannerImage = (req, res, next) => {
 
 router.get('/', bannerController.getBanners);
 router.post(
+  '/',
+  verifyToken,
+  verifyAdmin,
+  uploadBannerImage,
+  bannerController.createBanner
+);
+router.post(
   '/:position',
   verifyToken,
   verifyAdmin,

@@ -139,6 +139,7 @@ export default function HomePage() {
 
   // Auto-slide banner
   useEffect(() => {
+    if (slides.length <= 1) return;
     if (slidePaused) return;
     slideInterval.current = setInterval(
       () => setSlideIndex((p) => (p + 1) % slides.length),
@@ -153,20 +154,38 @@ export default function HomePage() {
         if (!res.data.success) return;
 
         const banners = res.data.data || [];
-        const nextSlides = DEFAULT_SLIDES.map((defaultSlide) => {
+        const defaultIds = new Set(DEFAULT_SLIDES.map((slide) => slide.id));
+        const nextSlides = DEFAULT_SLIDES.reduce((items, defaultSlide) => {
           const banner = banners.find(
             (item) => Number(item.position) === defaultSlide.id
           );
 
-          return {
+          if (banner?.is_visible === false) return items;
+
+          items.push({
             ...defaultSlide,
             image: resolveBannerImage(banner?.image_url, defaultSlide.image),
             link: banner?.link || defaultSlide.link,
-          };
-        });
+          });
 
-        setSlides(nextSlides);
-        setSlideIndex((current) => Math.min(current, nextSlides.length - 1));
+          return items;
+        }, []);
+        const extraSlides = banners
+          .filter((banner) => !defaultIds.has(Number(banner.position)))
+          .filter((banner) => banner.is_visible !== false && banner.image_url)
+          .sort((a, b) => Number(a.position) - Number(b.position))
+          .map((banner) => ({
+            id: Number(banner.position),
+            image: resolveBannerImage(banner.image_url, null),
+            link: banner.link || "/",
+          }));
+
+        const allSlides = [...nextSlides, ...extraSlides];
+
+        setSlides(allSlides);
+        setSlideIndex((current) =>
+          allSlides.length > 0 ? Math.min(current, allSlides.length - 1) : 0
+        );
       })
       .catch(() => {});
   }, []);
@@ -361,6 +380,7 @@ export default function HomePage() {
   return (
     <div className="p-4">
       {/* ── Banner Slider ── */}
+      {slides.length > 0 && (
       <div
         className="relative mb-5 rounded-2xl overflow-hidden select-none"
         onMouseEnter={() => setSlidePaused(true)}
@@ -387,36 +407,43 @@ export default function HomePage() {
         </div>
 
         {/* Mũi tên slider */}
-        <button
-          onClick={() =>
-            setSlideIndex((p) => (p - 1 + slides.length) % slides.length)
-          }
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          onClick={() => setSlideIndex((p) => (p + 1) % slides.length)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
-        >
-          <ChevronRight size={20} />
-        </button>
+        {slides.length > 1 && (
+          <>
+            <button
+              onClick={() =>
+                setSlideIndex((p) => (p - 1 + slides.length) % slides.length)
+              }
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={() => setSlideIndex((p) => (p + 1) % slides.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center backdrop-blur-sm transition"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
+        )}
 
         {/* Dots */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setSlideIndex(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === slideIndex
-                  ? "w-6 h-2 bg-white"
-                  : "w-2 h-2 bg-white/40 hover:bg-white/70"
-              }`}
-            />
-          ))}
-        </div>
+        {slides.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlideIndex(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === slideIndex
+                    ? "w-6 h-2 bg-white"
+                    : "w-2 h-2 bg-white/40 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
+      )}
 
       {/* ── Sản phẩm nổi bật ── */}
       {featuredProducts.length > 0 && (

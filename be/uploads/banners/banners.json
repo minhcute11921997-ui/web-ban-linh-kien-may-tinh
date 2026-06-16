@@ -2,19 +2,29 @@
   {
     "position": 1,
     "image_url": null,
-    "link": null,
-    "updated_at": null
+    "link": "/products/69",
+    "is_visible": false,
+    "updated_at": "2026-06-08T06:32:52.020Z"
   },
   {
     "position": 2,
     "image_url": null,
     "link": null,
+    "is_visible": true,
     "updated_at": null
   },
   {
     "position": 3,
     "image_url": null,
     "link": null,
+    "is_visible": true,
     "updated_at": null
+  },
+  {
+    "position": 4,
+    "image_url": "/uploads/banners/banner-x-1780594399540-315347.png",
+    "link": null,
+    "is_visible": false,
+    "updated_at": "2026-06-04T17:33:58.055Z"
   }
 ]
